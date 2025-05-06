@@ -19,6 +19,19 @@ body {
   margin-bottom: 2rem;
 }
 
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* responsive */
+  gap: 1rem;
+}
+
+.info-grid div {
+  background: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
 .progress-container {
   display: flex;
   justify-content: space-between;
@@ -134,7 +147,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: #003e2d14;
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);

@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Home from './components/pages/home';
-import Page404 from './components/pages/page404';
+import Home from './components/pages/Home';
+import Page404 from './components/pages/Page404';
 import TrackingSearch from './components/pages/TrackingSearch';
 import Tracking from './components/pages/Tracking';
 import './App.css';

@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(36, 49, 38, 0.671);
+  background: rgba(36, 49, 38, 0.65);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(10px); /* For Safari support */
   display: flex;
@@ -14,9 +14,9 @@
 }
 
 .modal-content {
-  background: rgb(255, 255, 255); /* Slightly lower opacity works better with blur */
+  background: #003e2db9;
   padding: 1rem;
-  border: 1px solid #003e2d5d;
+  border: 1px solid #ffc928c7;
   border-radius: 8px;
   width: 90%;
   max-width: 600px;
@@ -24,7 +24,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px); /* For Safari support */
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  color: #003e2d;
+  color: #ffffff;
 }
 
 .torrestir_map_logo {

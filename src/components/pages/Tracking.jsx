@@ -1,7 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import TrackingMap from '../trackingMap/trackingMap';
+import TrackingMap from '../trackingMap/TrackingMap';
+import Footer from './Footer';
 import api from '../api/api';
 import {
   FaCheck,
@@ -27,7 +28,7 @@ const stageException = { label: 'Exception', icon: <FaExclamationTriangle /> };
 
 const TTL = 10 * 60 * 1000; // 10 minutes in ms
 
-export default function TrackingPage() {
+const TrackingPage = () => {
   const { trackingNumber } = useParams();
   console.log('TrackingPage', trackingNumber);
 
@@ -239,6 +240,9 @@ export default function TrackingPage() {
           </div>
         </div>
       )}
+      <Footer />
     </>
   );
-}
+};
+
+export default TrackingPage;
