@@ -1,0 +1,203 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #f9fafb;
+  color: #374151;
+}
+
+.container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.progress-container {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.stage {
+  flex: 1;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.stage-icon {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  margin: 0 auto 0.5rem;
+  border-radius: 8px;
+  background-color: #d1d5db;
+  color: #374151;
+}
+
+.stage-icon.active {
+  background-color: #16a34a;
+  color: white;
+}
+
+.stage-line {
+  position: absolute;
+  top: 20px;
+  left: 5%;
+  right: 5%;
+  height: 4px;
+  background-color: #d1d5db;
+  z-index: 0;
+}
+
+.stage-line .progress {
+  height: 100%;
+  background-color: #16a34a;
+  transition: width 0.3s;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.button {
+  border: 2px solid #16a34a;
+  background: white;
+  color: #16a34a;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.button:hover {
+  background: #16a34a;
+  color: white;
+}
+
+.details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 600px;
+  font-size: 0.875rem;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.details-list li {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.details-list li:last-child {
+  border-bottom: none;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+thead {
+  background-color: #065f46;
+  color: white;
+}
+
+.tracker-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #d1d5db; /* Gray */
+  color: #4b5563; /* Icon gray */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.icon-box.active {
+  background: #10b981; /* Green */
+  color: white;
+}
+
+.label {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #4b5563;
+  text-align: center;
+}
+
+/* Connecting line */
+.connector {
+  position: absolute;
+  top: 20px;
+  right: -50%;
+  width: 100%;
+  height: 4px;
+  background: #d1d5db;
+  z-index: 1;
+}
+
+.connector.active {
+  background: #10b981;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+  .progress-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stage {
+    margin-bottom: 1rem;
+  }
+
+  .stage-line {
+    display: none;
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "currentStage": 2,
+  "entity": "Client A",
+  "entityRef": "CA123",
+  "ourRef": "GRP987",
+  "estimated": "2025-05-09",
+  "from": "Lisbon",
+  "to": "Porto",
+  "packages": 5,
+  "pallets": 2,
+  "deliveryDetails": ["Signed by: João Silva", "Time: 14:32", "Comment: Delivered without damage"],
+  "statusLog": [
+    { "local": "Lisbon Hub", "date": "2025-05-05", "status": "Documented", "location": "Lisbon" },
+    {
+      "local": "Central Depot",
+      "date": "2025-05-06",
+      "status": "In Transit",
+      "location": "Coimbra"
+    }
+  ]
+}
