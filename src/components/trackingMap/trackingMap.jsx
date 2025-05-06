@@ -4,20 +4,26 @@ import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
 
-const TrackingMap = ({ coordinates, title = 'Current location' }) => {
+import gpsIcon from '../../assets/gps.png';
+
+const TrackingMap = ({ coordinates, title = 'Current local' }) => {
   const [map, setMap] = useState(null);
-
-  // Fix for default markers not showing up
   useEffect(() => {
-    delete L.Icon.Default.prototype._getIconUrl;
-
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl:
-        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    // Create a custom icon instead of modifying the default
+    const customIcon = L.icon({
+      iconUrl: gpsIcon,
+      iconSize: [32, 32], // Set your desired width and height in pixels
+      iconAnchor: [16, 16], // Usually half of iconSize to center the icon on the marker position
+      popupAnchor: [0, -16], // Position of the popup relative to the icon
     });
-  }, []);
+
+    // Use this custom icon when creating markers
+    if (map && coordinates.length) {
+      coordinates.forEach((coord) => {
+        L.marker([coord.lat, coord.lng], { icon: customIcon }).addTo(map).bindPopup(title);
+      });
+    }
+  }, [map, coordinates, title]);
 
   // Ensure coordinates are valid and in the correct format
   const position =

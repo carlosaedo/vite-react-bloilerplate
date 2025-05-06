@@ -31,6 +31,7 @@ export default function TrackingPage() {
   const [data, setData] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [mapCurrentLocal, setMapCurrentLocal] = useState('');
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
 
   useEffect(() => {
@@ -68,8 +69,11 @@ export default function TrackingPage() {
   };
   const modifiedStages = getStagesWithException(currentStage, hasException);
 
-  const handleMapClick = (lat, lng) => {
+  const handleMapClick = (lat, lng, local) => {
+    console.log('handleMapClick', lat, lng, local);
     setCoordinates({ lat, lng });
+    setMapCurrentLocal(local);
+    console.log(mapCurrentLocal);
     setShowMap(true);
   };
 
@@ -170,7 +174,9 @@ export default function TrackingPage() {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                             className='button'
-                            onClick={() => handleMapClick(row.location.lat, row.location.lng)}
+                            onClick={() =>
+                              handleMapClick(row.location.lat, row.location.lng, row.local)
+                            }
                           >
                             Map
                           </motion.button>
@@ -187,7 +193,7 @@ export default function TrackingPage() {
       {showMap && (
         <div className='modal-overlay'>
           <div className='modal-content'>
-            <TrackingMap coordinates={coordinates} />
+            <TrackingMap coordinates={coordinates} title={mapCurrentLocal} />
             <br />
             <br />
             <br />
