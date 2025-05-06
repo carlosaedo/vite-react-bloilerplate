@@ -189,6 +189,8 @@ export default function TrackingPage() {
           <div className='modal-content'>
             <TrackingMap coordinates={coordinates} />
             <br />
+            <br />
+            <br />
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}

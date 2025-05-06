@@ -1,10 +1,12 @@
 import './trackingMap.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import L from 'leaflet';
 
-const TrackingMap = ({ coordinates }) => {
+const TrackingMap = ({ coordinates, title = 'Current location' }) => {
+  const [map, setMap] = useState(null);
+
   // Fix for default markers not showing up
   useEffect(() => {
     delete L.Icon.Default.prototype._getIconUrl;
@@ -23,15 +25,28 @@ const TrackingMap = ({ coordinates }) => {
       ? [coordinates.lat, coordinates.lng]
       : [51.505, -0.09]; // Default position (London) if coordinates are invalid
 
+  // When map or position changes, update the view
+  useEffect(() => {
+    if (map) {
+      map.setView(position, 13);
+    }
+  }, [map, position]);
+
   return (
     <div className='map-container'>
-      <MapContainer center={position} zoom={13} style={{ height: '400px', width: '100%' }}>
+      <h3 className='map-title'>{title}</h3>
+      <MapContainer
+        center={position}
+        zoom={13}
+        style={{ height: '400px', width: '100%' }}
+        whenCreated={setMap}
+      >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
         <Marker position={position}>
-          <Popup>Current location</Popup>
+          <Popup>{title}</Popup>
         </Marker>
       </MapContainer>
     </div>
