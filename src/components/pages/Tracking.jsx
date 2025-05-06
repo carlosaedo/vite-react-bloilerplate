@@ -91,10 +91,10 @@ export default function TrackingPage() {
           className='button'
           onClick={() => setShowDetails((prev) => !prev)}
         >
-          DELIVERY DETAILS {showDetails ? '➖' : '➕'}
+          {showDetails ? 'HIDE DELIVERY DETAILS' : 'SHOW DELIVERY DETAILS'}
         </motion.button>
       </div>
-
+      <br />
       {showDetails && (
         <div className='details-section'>
           <ul className='details-list'>
@@ -102,9 +102,10 @@ export default function TrackingPage() {
               <li key={idx}>{item}</li>
             ))}
           </ul>
+          <br />
           <div className='table-wrapper'>
-            <table>
-              <thead>
+            <table className='status-table'>
+              <thead className='table-header'>
                 <tr>
                   <th>Local</th>
                   <th>Date</th>
@@ -115,10 +116,10 @@ export default function TrackingPage() {
               <tbody>
                 {statusLog.map((row, idx) => (
                   <tr key={idx}>
-                    <td>{row.local}</td>
-                    <td>{row.date}</td>
-                    <td>{row.status}</td>
-                    <td>{row.location}</td>
+                    <td data-label='Local'>{row.local}</td>
+                    <td data-label='Date'>{row.date}</td>
+                    <td data-label='Status'>{row.status}</td>
+                    <td data-label='Location'>{row.location}</td>
                   </tr>
                 ))}
               </tbody>

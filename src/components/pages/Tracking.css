@@ -89,7 +89,7 @@ body {
   list-style: none;
   padding: 0;
   margin: 0 auto;
-  max-width: 600px;
+
   font-size: 0.875rem;
   background: white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -115,10 +115,24 @@ table {
   border-collapse: collapse;
   font-size: 0.875rem;
 }
-
-thead {
+.table-header {
   background-color: #065f46;
-  color: white;
+  color: #ffffff;
+}
+
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.status-table th,
+.status-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text- thead {
+    background-color: #065f46;
+    color: white;
+  }
 }
 
 .tracker-container {
@@ -199,5 +213,46 @@ td {
 
   .stage-line {
     display: none;
+  }
+  .label {
+    font-size: 0.6rem;
+  }
+  .status-table thead {
+    display: none;
+  }
+
+  .status-table,
+  .status-table tbody,
+  .status-table tr,
+  .status-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .status-table tr {
+    margin-bottom: 1rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+
+  .status-table td {
+    padding: 10px;
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+  }
+
+  .status-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+    color: #555;
+  }
+
+  .status-table td:last-child {
+    border-bottom: none;
   }
 }

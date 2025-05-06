@@ -5,3 +5,11 @@
   text-align: center;
   min-width: 60%;
 }
+
+@media (max-width: 768px) {
+  #root {
+    margin: 0;
+    padding: 0.5rem;
+    min-width: 80%;
+  }
+}
