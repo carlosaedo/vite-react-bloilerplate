@@ -42,7 +42,7 @@ body {
 }
 
 .stage-icon.active {
-  background-color: #16a34a;
+  background-color: #003e2d;
   color: white;
 }
 
@@ -58,7 +58,7 @@ body {
 
 .stage-line .progress {
   height: 100%;
-  background-color: #16a34a;
+  background-color: #003e2d;
   transition: width 0.3s;
 }
 
@@ -70,9 +70,9 @@ body {
 }
 
 .button {
-  border: 2px solid #16a34a;
+  border: 2px solid #003e2d;
   background: white;
-  color: #16a34a;
+  color: #003e2d;
   padding: 0.5rem 1rem;
   border-radius: 999px;
   font-weight: bold;
@@ -81,7 +81,7 @@ body {
 }
 
 .button:hover {
-  background: #16a34a;
+  background: #003e2d;
   color: white;
 }
 
@@ -111,7 +111,7 @@ body {
 }
 
 .table-header {
-  background-color: #065f46;
+  background-color: #003e2d;
   color: #ffffff;
 }
 
@@ -121,7 +121,7 @@ body {
 }
 
 .status-table th {
-  background-color: #065f46;
+  background-color: #003e2d;
   color: #ffffff;
   padding: 10px;
 }
@@ -155,7 +155,7 @@ body {
   height: 40px;
   border-radius: 10px;
   background: #d1d5db; /* Gray */
-  color: #4b5563; /* Icon gray */
+  color: #003e2d; /* Icon gray */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,7 +163,7 @@ body {
 }
 
 .icon-box.active {
-  background: #10b981; /* Green */
+  background: #003e2d; /* Green */
   color: white;
 }
 
@@ -186,7 +186,7 @@ body {
 }
 
 .connector.active {
-  background: #10b981;
+  background: #003e2d;
 }
 
 @media (max-width: 768px) {
