@@ -110,11 +110,6 @@ body {
   overflow-x: auto;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
 .table-header {
   background-color: #065f46;
   color: #ffffff;
@@ -225,16 +220,15 @@ td {
   .status-table tbody,
   .status-table tr,
   .status-table td {
-    display: block;
-    width: 100%;
+    display: inline-block;
+    width: 90%;
   }
 
   .status-table tr {
     margin-bottom: 1rem;
-    background: #f9f9f9;
+    background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
   }
 
   .status-table td {

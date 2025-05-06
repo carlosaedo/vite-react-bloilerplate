@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaCheck, FaThLarge, FaTruck, FaUser, FaHome } from 'react-icons/fa';
+import { FaCheck, FaThLarge, FaTruck, FaUser, FaHome, FaPlus, FaMinus } from 'react-icons/fa';
 import './Tracking.css';
 
 const stages = [
@@ -91,7 +91,7 @@ export default function TrackingPage() {
           className='button'
           onClick={() => setShowDetails((prev) => !prev)}
         >
-          {showDetails ? 'HIDE DELIVERY DETAILS' : 'SHOW DELIVERY DETAILS'}
+          DELIVERY DETAILS {showDetails ? <FaMinus /> : <FaPlus />}
         </motion.button>
       </div>
       <br />
