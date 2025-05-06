@@ -184,7 +184,15 @@ export default function TrackingPage() {
         <div className='modal-overlay'>
           <div className='modal-content'>
             <TrackingMap coordinates={coordinates} />
-            <button onClick={() => setShowMap(false)}>Close</button>
+            <br />
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className='button'
+              onClick={() => setShowMap(false)}
+            >
+              Close
+            </motion.button>
           </div>
         </div>
       )}
