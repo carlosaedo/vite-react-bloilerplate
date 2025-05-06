@@ -6,24 +6,19 @@ import L from 'leaflet';
 
 import gpsIcon from '../../assets/gps.png';
 
-const TrackingMap = ({ coordinates, title = 'Current local' }) => {
+const TrackingMap = ({ coordinates, title = 'Current location' }) => {
   const [map, setMap] = useState(null);
-  useEffect(() => {
-    // Create a custom icon instead of modifying the default
-    const customIcon = L.icon({
-      iconUrl: gpsIcon,
-      iconSize: [32, 32], // Set your desired width and height in pixels
-      iconAnchor: [16, 16], // Usually half of iconSize to center the icon on the marker position
-      popupAnchor: [0, -16], // Position of the popup relative to the icon
-    });
 
-    // Use this custom icon when creating markers
-    if (map && coordinates.length) {
-      coordinates.forEach((coord) => {
-        L.marker([coord.lat, coord.lng], { icon: customIcon }).addTo(map).bindPopup(title);
-      });
-    }
-  }, [map, coordinates, title]);
+  // Fix for default markers not showing up
+  useEffect(() => {
+    delete L.Icon.Default.prototype._getIconUrl;
+
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: gpsIcon,
+      iconUrl: gpsIcon,
+      shadowUrl: '',
+    });
+  }, []);
 
   // Ensure coordinates are valid and in the correct format
   const position =
