@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import L from 'leaflet';
 
 import gpsIcon from '../../assets/gps.png';
+import torrestirLogo from '../../assets/logotipo.png';
 
 const TrackingMap = ({ coordinates, title = 'Current location' }) => {
   const [map, setMap] = useState(null);
@@ -35,6 +36,7 @@ const TrackingMap = ({ coordinates, title = 'Current location' }) => {
 
   return (
     <div className='map-container'>
+      <img className='torrestir_map_logo' src={torrestirLogo}></img>
       <h3 className='map-title'>{title}</h3>
       <MapContainer
         center={position}

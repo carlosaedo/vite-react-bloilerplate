@@ -229,9 +229,9 @@ export default function TrackingPage() {
             <br />
             <br />
             <motion.button
+              className='button modal_close_button'
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className='button'
               onClick={() => setShowMap(false)}
             >
               Close

@@ -158,9 +158,9 @@ body {
 .icon-box {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 10px 0 10px 0;
   background: #d1d5db; /* Gray */
-  color: #003e2d; /* Icon gray */
+  color: #91a7a1; /* Icon gray */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,8 +168,17 @@ body {
 }
 
 .icon-box.active {
-  background: #003e2d; /* Green */
-  color: white;
+  width: 43px;
+  height: 43px;
+  background: #ffffff; /* Green */
+  border: 1px solid #003e2d46;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #003e2d;
+}
+
+.modal_close_button {
+  display: inline-block;
+  margin-top: 80px;
 }
 
 .label {
@@ -185,7 +194,7 @@ body {
   top: 20px;
   right: -50%;
   width: 100%;
-  height: 4px;
+  height: 2px;
   background: #d1d5db;
   z-index: 1;
 }
