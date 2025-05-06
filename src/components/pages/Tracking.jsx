@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaCheck, FaThLarge, FaTruck, FaUser, FaHome, FaPlus, FaMinus } from 'react-icons/fa';
+import {
+  FaCheck,
+  FaThLarge,
+  FaTruck,
+  FaUser,
+  FaHome,
+  FaPlus,
+  FaMinus,
+  FaExclamationTriangle,
+} from 'react-icons/fa';
 import './Tracking.css';
 
 const stages = [
@@ -10,6 +19,8 @@ const stages = [
   { label: 'In Deliver', icon: <FaUser /> },
   { label: 'Delivered', icon: <FaHome /> },
 ];
+
+const stageException = { label: 'Exception', icon: <FaExclamationTriangle /> };
 
 export default function TrackingPage() {
   const [data, setData] = useState(null);
@@ -35,20 +46,39 @@ export default function TrackingPage() {
     pallets,
     deliveryDetails,
     statusLog,
+    hasException,
   } = data;
+
+  // Inject "Exception" stage after the current stage if reported
+  const getStagesWithException = (currentStage, hasException) => {
+    if (!hasException) return stages;
+
+    return [
+      ...stages.slice(0, currentStage + 1),
+      stageException,
+      ...stages.slice(currentStage + 1),
+    ];
+  };
+  const modifiedStages = getStagesWithException(currentStage, hasException);
 
   return (
     <div className='page-wrapper'>
       <div className='tracker-container'>
-        {stages.map((stage, index) => {
-          const isActive = index <= currentStage;
+        {modifiedStages.map((stage, index) => {
+          const isActive = hasException ? index <= currentStage + 1 : index <= currentStage;
+
+          const isException = stage.label === 'Exception';
 
           return (
             <div key={index} className='stage-wrapper'>
-              {index < stages.length - 1 && (
-                <div className={`connector ${index < currentStage ? 'active' : ''}`}></div>
+              {index < modifiedStages.length - 1 && (
+                <div className={`connector ${isActive ? 'active' : ''}`}></div>
               )}
-              <div className={`icon-box ${isActive ? 'active' : ''}`}>{stage.icon}</div>
+              <div
+                className={`icon-box ${isActive ? 'active' : ''} ${isException ? 'exception' : ''}`}
+              >
+                {stage.icon}
+              </div>
               <div className='label'>{stage.label}</div>
             </div>
           );
