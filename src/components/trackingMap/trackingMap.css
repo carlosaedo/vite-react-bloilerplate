@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(36, 49, 38, 0.671);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,11 +12,15 @@
 }
 
 .modal-content {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.555); /* Slightly lower opacity works better with blur */
   padding: 1rem;
   border-radius: 8px;
   width: 90%;
   max-width: 600px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* For Safari support */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Optional: soft shadow for contrast */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Optional: subtle border */
 }
 
 .map-container {

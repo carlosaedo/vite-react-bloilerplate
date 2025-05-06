@@ -39,7 +39,12 @@ const TrackingMap = ({ coordinates, title = 'Current location' }) => {
       <MapContainer
         center={position}
         zoom={13}
-        style={{ height: '400px', width: '100%' }}
+        style={{
+          height: '400px',
+          width: '100%',
+          borderRadius: '12px',
+          overflow: 'hidden',
+        }}
         whenCreated={setMap}
       >
         <TileLayer
