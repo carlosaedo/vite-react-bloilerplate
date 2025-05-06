@@ -1,3 +1,4 @@
+import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import TrackingMap from '../trackingMap/trackingMap';
@@ -24,6 +25,9 @@ const stages = [
 const stageException = { label: 'Exception', icon: <FaExclamationTriangle /> };
 
 export default function TrackingPage() {
+  const { trackingNumber } = useParams();
+  console.log('TrackingPage', trackingNumber);
+
   const [data, setData] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showMap, setShowMap] = useState(false);
