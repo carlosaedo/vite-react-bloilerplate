@@ -1,0 +1,18 @@
+{
+  "hello": "Hola {{name}}",
+  "documented": "Documentado",
+  "collected": "Recogido",
+  "inTransit": "En tránsito",
+  "exception": "Excepción",
+  "inDeliver": "En entrega",
+  "delivered": "Entregado",
+  "entity": "Entidad",
+  "entityRef": "Ref. de la Entidad",
+  "ourReference": "Nuestra Referencia",
+  "estimated": "Estimado",
+  "from": "Desde",
+  "to": "Hasta",
+  "packages": "Paquetes",
+  "pallets": "Palets",
+  "deliveryDetails": "DETALLES DE ENTREGA"
+}

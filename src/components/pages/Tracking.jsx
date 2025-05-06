@@ -15,6 +15,7 @@ import {
   FaExclamationTriangle,
 } from 'react-icons/fa';
 import './Tracking.css';
+import { useTranslation } from 'react-i18next';
 
 const stages = [
   { label: 'Documented', icon: <FaCheck /> },
@@ -31,6 +32,8 @@ const TTL = 10 * 60 * 1000; // 10 minutes in ms
 const TrackingPage = () => {
   const { trackingNumber } = useParams();
   console.log('TrackingPage', trackingNumber);
+
+  const { t } = useTranslation();
 
   const cacheKey = `trackingData-${trackingNumber}`;
   const timestampKey = `trackingTimestamp-${trackingNumber}`;
@@ -134,7 +137,7 @@ const TrackingPage = () => {
         <div className='card'>
           <div className='info-grid'>
             <div>
-              <strong>Entity:</strong> {entity}
+              <strong>{t('entity')}:</strong> {entity}
             </div>
             <div>
               <strong>Entity Ref:</strong> {entityRef}

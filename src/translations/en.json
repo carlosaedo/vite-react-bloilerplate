@@ -1,0 +1,18 @@
+{
+  "hello": "Hello {{name}}",
+  "documented": "Documented",
+  "collected": "Collected",
+  "inTransit": "In Transit",
+  "exception": "Exception",
+  "inDeliver": "In Deliver",
+  "delivered": "Delivered",
+  "entity": "Entity",
+  "entityRef": "Entity Ref",
+  "ourReference": "Our Reference",
+  "estimated": "Estimated",
+  "from": "From",
+  "to": "To",
+  "packages": "Packages",
+  "pallets": "Pallets",
+  "deliveryDetails": "DELIVERY DETAILS"
+}
