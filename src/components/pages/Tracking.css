@@ -142,6 +142,11 @@ body {
   overflow: hidden;
 }
 
+.span_delivery {
+  margin-left: 1rem;
+  vertical-align: text-top;
+}
+
 .stage-wrapper {
   position: relative;
   display: flex;

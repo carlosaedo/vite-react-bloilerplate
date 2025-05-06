@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import TrackingMap from '../trackingMap/trackingMap';
+import api from '../api/api';
 import {
   FaCheck,
   FaThLarge,
@@ -24,9 +25,14 @@ const stages = [
 
 const stageException = { label: 'Exception', icon: <FaExclamationTriangle /> };
 
+const TTL = 10 * 60 * 1000; // 10 minutes in ms
+
 export default function TrackingPage() {
   const { trackingNumber } = useParams();
   console.log('TrackingPage', trackingNumber);
+
+  const cacheKey = `trackingData-${trackingNumber}`;
+  const timestampKey = `trackingTimestamp-${trackingNumber}`;
 
   const [data, setData] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -35,10 +41,30 @@ export default function TrackingPage() {
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
 
   useEffect(() => {
-    fetch('/mock-tracking.json')
-      .then((res) => res.json())
-      .then(setData);
-  }, []);
+    const cachedData = localStorage.getItem(cacheKey);
+    const cachedTime = localStorage.getItem(timestampKey);
+    const now = Date.now();
+
+    if (cachedData && cachedTime && now - parseInt(cachedTime, 10) < TTL) {
+      console.log('Using cached data:', cachedData);
+      setData(JSON.parse(cachedData));
+    } else {
+      async function fetchTrackingInfo() {
+        try {
+          const response = await api.get(`/tracking/${trackingNumber}`);
+          if (response) {
+            console.log('Tracking data:', response.data.trackingData);
+            setData(response.data.trackingData);
+            localStorage.setItem(cacheKey, JSON.stringify(response.data.trackingData));
+            localStorage.setItem(timestampKey, now.toString());
+          }
+        } catch (error) {
+          console.error('Error fetching tracking data:', error);
+        }
+      }
+      fetchTrackingInfo();
+    }
+  }, [trackingNumber]);
 
   if (!data) return <div className='loading'>Loading...</div>;
 
@@ -140,7 +166,12 @@ export default function TrackingPage() {
             className='button'
             onClick={() => setShowDetails((prev) => !prev)}
           >
-            DELIVERY DETAILS {showDetails ? <FaMinus /> : <FaPlus />}
+            DELIVERY DETAILS{' '}
+            {showDetails ? (
+              <FaMinus className='span_delivery' />
+            ) : (
+              <FaPlus className='span_delivery' />
+            )}
           </motion.button>
         </div>
         <br />
