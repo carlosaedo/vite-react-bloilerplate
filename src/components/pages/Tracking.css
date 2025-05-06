@@ -120,14 +120,14 @@ body {
   border-collapse: collapse;
 }
 
-.status-table th,
+.status-table th {
+  background-color: #065f46;
+  color: #ffffff;
+  padding: 10px;
+}
 .status-table td {
-  padding: 12px;
+  padding: 10px;
   border: 1px solid #ddd;
-  text- thead {
-    background-color: #065f46;
-    color: white;
-  }
 }
 
 .tracker-container {
@@ -187,13 +187,6 @@ body {
 
 .connector.active {
   background: #10b981;
-}
-
-th,
-td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
 }
 
 @media (max-width: 768px) {

@@ -11,18 +11,24 @@
   "pallets": 2,
   "deliveryDetails": ["Signed by: João Silva", "Time: 14:32", "Comment: Delivered without damage"],
   "statusLog": [
-    { "local": "Lisbon Hub", "date": "2025-05-05", "status": "Documented", "location": "Lisbon" },
+    { "local": "Lisbon Hub", "date": "2025-05-05", "status": "Documented" },
     {
       "local": "Central Depot",
       "date": "2025-05-06",
       "status": "In Transit",
-      "location": "Porto"
+      "location": {
+        "lat": 41.5320533,
+        "lng": -8.4230007
+      }
     },
     {
       "local": "Braga",
       "date": "2025-05-07",
       "status": "Delivered",
-      "location": "Braga"
+      "location": {
+        "lat": 41.5320533,
+        "lng": -8.4230007
+      }
     }
   ]
 }
