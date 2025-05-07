@@ -14,5 +14,11 @@
   "to": "Para",
   "packages": "Volumes",
   "pallets": "Paletes",
-  "deliveryDetails": "DETALHES DA ENTREGA"
+  "deliveryDetails": "DETALHES DA ENTREGA",
+  "local": "Local",
+  "date": "Data",
+  "status": "Estado",
+  "location": "Localização",
+  "map": "Mapa",
+  "close": "Fechar"
 }

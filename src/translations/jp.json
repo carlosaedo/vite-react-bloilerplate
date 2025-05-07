@@ -14,5 +14,11 @@
   "to": "到着地",
   "packages": "荷物",
   "pallets": "パレット",
-  "deliveryDetails": "配達の詳細"
+  "deliveryDetails": "配達の詳細",
+  "local": "ローカル",
+  "date": "日付",
+  "status": "ステータス",
+  "location": "場所",
+  "map": "地図",
+  "close": "閉じる"
 }

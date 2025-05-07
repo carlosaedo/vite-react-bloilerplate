@@ -14,5 +14,11 @@
   "to": "Hasta",
   "packages": "Paquetes",
   "pallets": "Palets",
-  "deliveryDetails": "DETALLES DE ENTREGA"
+  "deliveryDetails": "DETALLES DE ENTREGA",
+  "local": "Local",
+  "date": "Fecha",
+  "status": "Estado",
+  "location": "Ubicación",
+  "map": "Mapa",
+  "close": "Cerrar"
 }

@@ -14,5 +14,11 @@
   "to": "到",
   "packages": "包裹",
   "pallets": "托盘",
-  "deliveryDetails": "配送详情"
+  "deliveryDetails": "配送详情",
+  "local": "本地",
+  "date": "日期",
+  "status": "状态",
+  "location": "位置",
+  "map": "地图",
+  "close": "关闭"
 }

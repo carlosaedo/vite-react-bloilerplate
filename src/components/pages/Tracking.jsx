@@ -17,23 +17,23 @@ import {
 import './Tracking.css';
 import { useTranslation } from 'react-i18next';
 
-const stages = [
-  { label: 'Documented', icon: <FaCheck /> },
-  { label: 'Collected', icon: <FaThLarge /> },
-  { label: 'In Transit', icon: <FaTruck /> },
-  { label: 'In Deliver', icon: <FaUser /> },
-  { label: 'Delivered', icon: <FaHome /> },
-];
-
-const stageException = { label: 'Exception', icon: <FaExclamationTriangle /> };
-
 const TTL = 10 * 60 * 1000; // 10 minutes in ms
 
 const TrackingPage = () => {
+  const { t } = useTranslation();
+
+  const stages = [
+    { label: t('documented'), icon: <FaCheck /> },
+    { label: t('collected'), icon: <FaThLarge /> },
+    { label: t('inTransit'), icon: <FaTruck /> },
+    { label: t('inDeliver'), icon: <FaUser /> },
+    { label: t('delivered'), icon: <FaHome /> },
+  ];
+
+  const stageException = { label: t('exception'), icon: <FaExclamationTriangle /> };
+
   const { trackingNumber } = useParams();
   console.log('TrackingPage', trackingNumber);
-
-  const { t } = useTranslation();
 
   const cacheKey = `trackingData-${trackingNumber}`;
   const timestampKey = `trackingTimestamp-${trackingNumber}`;
@@ -140,25 +140,25 @@ const TrackingPage = () => {
               <strong>{t('entity')}:</strong> {entity}
             </div>
             <div>
-              <strong>Entity Ref:</strong> {entityRef}
+              <strong>{t('entityRef')}:</strong> {entityRef}
             </div>
             <div>
-              <strong>Our Reference:</strong> {ourRef}
+              <strong>{t('ourReference')}:</strong> {ourRef}
             </div>
             <div>
-              <strong>Estimated:</strong> {estimated}
+              <strong>{t('estimated')}:</strong> {estimated}
             </div>
             <div>
-              <strong>From:</strong> {from}
+              <strong>{t('from')}:</strong> {from}
             </div>
             <div>
-              <strong>To:</strong> {to}
+              <strong>{t('to')}:</strong> {to}
             </div>
             <div>
-              <strong>Packages:</strong> {packages}
+              <strong>{t('packages')}:</strong> {packages}
             </div>
             <div>
-              <strong>Pallets:</strong> {pallets}
+              <strong>{t('pallets')}:</strong> {pallets}
             </div>
           </div>
         </div>
@@ -170,7 +170,7 @@ const TrackingPage = () => {
             className='button'
             onClick={() => setShowDetails((prev) => !prev)}
           >
-            DELIVERY DETAILS{' '}
+            {t('deliveryDetails')}{' '}
             {showDetails ? (
               <FaMinus className='span_delivery' />
             ) : (
@@ -191,10 +191,10 @@ const TrackingPage = () => {
               <table className='status-table'>
                 <thead className='table-header'>
                   <tr>
-                    <th>Local</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Location</th>
+                    <th>{t('local')}</th>
+                    <th>{t('date')}</th>
+                    <th>{t('status')}</th>
+                    <th>{t('location')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -213,7 +213,7 @@ const TrackingPage = () => {
                               handleMapClick(row.location.lat, row.location.lng, row.local)
                             }
                           >
-                            Map
+                            {t('map')}
                           </motion.button>
                         )}
                       </td>
@@ -238,7 +238,7 @@ const TrackingPage = () => {
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowMap(false)}
             >
-              Close
+              {t('close')}
             </motion.button>
           </div>
         </div>

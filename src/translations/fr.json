@@ -14,5 +14,11 @@
   "to": "À",
   "packages": "Colis",
   "pallets": "Palettes",
-  "deliveryDetails": "DÉTAILS DE LIVRAISON"
+  "deliveryDetails": "DÉTAILS DE LIVRAISON",
+  "local": "Local",
+  "date": "Date",
+  "status": "Statut",
+  "location": "Emplacement",
+  "map": "Carte",
+  "close": "Fermer"
 }

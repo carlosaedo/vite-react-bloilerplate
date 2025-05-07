@@ -30,7 +30,7 @@ i18n.use(initReactI18next).init({
       translation: jpTranslation,
     },
   },
-  lng: 'pt', // Default language
+  lng: 'jp', // Default language
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false, // React already escapes values
