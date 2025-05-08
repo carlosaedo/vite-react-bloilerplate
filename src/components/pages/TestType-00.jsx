@@ -21,9 +21,13 @@ const TestType = () => {
   const [inputPage, setInputPage] = useState(currentPage);
 
   const [selectedDate, setSelectedDate] = useState('');
+  const [startupDateFirstTime, setStartupDateFirstTime] = useState(true);
 
   useEffect(() => {
-    setSelectedDate(getLastFridayOfPreviousWeek());
+    if (startupDateFirstTime) {
+      setSelectedDate(getLastFridayOfPreviousWeek());
+      setStartupDateFirstTime(false);
+    }
     async function fetchData() {
       try {
         const response = await api.get(`/test-type-00`, {
