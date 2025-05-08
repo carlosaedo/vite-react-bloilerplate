@@ -226,8 +226,8 @@ const TrackingPage = () => {
         )}
       </div>
       {showMap && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
+        <div className='modal-overlay_tracking'>
+          <div className='modal-content_tracking'>
             <TrackingMap coordinates={coordinates} title={mapCurrentLocal} />
             <br />
             <br />

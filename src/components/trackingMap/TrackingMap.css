@@ -1,4 +1,4 @@
-.modal-overlay {
+.modal-overlay_tracking {
   position: fixed;
   top: 0;
   left: 0;
@@ -13,7 +13,7 @@
   z-index: 1000;
 }
 
-.modal-content {
+.modal-content_tracking {
   background: #003e2db9;
   padding: 1rem;
   border: 1px solid #ffc928c7;

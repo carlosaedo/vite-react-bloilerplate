@@ -14,7 +14,7 @@ const Modal = ({ isOpen, closeModal, data }) => {
         <div className='modal-body'>
           {Object.entries(data).map(([key, value]) => (
             <p key={key}>
-              <strong>{key}:</strong> {value}
+              <strong>{key.toUpperCase()}:</strong> {value}
             </p>
           ))}
         </div>
