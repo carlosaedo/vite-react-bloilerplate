@@ -17,7 +17,7 @@ const TestType = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize] = useState(15);
+  const [pageSize, setPageSize] = useState(15);
   const [inputPage, setInputPage] = useState(currentPage);
 
   useEffect(() => {
@@ -51,6 +51,13 @@ const TestType = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handlePerPageChange = (e) => {
+    const newPageSize = parseInt(e.target.value, 10);
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when page size changes
+    setInputPage(1); // Reset input to first page
   };
 
   const handlePageChange = (page) => {
@@ -168,6 +175,15 @@ const TestType = () => {
         >
           Next &raquo;
         </button>
+
+        {/* Dropdown for page size selection */}
+        <select value={pageSize} onChange={handlePerPageChange} className='page-size-dropdown'>
+          {[10, 15, 20, 25, 30, 35, 40, 45, 50].map((size) => (
+            <option key={size} value={size}>
+              {size} per page
+            </option>
+          ))}
+        </select>
       </div>
       <Footer />
     </>
