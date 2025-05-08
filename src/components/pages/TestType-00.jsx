@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../TestType00-Modal/Modal';
-import Header from './Header';
-import Footer from './Footer';
+
+import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek.util';
 
 import api from '../api/api';
 
@@ -20,13 +20,17 @@ const TestType = () => {
   const [pageSize, setPageSize] = useState(15);
   const [inputPage, setInputPage] = useState(currentPage);
 
+  const [selectedDate, setSelectedDate] = useState('');
+
   useEffect(() => {
+    setSelectedDate(getLastFridayOfPreviousWeek());
     async function fetchData() {
       try {
         const response = await api.get(`/test-type-00`, {
           params: {
             page: currentPage,
             pageSize: pageSize,
+            selectedDate: selectedDate,
           },
         });
         if (response && response.data && response.data.data) {
@@ -42,7 +46,7 @@ const TestType = () => {
       }
     }
     fetchData();
-  }, [currentPage, pageSize]); // Re-fetch data when page changes
+  }, [currentPage, pageSize, selectedDate]); // Re-fetch data when page changes
 
   const handleRowDoubleClick = (row) => {
     setSelectedRow(row);
@@ -58,6 +62,10 @@ const TestType = () => {
     setPageSize(newPageSize);
     setCurrentPage(1); // Reset to first page when page size changes
     setInputPage(1); // Reset input to first page
+  };
+
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
   };
 
   const handlePageChange = (page) => {
@@ -118,50 +126,46 @@ const TestType = () => {
 
   return (
     <>
-      <Header />
+      <div style={{ padding: '1rem', fontFamily: 'Arial' }}>
+        <label htmlFor='datePicker' style={{ marginRight: '1rem' }}>
+          Select a date:
+        </label>
+        <input type='date' id='datePicker' value={selectedDate} onChange={handleDateChange} />
+        {selectedDate && (
+          <div style={{ marginTop: '1rem' }}>
+            <strong>Selected date:</strong> {selectedDate}
+          </div>
+        )}
+      </div>
       <div className='table-container'>
-        <table className='responsive-table'>
-          <thead>
-            <tr>
-              {headers.map((header) => (
-                <th key={header}>{header.toUpperCase()}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index} onDoubleClick={() => handleRowDoubleClick(row)}>
+        {data.length === 0 ? (
+          <p>No data to show</p>
+        ) : (
+          <table className='responsive-table'>
+            <thead>
+              <tr>
                 {headers.map((header) => (
-                  <td key={header} data-label={header}>
-                    {row[header]}
-                  </td>
+                  <th key={header}>{header.toUpperCase()}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* <table className='responsive-table'>
-          <thead>
-            <tr>
-              {headers.map((header) => (
-                <th key={header}>{header}</th>
+            </thead>
+            <tbody>
+              {data.map((row, index) => (
+                <tr key={index} onDoubleClick={() => handleRowDoubleClick(row)}>
+                  {headers.map((header) => (
+                    <td key={header} data-label={header}>
+                      {row[header]}
+                    </td>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index} onDoubleClick={() => handleRowDoubleClick(row)}>
-                {headers.map((header) => (
-                  <td key={header}>{row[header]}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table> */}
+            </tbody>
+          </table>
+        )}
 
         <Modal isOpen={isModalOpen} closeModal={closeModal} data={selectedRow} />
       </div>
+
       {/* Pagination Controls */}
       <div className='pagination'>
         <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
@@ -208,7 +212,6 @@ const TestType = () => {
           )}
         </select>
       </div>
-      <Footer />
     </>
   );
 };

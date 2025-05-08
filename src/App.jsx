@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import Header from './components/pages/Header';
+import Footer from './components/pages/Footer';
 import Home from './components/pages/Home';
 import Page404 from './components/pages/Page404';
 import TrackingSearch from './components/pages/TrackingSearch';
@@ -18,14 +20,20 @@ function App() {
   `);
 
   return (
-    <Routes>
-      <Route path='/' element={<Home />} />
-      <Route path='*' element={<Navigate to='/404' replace />} />
-      <Route path='/404' element={<Page404 />} />
-      <Route path='/tracking' element={<TrackingSearch />} />
-      <Route path='/tracking/:trackingNumber' element={<Tracking />} />
-      <Route path='/test-type-00' element={<TestType00 />} />
-    </Routes>
+    <>
+      <Header />
+      <div className='content-main'>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='*' element={<Navigate to='/404' replace />} />
+          <Route path='/404' element={<Page404 />} />
+          <Route path='/tracking' element={<TrackingSearch />} />
+          <Route path='/tracking/:trackingNumber' element={<Tracking />} />
+          <Route path='/test-type-00' element={<TestType00 />} />
+        </Routes>
+      </div>
+      <Footer />
+    </>
   );
 }
 

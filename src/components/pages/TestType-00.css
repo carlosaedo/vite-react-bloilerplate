@@ -14,7 +14,7 @@
   padding: 8px;
   border: 1px solid #ddd;
   text-align: left;
-  background-color: #436d12;
+  background-color: #003e2d;
   color: #ffffff;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .page-number.active {
-  background-color: #436d12;
+  background-color: #003e2d;
   color: white;
 }
 

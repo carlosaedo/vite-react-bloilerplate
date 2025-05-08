@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import TrackingMap from '../trackingMap/TrackingMap';
-import Footer from './Footer';
 import api from '../api/api';
 import {
   FaCheck,
@@ -243,7 +242,6 @@ const TrackingPage = () => {
           </div>
         </div>
       )}
-      <Footer />
     </>
   );
 };
