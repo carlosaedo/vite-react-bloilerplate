@@ -101,7 +101,7 @@ button:disabled {
 }
 
 /* Mobile styles */
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .responsive-table thead {
     display: none;
   }

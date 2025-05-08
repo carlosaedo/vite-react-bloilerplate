@@ -23,31 +23,32 @@ const TestType = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [startupDateFirstTime, setStartupDateFirstTime] = useState(true);
 
+  async function fetchData() {
+    try {
+      const response = await api.get(`/test-type-00`, {
+        params: {
+          page: currentPage,
+          pageSize: pageSize,
+          selectedDate: selectedDate,
+        },
+      });
+      if (response && response.data && response.data.data) {
+        setData(response.data.data);
+        setTotalPages(response.data.pagination.totalPages);
+        console.log(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Failed to load data.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (startupDateFirstTime) {
       setSelectedDate(getLastFridayOfPreviousWeek());
       setStartupDateFirstTime(false);
-    }
-    async function fetchData() {
-      try {
-        const response = await api.get(`/test-type-00`, {
-          params: {
-            page: currentPage,
-            pageSize: pageSize,
-            selectedDate: selectedDate,
-          },
-        });
-        if (response && response.data && response.data.data) {
-          setData(response.data.data);
-          setTotalPages(response.data.pagination.totalPages);
-          console.log(response.data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to load data.');
-      } finally {
-        setLoading(false);
-      }
     }
     fetchData();
   }, [currentPage, pageSize, selectedDate]); // Re-fetch data when page changes
@@ -167,7 +168,12 @@ const TestType = () => {
           </table>
         )}
 
-        <Modal isOpen={isModalOpen} closeModal={closeModal} data={selectedRow} />
+        <Modal
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          data={selectedRow}
+          onUpdate={fetchData}
+        />
       </div>
 
       {/* Pagination Controls */}
