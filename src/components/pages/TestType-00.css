@@ -10,11 +10,26 @@
   border-collapse: collapse;
 }
 
-.responsive-table th,
-.responsive-table td {
-  padding: 12px;
+.responsive-table th {
+  padding: 8px;
   border: 1px solid #ddd;
   text-align: left;
+  background-color: #436d12;
+  color: #ffffff;
+}
+
+.responsive-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.responsive-table tr:nth-child(even) {
+  background-color: #f9f9f9; /* light gray */
+}
+
+.responsive-table tr:nth-child(odd) {
+  background-color: #ffffff; /* white */
 }
 
 .pagination {
@@ -114,6 +129,14 @@ button:disabled {
     left: 12px;
     text-align: left;
     font-weight: bold;
+  }
+
+  .responsive-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .responsive-table tr:nth-child(odd) {
+    background-color: #ffffff;
   }
 }
 
