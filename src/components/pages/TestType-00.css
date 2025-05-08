@@ -1,4 +1,5 @@
 .table-container {
+  display: contents;
   padding: 20px;
   max-width: 100%;
   overflow-x: auto;
@@ -11,25 +12,19 @@
 
 .responsive-table th,
 .responsive-table td {
+  padding: 12px;
   border: 1px solid #ddd;
-  padding: 10px;
   text-align: left;
-}
-
-.responsive-table th {
-  background-color: #f2f2f2;
-}
-
-.responsive-table tr:hover {
-  background-color: #f1f1f1;
-  cursor: pointer;
 }
 
 .pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
 }
 
 .page-numbers {
@@ -90,14 +85,35 @@ button:disabled {
   border-radius: 5px;
 }
 
+/* Mobile styles */
 @media (max-width: 768px) {
-  .responsive-table {
-    font-size: 14px;
+  .responsive-table thead {
+    display: none;
   }
 
-  .responsive-table th,
+  .responsive-table tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
   .responsive-table td {
-    padding: 8px;
+    display: block;
+    text-align: right;
+    padding: 8px 12px;
+    position: relative;
+  }
+
+  .responsive-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 12px;
+    text-align: left;
+    font-weight: bold;
   }
 }
 

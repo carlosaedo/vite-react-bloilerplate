@@ -132,12 +132,33 @@ const TestType = () => {
             {data.map((row, index) => (
               <tr key={index} onDoubleClick={() => handleRowDoubleClick(row)}>
                 {headers.map((header) => (
-                  <td key={header}>{row[header]}</td>
+                  <td key={header} data-label={header}>
+                    {row[header]}
+                  </td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
+
+        {/* <table className='responsive-table'>
+          <thead>
+            <tr>
+              {headers.map((header) => (
+                <th key={header}>{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, index) => (
+              <tr key={index} onDoubleClick={() => handleRowDoubleClick(row)}>
+                {headers.map((header) => (
+                  <td key={header}>{row[header]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table> */}
 
         <Modal isOpen={isModalOpen} closeModal={closeModal} data={selectedRow} />
       </div>
@@ -178,11 +199,13 @@ const TestType = () => {
 
         {/* Dropdown for page size selection */}
         <select value={pageSize} onChange={handlePerPageChange} className='page-size-dropdown'>
-          {[10, 15, 20, 25, 30, 35, 40, 45, 50].map((size) => (
-            <option key={size} value={size}>
-              {size} per page
-            </option>
-          ))}
+          {[10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100].map(
+            (size) => (
+              <option key={size} value={size}>
+                {size} per page
+              </option>
+            ),
+          )}
         </select>
       </div>
       <Footer />
