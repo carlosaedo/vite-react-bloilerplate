@@ -39,27 +39,31 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
         <button className='close-btn' onClick={closeModal}>
           &times;
         </button>
-        <h2>Row Details</h2>
+        <h2>Details</h2>
         <div className='modal-body'>
           {Object.entries(data).map(([key, value]) => (
-            <p key={key}>
-              <strong>{key.toUpperCase()}:</strong>{' '}
-              {['lojas', 'hora_de', 'hora_ate'].includes(key) ? (
-                <input
-                  type='text'
-                  value={key === 'lojas' ? lojas : key === 'hora_de' ? horaDe : horaAte}
-                  onChange={(e) =>
-                    key === 'lojas'
-                      ? setLojas(e.target.value)
-                      : key === 'hora_de'
-                      ? setHoraDe(e.target.value)
-                      : setHoraAte(e.target.value)
-                  }
-                />
-              ) : (
-                value
-              )}
-            </p>
+            <div className='info-grid-modal'>
+              <div>
+                <p key={key}>
+                  <strong>{key.toUpperCase()}:</strong>{' '}
+                  {['lojas', 'hora_de', 'hora_ate'].includes(key) ? (
+                    <input
+                      type='text'
+                      value={key === 'lojas' ? lojas : key === 'hora_de' ? horaDe : horaAte}
+                      onChange={(e) =>
+                        key === 'lojas'
+                          ? setLojas(e.target.value)
+                          : key === 'hora_de'
+                          ? setHoraDe(e.target.value)
+                          : setHoraAte(e.target.value)
+                      }
+                    />
+                  ) : (
+                    value
+                  )}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
         <button className='save-btn' onClick={handleSave}>

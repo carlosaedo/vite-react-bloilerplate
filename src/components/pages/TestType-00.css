@@ -40,6 +40,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
+  margin-top: 10px;
 }
 
 .page-numbers {
@@ -60,7 +61,8 @@
 }
 
 .page-number:hover {
-  background-color: #f0f0f0;
+  background-color: #ffc928c7;
+  color: #003e2d;
 }
 
 .page-input {
