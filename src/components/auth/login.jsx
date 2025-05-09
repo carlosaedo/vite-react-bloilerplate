@@ -74,8 +74,8 @@ const Login = () => {
           <label>Email:</label>
           <input type='email' name='email' value={formData.email} onChange={handleChange} />
         </div>
-        <div>
-          <label>Password:</label>
+        <label>Password:</label>
+        <div className='input-form-password'>
           <input
             type={showPassword ? 'text' : 'password'}
             name='password'

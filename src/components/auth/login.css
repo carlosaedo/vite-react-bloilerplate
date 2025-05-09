@@ -10,8 +10,21 @@
   box-shadow: 2px 2px 15px#0f0f0f;
 }
 
+.input-form-password {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .flork-pass-login {
-  height: 45px;
+  height: 44px;
+  border: 1px solid #ffd700;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #ffd700ab;
+  margin-left: 5px;
 }
 
 .login-form label {
