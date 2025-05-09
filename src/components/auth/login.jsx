@@ -4,6 +4,9 @@ import api from '../api/api';
 import './login.css';
 import Flork from '../../assets/flork.png';
 
+import FlorkHide from '../../assets/flork-114-png.png';
+import FlorkYay from '../../assets/yay-flork.png';
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -11,6 +14,8 @@ const Login = () => {
   });
   const [error, setError] = useState(null);
   const [showFlork, setShowFlork] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowFlork = () => {
     setShowFlork(!showFlork);
@@ -55,6 +60,10 @@ const Login = () => {
     });
   };
 
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
   return (
     <>
       <h2>Login</h2>
@@ -68,11 +77,14 @@ const Login = () => {
         <div>
           <label>Password:</label>
           <input
-            type='password'
+            type={showPassword ? 'text' : 'password'}
             name='password'
             value={formData.password}
             onChange={handleChange}
           />
+          <span onClick={handleTogglePasswordVisibility}>
+            <img className='flork-pass-login' src={showPassword ? FlorkYay : FlorkHide} />
+          </span>
         </div>
 
         <button type='submit'>Login</button>
