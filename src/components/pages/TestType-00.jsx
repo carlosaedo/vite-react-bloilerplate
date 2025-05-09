@@ -172,7 +172,14 @@ const TestType = () => {
                 <tr key={index} onDoubleClick={() => handleRowDoubleClick(row)}>
                   {headers.map((header) => (
                     <td key={header} data-label={header}>
-                      {row[header]}
+                      {
+                        // Check if the cell value is a date and format it
+                        row[header] &&
+                        new Date(row[header]) instanceof Date &&
+                        !isNaN(new Date(row[header]))
+                          ? new Date(row[header]).toLocaleDateString('pt-PT') // Format to YYYY-MM-DD
+                          : row[header] // Otherwise, show the value as is
+                      }
                     </td>
                   ))}
                 </tr>
