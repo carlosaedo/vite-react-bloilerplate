@@ -42,7 +42,7 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
         <h2>Details</h2>
         <div className='modal-body'>
           {Object.entries(data).map(([key, value]) => (
-            <div className='info-grid-modal'>
+            <div className='info-grid-modal' key={key}>
               <div>
                 <p key={key}>
                   <strong>{key.toUpperCase()}:</strong>{' '}

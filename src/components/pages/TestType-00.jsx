@@ -5,9 +5,16 @@ import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek
 
 import api from '../api/api';
 
+import { useContextApi } from '../context/ApiContext';
+
 import './TestType-00.css';
 
 const TestType = () => {
+  const { contextApiData, setContextApiData } = useContextApi();
+
+  if (contextApiData) {
+    console.log(contextApiData.note);
+  }
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,6 +58,12 @@ const TestType = () => {
       setStartupDateFirstTime(false);
     }
     fetchData();
+
+    setContextApiData({
+      ...contextApiData,
+      note: 'Lol this works fine.',
+    });
+    console.log(contextApiData.note);
   }, [currentPage, pageSize, selectedDate]); // Re-fetch data when page changes
 
   const handleRowDoubleClick = (row) => {

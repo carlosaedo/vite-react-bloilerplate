@@ -1,12 +1,4 @@
 /* PrimaryMenu.css */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: sans-serif;
-}
 
 /* Container for the menu */
 .menu-container {
