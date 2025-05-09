@@ -8,6 +8,8 @@ import esTranslation from './translations/es.json';
 import frTranslation from './translations/fr.json';
 import cnTranslation from './translations/cn.json';
 import jpTranslation from './translations/jp.json';
+import deTranslation from './translations/de.json';
+import itTranslation from './translations/it.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -29,9 +31,15 @@ i18n.use(initReactI18next).init({
     jp: {
       translation: jpTranslation,
     },
+    de: {
+      translation: deTranslation,
+    },
+    it: {
+      translation: itTranslation,
+    },
   },
   lng: 'jp', // Default language
-  fallbackLng: 'en',
+  fallbackLng: 'pt',
   interpolation: {
     escapeValue: false, // React already escapes values
   },
