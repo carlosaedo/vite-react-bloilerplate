@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ApiProvider } from './components/context/ApiContext';
+import Sidebar from './components/sidebar/Sidebar';
 import Login from './components/auth/login';
 import ResetPassword from './components/auth/resetPassword';
 import ResetPassNew from './components/pages/resetPass_new';
@@ -13,7 +15,8 @@ import Tracking from './components/pages/Tracking';
 import TestType00 from './components/pages/TestType-00';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [sidebarWidth, setSidebarWidth] = useState(250); // default expanded
   const isAuthenticated = !!localStorage.getItem('token');
   console.log(`
 ▗▄▄▄▖▗▄▖ ▗▄▄▖ ▗▄▄▖ ▗▄▄▄▖ ▗▄▄▖▗▄▄▄▖▗▄▄▄▖▗▄▄▖
@@ -28,26 +31,36 @@ function App() {
   return (
     <>
       <Header />
-      <div className='content-main'>
-        <ApiProvider>
-          <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='*' element={<Navigate to='/404' replace />} />
-            <Route path='/404' element={<Page404 />} />
-            <Route path='/tracking' element={<TrackingSearch />} />
-            <Route path='/tracking/:trackingNumber' element={<Tracking />} />
-            <Route path='/test-type-00' element={<TestType00 />} />
+      <div
+        className='main-app-content'
+        style={{
+          marginLeft: `${sidebarWidth}px`,
+          transition: 'margin-left 0.3s ease',
+          padding: '20px',
+        }}
+      >
+        <div className='content-main'>
+          <ApiProvider>
+            <Sidebar onToggle={setSidebarWidth} />
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='*' element={<Navigate to='/404' replace />} />
+              <Route path='/404' element={<Page404 />} />
+              <Route path='/tracking' element={<TrackingSearch />} />
+              <Route path='/tracking/:trackingNumber' element={<Tracking />} />
+              <Route path='/test-type-00' element={<TestType00 />} />
 
-            <Route path='/resetpassword' element={<ResetPassword />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/resetpass-new' element={<ResetPassNew />} />
-            <Route path='/resetpass-error' element={<ResetPassError />} />
-          </Routes>
-        </ApiProvider>
+              <Route path='/resetpassword' element={<ResetPassword />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/resetpass-new' element={<ResetPassNew />} />
+              <Route path='/resetpass-error' element={<ResetPassError />} />
+            </Routes>
+          </ApiProvider>
+          <Footer />
+        </div>
       </div>
-      <Footer />
     </>
   );
-}
+};
 
 export default App;

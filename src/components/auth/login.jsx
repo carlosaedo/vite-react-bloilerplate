@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../api/api';
+import torrestirApi from '../api/torrestirApi';
 import './login.css';
 import Flork from '../../assets/flork.png';
 
@@ -23,21 +23,23 @@ const Login = () => {
 
   async function handleLogin() {
     try {
-      //const response = await api.post('/auth/login', formData, {});
-      //const { token, returnUserGroup } = response.data;
-      const token = 'mocktoken';
-      const returnUserGroup = 'userMock';
-      if (returnUserGroup === 'administrator') {
+      const response = await torrestirApi.post('/auth/login', formData, {});
+      const { token } = response.data;
+      /*const token = 'mocktoken';
+      const returnUserGroup = 'userMock';*/
+      if (token) {
         localStorage.setItem('token', token);
-        localStorage.setItem('userGroup', returnUserGroup);
         window.location.href = '/';
       } else {
         setError('Não tens acesso a isto!');
         toggleShowFlork();
       }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
+      if (error.response?.status === 401) {
         setError('Login inválido');
+        if (!showFlork) toggleShowFlork();
+      } else if (error.response?.status === 500) {
+        setError('Erro no servidor');
         if (!showFlork) toggleShowFlork();
       } else {
         console.error(error);
