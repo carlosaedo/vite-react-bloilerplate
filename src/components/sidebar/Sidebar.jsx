@@ -34,6 +34,12 @@ const Sidebar = ({ onToggle }) => {
     setCollapsed((prev) => !prev);
   };
 
+  const toggleSidebarMenuItem = () => {
+    if (!collapsed) {
+      setCollapsed(true);
+    }
+  };
+
   return (
     <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className='sidebar-header'>
@@ -44,7 +50,12 @@ const Sidebar = ({ onToggle }) => {
 
       <ul>
         <li>
-          <NavLink exact='true' to='/' className={({ isActive }) => (isActive ? 'active' : '')}>
+          <NavLink
+            exact='true'
+            to='/'
+            onClick={toggleSidebarMenuItem}
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
             <span className='icon'>
               <FaHome />
             </span>
@@ -52,7 +63,11 @@ const Sidebar = ({ onToggle }) => {
           </NavLink>
         </li>
         <li>
-          <NavLink to='/tracking' className={({ isActive }) => (isActive ? 'active' : '')}>
+          <NavLink
+            to='/tracking'
+            onClick={toggleSidebarMenuItem}
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
             <span className='icon'>
               <FaBoxOpen />
             </span>
@@ -60,7 +75,11 @@ const Sidebar = ({ onToggle }) => {
           </NavLink>
         </li>
         <li>
-          <NavLink to='/test-type-00' className={({ isActive }) => (isActive ? 'active' : '')}>
+          <NavLink
+            to='/test-type-00'
+            onClick={toggleSidebarMenuItem}
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
             <span className='icon'>
               <FaTable />
             </span>
@@ -68,7 +87,11 @@ const Sidebar = ({ onToggle }) => {
           </NavLink>
         </li>
         <li>
-          <NavLink to='/login' className={({ isActive }) => (isActive ? 'active' : '')}>
+          <NavLink
+            to='/login'
+            onClick={toggleSidebarMenuItem}
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
             <span className='icon'>
               <FaRegUserCircle />
             </span>
