@@ -13,6 +13,7 @@ import Page404 from './components/pages/Page404';
 import TrackingSearch from './components/pages/TrackingSearch';
 import Tracking from './components/pages/Tracking';
 import TestType00 from './components/pages/TestType-00';
+import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
 import './App.css';
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
 
   return (
     <>
+      <ConnectionBanner />
       <Header />
       <div
         className='main-app-content'
