@@ -80,10 +80,6 @@
   border-radius: 5px;
 }
 
-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
 .pagination-ellipsis {
   cursor: default;
   color: #999;
@@ -97,16 +93,17 @@ button:disabled {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-
-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
-
+input[type='date' i],
 .page-size-dropdown {
   margin-left: 10px;
-  padding: 5px;
-  border-radius: 5px;
+  border: 2px solid #003e2d;
+  background: white;
+  color: #003e2d;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
 }
 
 /* Mobile styles */
