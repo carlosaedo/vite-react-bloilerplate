@@ -1,21 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import PrimaryMenu from '../menus/PrimaryMenu';
 import { FaBoxOpen, FaHome, FaRegUserCircle, FaTable } from 'react-icons/fa';
 import './Sidebar.css';
+import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
+
+import { useContextApi } from '../context/ApiContext';
 
 const Sidebar = ({ onToggle }) => {
+  const { contextApiData, setContextApiData } = useContextApi();
+
   const [collapsed, setCollapsed] = useState(() => {
     // Get initial state from localStorage (default to false)
     const savedState = localStorage.getItem('sidebarCollapsed');
     return savedState === 'true';
   });
 
+  const [loginStatus, setLoginStatus] = useState(false);
+
   // Update localStorage and notify parent on change
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
     onToggle(collapsed ? 60 : 250);
-  }, [collapsed, onToggle]);
+
+    async function checkLoginStatus() {
+      const isLoggedIn = await authCheckLoginStatus();
+      setLoginStatus(isLoggedIn); // <- always set the result
+    }
+
+    checkLoginStatus();
+  }, [collapsed, onToggle, contextApiData?.login]);
 
   const toggleSidebar = () => {
     setCollapsed((prev) => !prev);
@@ -28,7 +41,7 @@ const Sidebar = ({ onToggle }) => {
           ☰
         </button>
       </div>
-      <PrimaryMenu />
+
       <ul>
         <li>
           <NavLink exact='true' to='/' className={({ isActive }) => (isActive ? 'active' : '')}>
@@ -59,7 +72,7 @@ const Sidebar = ({ onToggle }) => {
             <span className='icon'>
               <FaRegUserCircle />
             </span>
-            <span className='text'>Login</span>
+            <span className='text'>{loginStatus ? 'Logout' : 'Login'}</span>
           </NavLink>
         </li>
       </ul>

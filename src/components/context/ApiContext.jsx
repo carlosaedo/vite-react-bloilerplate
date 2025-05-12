@@ -3,6 +3,7 @@ import { createContext, useContext, useState } from 'react';
 // Initial data
 const contextApiData = {
   note: 'This is a note.',
+  login: false,
 };
 
 // Create context

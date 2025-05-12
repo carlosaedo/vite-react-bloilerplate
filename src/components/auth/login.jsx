@@ -1,41 +1,62 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import torrestirApi from '../api/torrestirApi';
 import './login.css';
 import Flork from '../../assets/flork.png';
-
 import FlorkHide from '../../assets/flork-114-png.png';
 import FlorkYay from '../../assets/yay-flork.png';
-
 import CryingFlork from '../../assets/crying_flork.png';
+import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
+
+import { useContextApi } from '../context/ApiContext';
+
+import Logout from '../auth/logout';
 
 const Login = () => {
+  const { contextApiData, setContextApiData } = useContextApi();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+  const [loginStatus, setLoginStatus] = useState(false);
+  const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null);
   const [showFlork, setShowFlork] = useState(false);
-
   const [showCryingFlork, setShowCryingFlork] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowFlork = () => {
     setShowFlork(!showFlork);
   };
+
   const toggleShowCryingFlork = () => {
     setShowCryingFlork(!showCryingFlork);
   };
+
+  useEffect(() => {
+    async function checkLoginStatus() {
+      const loginStatus = await authCheckLoginStatus();
+      console.log('login status: ', loginStatus);
+      setLoginStatus(loginStatus);
+      setContextApiData({
+        ...contextApiData,
+        login: loginStatus,
+      });
+      setLoading(false); // Set loading to false once login status is checked
+    }
+    checkLoginStatus();
+  }, []);
 
   async function handleLogin() {
     try {
       const response = await torrestirApi.post('/auth/login', formData, {});
       const { token } = response.data;
-      /*const token = 'mocktoken';
-      const returnUserGroup = 'userMock';*/
       if (token) {
         localStorage.setItem('token', token);
+        setContextApiData({
+          ...contextApiData,
+          login: true,
+        });
         window.location.href = '/';
       } else {
         setError('Não tens acesso a isto!');
@@ -58,7 +79,6 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     await handleLogin();
   };
 
@@ -76,37 +96,48 @@ const Login = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Show loading message while checking login status
+  }
+
   return (
     <>
-      <h2>Login</h2>
-      {showFlork && <img className='flork' src={Flork} />}
-      {showCryingFlork && <img className='crying-flork' src={CryingFlork} />}
-      <form className='login-form' onSubmit={handleSubmit}>
-        {error && <div className='error'>{error}</div>}
+      {loginStatus ? (
         <div>
-          <label>Email:</label>
-          <input type='email' name='email' value={formData.email} onChange={handleChange} />
+          <Logout />
         </div>
-        <label>Password:</label>
-        <div className='input-form-password'>
-          <input
-            type={showPassword ? 'text' : 'password'}
-            name='password'
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <span onClick={handleTogglePasswordVisibility}>
-            <img className='flork-pass-login' src={showPassword ? FlorkYay : FlorkHide} />
-          </span>
+      ) : (
+        <div>
+          <h2>Login</h2>
+          {showFlork && <img className='flork' src={Flork} />}
+          {showCryingFlork && <img className='crying-flork' src={CryingFlork} />}
+          <form className='login-form' onSubmit={handleSubmit}>
+            {error && <div className='error'>{error}</div>}
+            <div>
+              <label>Email:</label>
+              <input type='email' name='email' value={formData.email} onChange={handleChange} />
+            </div>
+            <label>Password:</label>
+            <div className='input-form-password'>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name='password'
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <span onClick={handleTogglePasswordVisibility}>
+                <img className='flork-pass-login' src={showPassword ? FlorkYay : FlorkHide} />
+              </span>
+            </div>
+            <button type='submit'>Login</button>
+          </form>
+          <p>
+            <Link className='custom-link' to='/resetpassword'>
+              Repor palavra chave
+            </Link>
+          </p>
         </div>
-
-        <button type='submit'>Login</button>
-      </form>
-      <p>
-        <Link className='custom-link' to='/resetpassword'>
-          Repor palavra chave
-        </Link>
-      </p>
+      )}
     </>
   );
 };

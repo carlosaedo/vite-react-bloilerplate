@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import Modal from '../TestType00-Modal/Modal';
 
 import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek.util';
@@ -10,6 +12,8 @@ import { useContextApi } from '../context/ApiContext';
 import './TestType-00.css';
 
 const TestType = () => {
+  const navigateTo = useNavigate();
+
   const { contextApiData, setContextApiData } = useContextApi();
 
   if (contextApiData) {
@@ -53,6 +57,15 @@ const TestType = () => {
   }
 
   useEffect(() => {
+    async function checkLoginStatus() {
+      const loginStatus = await authCheckLoginStatus();
+      console.log('login status: ', loginStatus);
+      if (!loginStatus) {
+        navigateTo('/login');
+      }
+    }
+    checkLoginStatus();
+
     if (startupDateFirstTime) {
       setSelectedDate(getLastFridayOfPreviousWeek());
       setStartupDateFirstTime(false);

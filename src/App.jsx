@@ -45,17 +45,23 @@ const App = () => {
           <ApiProvider>
             <Sidebar onToggle={setSidebarWidth} />
             <Routes>
+              {isAuthenticated ? (
+                <>
+                  <Route path='/test-type-00' element={<TestType00 />} />
+                </>
+              ) : (
+                <Route path='*' element={<Navigate to='/login' replace />} />
+              )}
+              <Route path='/resetpassword' element={<ResetPassword />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/resetpass-new' element={<ResetPassNew />} />
+              <Route path='/resetpass-error' element={<ResetPassError />} />
+
               <Route path='/' element={<Home />} />
               <Route path='*' element={<Navigate to='/404' replace />} />
               <Route path='/404' element={<Page404 />} />
               <Route path='/tracking' element={<TrackingSearch />} />
               <Route path='/tracking/:trackingNumber' element={<Tracking />} />
-              <Route path='/test-type-00' element={<TestType00 />} />
-
-              <Route path='/resetpassword' element={<ResetPassword />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/resetpass-new' element={<ResetPassNew />} />
-              <Route path='/resetpass-error' element={<ResetPassError />} />
             </Routes>
           </ApiProvider>
           <Footer />
