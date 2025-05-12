@@ -84,6 +84,13 @@
   border-radius: 5px;
   z-index: 0;
 }
+.crying-flork {
+  position: sticky;
+  margin-bottom: -15px;
+  width: 150px;
+  border-radius: 5px;
+  z-index: 0;
+}
 
 .custom-link {
   color: rgb(17, 17, 17);
