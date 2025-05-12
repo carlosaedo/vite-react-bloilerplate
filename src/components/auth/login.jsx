@@ -131,11 +131,11 @@ const Login = () => {
             </div>
             <button type='submit'>Login</button>
           </form>
-          <p>
+          {/*<p>
             <Link className='custom-link' to='/resetpassword'>
               Repor palavra chave
             </Link>
-          </p>
+          </p>*/}
         </div>
       )}
     </>
