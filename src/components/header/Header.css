@@ -4,10 +4,12 @@
   justify-content: space-between;
   align-items: center;
   background-color: #003e2d; /* or your preferred background color */
-  margin: 0 auto
-  width: 100%;
+  margin: 0 auto;
   height: 50px;
   z-index: 1000;
+  position: sticky;
+  top: 0;
+  padding-right: 20px;
 }
 
 .logo-span {
