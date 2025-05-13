@@ -29,10 +29,10 @@
 
 /* Header with toggle button */
 .sidebar-header {
-  padding: 14px;
   display: flex;
   justify-content: flex-end;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0 auto;
 }
 
 /* Menu list */
