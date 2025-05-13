@@ -34,7 +34,7 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
   return (
     <Dialog open={isOpenDeleteRow} onClose={closeModalDeleteRow} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant='h6' sx={{ color: '#003e2d' }}>
+        <Typography component='span' variant='h6' sx={{ color: '#003e2d' }}>
           Confirm Operation
         </Typography>{' '}
         {/* Applying primary green color */}
