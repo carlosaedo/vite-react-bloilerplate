@@ -31,19 +31,19 @@ const App = () => {
 
   return (
     <>
-      <ConnectionBanner />
-      <Header />
-      <div
-        className='main-app-content'
-        style={{
-          marginLeft: `${sidebarWidth}px`,
-          transition: 'margin-left 0.3s ease',
-          padding: '20px',
-        }}
-      >
-        <div className='content-main'>
-          <ApiProvider>
-            <Sidebar onToggle={setSidebarWidth} />
+      <ApiProvider>
+        <ConnectionBanner />
+        <Sidebar onToggle={setSidebarWidth} />
+        <div
+          className='main-app-content'
+          style={{
+            marginLeft: `${sidebarWidth}px`,
+            transition: 'margin-left 0.3s ease',
+            padding: '0px',
+          }}
+        >
+          <div className='content-main'>
+            <Header />
             <Routes>
               {isAuthenticated ? (
                 <>
@@ -63,10 +63,10 @@ const App = () => {
               <Route path='/tracking' element={<TrackingSearch />} />
               <Route path='/tracking/:trackingNumber' element={<Tracking />} />
             </Routes>
-          </ApiProvider>
-          <Footer />
+            <Footer />
+          </div>
         </div>
-      </div>
+      </ApiProvider>
     </>
   );
 };

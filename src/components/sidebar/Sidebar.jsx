@@ -60,7 +60,7 @@ const Sidebar = ({ onToggle }) => {
           color: '#003e2d',
           transition: 'width 0.3s ease',
           position: 'fixed',
-          top: 60,
+          top: 0,
         },
       }}
     >
