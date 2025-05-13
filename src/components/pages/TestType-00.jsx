@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import Modal from '../TestType00-Modal/Modal';
+import ModalDeleteRow from '../TestType00-Modal/ModalDeleteRow';
 
 import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek.util';
 
@@ -25,6 +26,8 @@ const TestType = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isModalDeleteRowOpen, setIsModalDeleteRowOpen] = useState(false);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -33,6 +36,29 @@ const TestType = () => {
 
   const [selectedDate, setSelectedDate] = useState('');
   const [startupDateFirstTime, setStartupDateFirstTime] = useState(true);
+
+  const [contextMenu, setContextMenu] = useState(null); // { x, y, rowIndex }
+
+  const handleContextMenu = (event, row) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.pageX,
+      y: event.pageY,
+      row,
+    });
+  };
+
+  const handleDelete = (row) => {
+    //const updatedData = data.filter((_, index) => index !== contextMenu.rowIndex);
+    //setData(updatedData);
+    setSelectedRow(row);
+    setIsModalDeleteRowOpen(true);
+    setContextMenu(null);
+  };
+
+  const handleClickOutside = () => {
+    setContextMenu(null);
+  };
 
   async function fetchData() {
     try {
@@ -57,27 +83,44 @@ const TestType = () => {
   }
 
   useEffect(() => {
+    // Run on mount: check login and set startup date
     async function checkLoginStatus() {
       const loginStatus = await authCheckLoginStatus();
-      console.log('login status: ', loginStatus);
+      console.log('login status:', loginStatus);
       if (!loginStatus) {
         navigateTo('/login');
       }
     }
+
     checkLoginStatus();
 
     if (startupDateFirstTime) {
       setSelectedDate(getLastFridayOfPreviousWeek());
       setStartupDateFirstTime(false);
     }
-    fetchData();
 
-    setContextApiData({
-      ...contextApiData,
+    // Set initial context data
+    setContextApiData((prev) => ({
+      ...prev,
       note: 'Lol this works fine.',
-    });
-    console.log(contextApiData.note);
-  }, [currentPage, pageSize, selectedDate]); // Re-fetch data when page changes
+    }));
+    console.log(contextApiData.note); // This will still log old value, because `setState` is async
+  }, []); // Only on initial mount
+
+  useEffect(() => {
+    // Re-fetch data when selectedDate, page, or page size changes
+    fetchData();
+  }, [currentPage, pageSize, selectedDate]);
+
+  useEffect(() => {
+    // Attach click listener for context menu
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    console.log('Updated context note:', contextApiData.note);
+  }, [contextApiData.note]);
 
   const handleRowDoubleClick = (row) => {
     setSelectedRow(row);
@@ -86,6 +129,10 @@ const TestType = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const closeModalDeleteRow = () => {
+    setIsModalDeleteRowOpen(false);
   };
 
   const handlePerPageChange = (e) => {
@@ -182,7 +229,11 @@ const TestType = () => {
             </thead>
             <tbody>
               {data.map((row, index) => (
-                <tr key={index} onDoubleClick={() => handleRowDoubleClick(row)}>
+                <tr
+                  key={index}
+                  onDoubleClick={() => handleRowDoubleClick(row)}
+                  onContextMenu={(e) => handleContextMenu(e, row)}
+                >
                   {headers.map((header) => (
                     <td key={header} data-label={header}>
                       {
@@ -201,9 +252,22 @@ const TestType = () => {
           </table>
         )}
 
+        {contextMenu && (
+          <ul className='context-menu' style={{ top: contextMenu.y, left: contextMenu.x }}>
+            <li onClick={() => handleDelete(contextMenu.row)}>Delete row</li>
+          </ul>
+        )}
+
         <Modal
           isOpen={isModalOpen}
           closeModal={closeModal}
+          data={selectedRow}
+          onUpdate={fetchData}
+        />
+
+        <ModalDeleteRow
+          isOpenDeleteRow={isModalDeleteRowOpen}
+          closeModalDeleteRow={closeModalDeleteRow}
           data={selectedRow}
           onUpdate={fetchData}
         />
