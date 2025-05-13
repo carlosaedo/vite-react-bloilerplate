@@ -119,7 +119,11 @@ const Login = () => {
           <Logout />
         </div>
       ) : (
-        <div>
+        <div
+          style={{
+            padding: '0px 20px 0 20px',
+          }}
+        >
           <Typography variant='h4' gutterBottom>
             Login
           </Typography>

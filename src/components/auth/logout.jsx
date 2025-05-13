@@ -23,7 +23,11 @@ const Logout = () => {
 
   return (
     <>
-      <div>
+      <div
+        style={{
+          padding: '0px 20px 0 20px',
+        }}
+      >
         <Typography variant='h6'>Are you sure you want to logout?</Typography>
         <Button onClick={handleLogout} variant='contained' color='secondary'>
           Logout

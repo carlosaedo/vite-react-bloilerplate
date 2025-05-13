@@ -108,7 +108,12 @@ const TrackingPage = () => {
 
   return (
     <>
-      <div className='page-wrapper'>
+      <div
+        className='page-wrapper'
+        style={{
+          padding: '20px 20px 0 20px',
+        }}
+      >
         <div className='tracker-container'>
           {modifiedStages.map((stage, index) => {
             const isActive = hasException ? index <= currentStage + 1 : index <= currentStage;
