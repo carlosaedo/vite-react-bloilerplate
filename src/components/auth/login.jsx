@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import torrestirApi from '../api/torrestirApi';
 import './login.css';
@@ -13,6 +14,7 @@ import { useContextApi } from '../context/ApiContext';
 import Logout from '../auth/logout';
 
 const Login = () => {
+  const navigateTo = useNavigate();
   const { contextApiData, setContextApiData } = useContextApi();
   const [formData, setFormData] = useState({
     email: '',
@@ -57,7 +59,7 @@ const Login = () => {
           ...contextApiData,
           login: true,
         });
-        window.location.href = '/';
+        navigateTo('/');
       } else {
         setError('Não tens acesso a isto!');
         toggleShowFlork();

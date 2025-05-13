@@ -58,7 +58,7 @@ const App = () => {
               <Route path='/resetpass-error' element={<ResetPassError />} />
 
               <Route path='/' element={<Home />} />
-              <Route path='*' element={<Navigate to='/404' replace />} />
+              <Route path='*' element={<Navigate to='/' replace />} />
               <Route path='/404' element={<Page404 />} />
               <Route path='/tracking' element={<TrackingSearch />} />
               <Route path='/tracking/:trackingNumber' element={<Tracking />} />
