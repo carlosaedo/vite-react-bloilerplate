@@ -4,6 +4,24 @@ import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import Modal from '../TestType00-Modal/Modal';
 import ModalDeleteRow from '../TestType00-Modal/ModalDeleteRow';
 
+import {
+  Box,
+  Typography,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+} from '@mui/material';
+
 import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
 
 import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek.util';
@@ -11,8 +29,6 @@ import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek
 import api from '../api/api';
 
 import { useContextApi } from '../context/ApiContext';
-
-import './TestType-00.css';
 
 const TestType = () => {
   const navigateTo = useNavigate();
@@ -246,125 +262,157 @@ const TestType = () => {
 
   return (
     <>
-      <div style={{ padding: '1rem', fontFamily: 'Arial' }}>
-        <label htmlFor='datePicker' style={{ marginRight: '1rem' }}>
+      <Box sx={{ padding: 2 }}>
+        <Typography variant='subtitle1' gutterBottom>
           Select a date:
-        </label>
-        <input type='date' id='datePicker' value={selectedDate} onChange={handleDateChange} />
+        </Typography>
+
+        <TextField
+          type='date'
+          value={selectedDate}
+          onChange={handleDateChange}
+          InputLabelProps={{ shrink: true }}
+          sx={{ mb: 2 }}
+        />
+
         {selectedDate && (
-          <div style={{ marginTop: '1rem' }}>
+          <Typography variant='body1' sx={{ mt: 2 }}>
             <strong>Selected date:</strong> {selectedDate}
-          </div>
+          </Typography>
         )}
-      </div>
-      <div className='table-container'>
+      </Box>
+
+      <Box sx={{ padding: 2 }}>
         {data.length === 0 ? (
-          <p>No data to show</p>
+          <Typography>No data to show</Typography>
         ) : (
-          <table className='responsive-table'>
-            <thead>
-              <tr>
-                {headers.map((header) => (
-                  <th
-                    key={header}
-                    onClick={() => handleHeaderClick(header)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {header.toUpperCase()}
-                    {sortConfig.key === header && (
-                      <span>{sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽'}</span>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sortedData.map((row, index) => (
-                <tr
-                  key={index}
-                  onDoubleClick={() => handleRowDoubleClick(row)}
-                  onContextMenu={(e) => handleContextMenu(e, row)}
-                >
+          <TableContainer component={Paper}>
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
                   {headers.map((header) => (
-                    <td key={header} data-label={header}>
-                      {dateFields.includes(header)
-                        ? new Date(row[header]).toLocaleDateString('pt-PT')
-                        : row[header]}
-                    </td>
+                    <TableCell
+                      key={header}
+                      onClick={() => handleHeaderClick(header)}
+                      sx={{ cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      {header.toUpperCase()}
+                      {sortConfig.key === header && (
+                        <span>{sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽'}</span>
+                      )}
+                    </TableCell>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sortedData.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    hover
+                    onDoubleClick={() => handleRowDoubleClick(row)}
+                    onContextMenu={(e) => handleContextMenu(e, row)}
+                  >
+                    {headers.map((header) => (
+                      <TableCell key={header}>
+                        {dateFields.includes(header)
+                          ? new Date(row[header]).toLocaleDateString('pt-PT')
+                          : row[header]}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
+      </Box>
 
-        {contextMenu && (
-          <ul className='context-menu' style={{ top: contextMenu.y, left: contextMenu.x }}>
-            <li onClick={() => handleDelete(contextMenu.row)}>Delete row</li>
-          </ul>
-        )}
+      {contextMenu && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            bgcolor: 'background.paper',
+            boxShadow: 2,
+            zIndex: 1000,
+            borderRadius: 1,
+          }}
+        >
+          <Button onClick={() => handleDelete(contextMenu.row)} size='small'>
+            Delete row
+          </Button>
+        </Box>
+      )}
 
-        <Modal
-          isOpen={isModalOpen}
-          closeModal={closeModal}
-          data={selectedRow}
-          onUpdate={fetchData}
-        />
+      <Modal isOpen={isModalOpen} closeModal={closeModal} data={selectedRow} onUpdate={fetchData} />
 
-        <ModalDeleteRow
-          isOpenDeleteRow={isModalDeleteRowOpen}
-          closeModalDeleteRow={closeModalDeleteRow}
-          data={selectedRow}
-          onUpdate={fetchData}
-        />
-      </div>
+      <ModalDeleteRow
+        isOpenDeleteRow={isModalDeleteRowOpen}
+        closeModalDeleteRow={closeModalDeleteRow}
+        data={selectedRow}
+        onUpdate={fetchData}
+      />
 
       {/* Pagination Controls */}
-      <div className='pagination'>
-        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+      <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+        <Button
+          variant='outlined'
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
           &laquo; Previous
-        </button>
+        </Button>
 
-        <div className='page-numbers'>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {generatePageNumbers().map((page, index) => (
-            <span
+            <Button
               key={index}
+              variant={page === currentPage ? 'contained' : 'text'}
               onClick={() => typeof page === 'number' && handlePageChange(page)}
-              className={`page-number ${page === currentPage ? 'active' : ''}`}
+              color={page === currentPage ? 'primary' : 'inherit'}
+              size='small'
             >
               {page}
-            </span>
+            </Button>
           ))}
-        </div>
+        </Box>
 
-        <input
+        <TextField
           type='number'
           value={inputPage}
-          min='1'
-          max={totalPages}
           onChange={handleInputChange}
           onBlur={handleJumpToPage}
-          className='page-input'
+          slotProps={{
+            htmlInput: {
+              min: 1,
+              max: totalPages,
+            },
+          }}
+          size='small'
+          label='Go to page'
+          sx={{ width: 120 }}
         />
 
-        <button
+        <Button
+          variant='outlined'
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           Next &raquo;
-        </button>
+        </Button>
 
-        {/* Dropdown for page size selection */}
-        <select value={pageSize} onChange={handlePerPageChange} className='page-size-dropdown'>
-          {[10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100].map(
-            (size) => (
-              <option key={size} value={size}>
-                {size} per page
-              </option>
-            ),
-          )}
-        </select>
-      </div>
+        <FormControl size='small'>
+          <InputLabel>Rows per page</InputLabel>
+          <Select value={pageSize} label='Rows per page' onChange={handlePerPageChange}>
+            {[10, 15, 20, 25, 30, 40, 50, 75, 100].map((size) => (
+              <MenuItem key={size} value={size}>
+                {size}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
     </>
   );
 };

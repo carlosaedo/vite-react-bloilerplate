@@ -1,56 +1,51 @@
-/* Sidebar container */
-.sidebar {
-  height: 100vh;
-  width: 250px;
+/* Base Drawer styles */
+.MuiDrawer-paper {
   background-color: #ffffff;
   color: #003e2d;
-  transition: width 0.3s ease;
-  overflow: hidden;
-  position: fixed;
-  top: 60px;
-  left: 0;
   font-family: Arial, sans-serif;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
 }
 
-/* Collapsed state */
-.sidebar.collapsed {
-  width: 60px;
+/* Collapsed state (only when 'collapsed' class is present) */
+.MuiDrawer-paper.sidebar-collapsed {
+  width: 60px !important;
+}
+
+.sidebar-collapsed-text {
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflowing text */
+  width: 0; /* Start with width 0 when collapsed */
+  opacity: 0; /* Start with opacity 0 when collapsed */
+  visibility: hidden; /* Hide it from layout */
+  transition: width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+}
+
+.sidebar-expanded-text {
+  visibility: visible; /* Make it visible when expanded */
+  opacity: 1; /* Full opacity */
+  width: auto; /* Let it take up its natural width */
 }
 
 /* Header with toggle button */
 .sidebar-header {
-  padding: 16px;
+  padding: 14px;
   display: flex;
   justify-content: flex-end;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.menu-toggle {
-  background: none;
-  border: none;
-  color: #003e2d;
-  font-size: 24px;
-  cursor: pointer;
-  display: contents;
-}
-
-.menu-toggle:hover {
-  color: #ffc928;
-}
-
 /* Menu list */
-.sidebar ul {
-  list-style: none;
-  margin: 0;
+.MuiList-root {
   padding: 0;
 }
 
-.sidebar li {
+.MuiListItem-root {
   border-bottom: 1px solid #003e2d1a;
 }
 
 /* NavLink styling */
-.sidebar a {
+.MuiListItemButton-root {
   display: flex;
   align-items: center;
   padding: 14px 20px;
@@ -59,29 +54,27 @@
   transition: background 0.2s;
 }
 
-.sidebar a .icon {
-  width: 30px;
-  font-size: 18px;
-  display: contents;
+.MuiListItemIcon-root {
+  min-width: 35px;
 }
 
-.sidebar a .text {
-  white-space: nowrap;
-  margin-left: 8px;
-}
-
-/* Collapsed: hide text */
-.sidebar.collapsed .text {
+/* Only hide text when collapsed */
+.MuiDrawer-paper.sidebar-collapsed .MuiListItemText-root {
   display: none;
 }
 
 /* Hover and active states */
-.sidebar a:hover {
+.MuiListItemButton-root:hover {
   background-color: #003e2d18;
 }
 
-.sidebar a.active {
+.MuiListItemButton-root.Mui-selected {
   background-color: #ffc928;
   color: #003e2d;
   font-weight: bold;
+}
+
+/* Alternatively, you can target the ListItemButton itself */
+.MuiListItemButton-root.active {
+  background-color: #003e2d26 !important;
 }

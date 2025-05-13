@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/torrestirApi';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
+  Typography,
+  TextField,
+  IconButton,
+  Divider,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
-import './Modal.css';
 
 const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }) => {
   if (!isOpenDeleteRow || !data) return null;
@@ -20,29 +32,42 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
   const dateFields = dateFieldsArray;
 
   return (
-    <div className='modal-overlay' onClick={closeModalDeleteRow}>
-      <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-        <button className='close-btn' onClick={closeModalDeleteRow}>
-          &times;
-        </button>
-        <h2>Confirm operation</h2>
-        <div className='modal-body'>
-          {Object.entries(data).map(([key, value]) => (
-            <div className='info-grid-modal' key={key}>
-              <div>
-                <p key={key}>
-                  <strong>{key.toUpperCase()}:</strong>{' '}
-                  {dateFields.includes(key) ? new Date(value).toLocaleDateString('pt-PT') : value}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <button className='save-btn' onClick={handleDelete}>
+    <Dialog open={isOpenDeleteRow} onClose={closeModalDeleteRow} maxWidth='sm' fullWidth>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant='h6' sx={{ color: '#003e2d' }}>
+          Confirm Operation
+        </Typography>{' '}
+        {/* Applying primary green color */}
+        <IconButton onClick={closeModalDeleteRow}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        {Object.entries(data).map(([key, value], index) => (
+          <div key={key}>
+            <Typography variant='subtitle2' gutterBottom sx={{ color: '#003e2d' }}>
+              {key.toUpperCase()}
+            </Typography>
+
+            {dateFields.includes(key) ? (
+              <Typography>{new Date(value).toLocaleDateString('pt-PT')}</Typography>
+            ) : (
+              <Typography>{value}</Typography>
+            )}
+
+            {/* Add a divider between entries, except after the last one */}
+            {index < Object.entries(data).length - 1 && <Divider sx={{ my: 2 }} />}
+          </div>
+        ))}
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={handleDelete} variant='contained' color='error'>
           Delete
-        </button>
-      </div>
-    </div>
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

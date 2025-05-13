@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './Modal.css';
+import api from '../api/api';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
+  Typography,
+  TextField,
+  IconButton,
+  Divider,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
 
 const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
@@ -21,7 +33,7 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`/api/endpoint/${data.Guia}`, {
+      await api.put(`/api/endpoint/${data.Guia}`, {
         lojas,
         hora_de: horaDe,
         hora_ate: horaAte,
@@ -37,46 +49,66 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
   const dateFields = dateFieldsArray;
 
   return (
-    <div className='modal-overlay' onClick={closeModal}>
-      <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-        <button className='close-btn' onClick={closeModal}>
-          &times;
-        </button>
-        <h2>Details</h2>
-        <div className='modal-body'>
-          {Object.entries(data).map(([key, value]) => (
-            <div className='info-grid-modal' key={key}>
-              <div>
-                <p key={key}>
-                  <strong>{key.toUpperCase()}:</strong>{' '}
-                  {['lojas', 'hora_de', 'hora_ate'].includes(key) ? (
-                    <input
-                      type='text'
-                      value={key === 'lojas' ? lojas : key === 'hora_de' ? horaDe : horaAte}
-                      onChange={(e) =>
-                        key === 'lojas'
-                          ? setLojas(e.target.value)
-                          : key === 'hora_de'
-                          ? setHoraDe(e.target.value)
-                          : setHoraAte(e.target.value)
-                      }
-                    />
-                  ) : // Check if the cell value is a date and format it
-                  dateFields.includes(key) ? (
-                    new Date(value).toLocaleDateString('pt-PT')
-                  ) : (
-                    value
-                  )}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <button className='save-btn' onClick={handleSave}>
+    <Dialog open={isOpen} onClose={closeModal} maxWidth='sm' fullWidth>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant='h6' sx={{ color: '#003e2d' }}>
+          Details
+        </Typography>{' '}
+        {/* Applying primary green color */}
+        <IconButton onClick={closeModal}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers>
+        {Object.entries(data).map(([key, value], index) => (
+          <div key={key}>
+            <Typography variant='subtitle2' gutterBottom sx={{ color: '#003e2d' }}>
+              {key.toUpperCase()}
+            </Typography>
+
+            {['lojas', 'hora_de', 'hora_ate'].includes(key) ? (
+              <TextField
+                fullWidth
+                size='small'
+                value={key === 'lojas' ? lojas : key === 'hora_de' ? horaDe : horaAte}
+                onChange={(e) => {
+                  if (key === 'lojas') {
+                    setLojas(e.target.value);
+                  } else if (key === 'hora_de') {
+                    setHoraDe(e.target.value);
+                  } else {
+                    setHoraAte(e.target.value);
+                  }
+                }}
+                sx={{ marginBottom: 1 }}
+              />
+            ) : dateFields.includes(key) ? (
+              <Typography>{new Date(value).toLocaleDateString('pt-PT')}</Typography>
+            ) : (
+              <Typography>{value}</Typography>
+            )}
+
+            {/* Add a divider between entries, except after the last one */}
+            {index < Object.entries(data).length - 1 && <Divider sx={{ my: 2 }} />}
+          </div>
+        ))}
+      </DialogContent>
+
+      <DialogActions>
+        <Button
+          onClick={handleSave}
+          variant='contained'
+          sx={{
+            backgroundColor: '#003e2d',
+            color: 'white',
+            '&:hover': { backgroundColor: '#00221b' },
+          }}
+        >
           Save changes
-        </button>
-      </div>
-    </div>
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import authLogout from '../../utils/authLogout';
+import { Button, Typography } from '@mui/material';
 
 import { useContextApi } from '../context/ApiContext';
 
@@ -23,8 +24,10 @@ const Logout = () => {
   return (
     <>
       <div>
-        <h2>Are you sure you want to logout?</h2>
-        <button onClick={handleLogout}>Logout</button>
+        <Typography variant='h6'>Are you sure you want to logout?</Typography>
+        <Button onClick={handleLogout} variant='contained' color='secondary'>
+          Logout
+        </Button>
       </div>
     </>
   );

@@ -3,6 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import torrestirApi from '../api/torrestirApi';
 import './login.css';
+import {
+  TextField,
+  Button,
+  Typography,
+  IconButton,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+} from '@mui/material';
 import Flork from '../../assets/flork.png';
 import FlorkHide from '../../assets/flork-114-png.png';
 import FlorkYay from '../../assets/yay-flork.png';
@@ -110,34 +120,70 @@ const Login = () => {
         </div>
       ) : (
         <div>
-          <h2>Login</h2>
-          {showFlork && <img className='flork' src={Flork} />}
-          {showCryingFlork && <img className='crying-flork' src={CryingFlork} />}
-          <form className='login-form' onSubmit={handleSubmit}>
-            {error && <div className='error'>{error}</div>}
-            <div>
-              <label>Email:</label>
-              <input type='email' name='email' value={formData.email} onChange={handleChange} />
-            </div>
-            <label>Password:</label>
-            <div className='input-form-password'>
-              <input
+          <Typography variant='h4' gutterBottom>
+            Login
+          </Typography>
+
+          {showFlork && <img className='flork' src={Flork} alt='Flork' />}
+          {showCryingFlork && <img className='crying-flork' src={CryingFlork} alt='Crying Flork' />}
+
+          <form onSubmit={handleSubmit}>
+            {error && (
+              <Typography variant='body2' color='error' sx={{ marginBottom: 2 }}>
+                {error}
+              </Typography>
+            )}
+
+            <TextField
+              label='Email'
+              type='email'
+              name='email'
+              value={formData.email}
+              onChange={handleChange}
+              fullWidth
+              margin='normal'
+              variant='outlined'
+            />
+
+            <FormControl fullWidth margin='normal' variant='outlined'>
+              <InputLabel>Password</InputLabel>
+              <OutlinedInput
                 type={showPassword ? 'text' : 'password'}
                 name='password'
                 value={formData.password}
                 onChange={handleChange}
+                endAdornment={
+                  <InputAdornment position='end'>
+                    <IconButton onClick={handleTogglePasswordVisibility}>
+                      <img
+                        className='flork-pass-login'
+                        src={showPassword ? FlorkYay : FlorkHide}
+                        alt='Toggle Password Visibility'
+                      />
+                    </IconButton>
+                  </InputAdornment>
+                }
+                label='Password'
               />
-              <span onClick={handleTogglePasswordVisibility}>
-                <img className='flork-pass-login' src={showPassword ? FlorkYay : FlorkHide} />
-              </span>
-            </div>
-            <button type='submit'>Login</button>
+            </FormControl>
+
+            <Button
+              type='submit'
+              variant='contained'
+              color='primary'
+              fullWidth
+              sx={{ marginTop: 2 }}
+            >
+              Login
+            </Button>
           </form>
-          {/*<p>
+
+          {/* Uncomment the following if you want to include the reset password link */}
+          {/* <p>
             <Link className='custom-link' to='/resetpassword'>
-              Repor palavra chave
+              Reset Password
             </Link>
-          </p>*/}
+          </p> */}
         </div>
       )}
     </>
