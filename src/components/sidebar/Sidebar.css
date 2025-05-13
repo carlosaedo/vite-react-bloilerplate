@@ -34,6 +34,10 @@
   display: contents;
 }
 
+.menu-toggle:hover {
+  color: #ffc928;
+}
+
 /* Menu list */
 .sidebar ul {
   list-style: none;
