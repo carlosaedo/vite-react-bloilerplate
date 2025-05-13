@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Modal.css';
+import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
 
 const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
   const [lojas, setLojas] = useState('');
@@ -33,7 +34,7 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
     }
   };
 
-  const dateFields = ['D. Registo', 'DiaEntrega'];
+  const dateFields = dateFieldsArray;
 
   return (
     <div className='modal-overlay' onClick={closeModal}>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/torrestirApi';
+import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
 import './Modal.css';
 
 const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }) => {
@@ -16,7 +17,7 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
     }
   };
 
-  const dateFields = ['D. Registo', 'DiaEntrega'];
+  const dateFields = dateFieldsArray;
 
   return (
     <div className='modal-overlay' onClick={closeModalDeleteRow}>
@@ -31,13 +32,7 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
               <div>
                 <p key={key}>
                   <strong>{key.toUpperCase()}:</strong>{' '}
-                  {
-
-
-                      dateFields.includes(key)
-    ? new Date(value).toLocaleDateString('pt-PT')
-    : value
-                  }
+                  {dateFields.includes(key) ? new Date(value).toLocaleDateString('pt-PT') : value}
                 </p>
               </div>
             </div>

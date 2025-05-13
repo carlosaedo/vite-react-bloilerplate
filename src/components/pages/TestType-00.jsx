@@ -4,6 +4,8 @@ import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import Modal from '../TestType00-Modal/Modal';
 import ModalDeleteRow from '../TestType00-Modal/ModalDeleteRow';
 
+import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
+
 import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek.util';
 
 import api from '../api/api';
@@ -39,7 +41,7 @@ const TestType = () => {
 
   const [contextMenu, setContextMenu] = useState(null); // { x, y, rowIndex }
 
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const handleContextMenu = (event, row) => {
     event.preventDefault();
@@ -72,7 +74,7 @@ const TestType = () => {
         },
       });
 
-      console.log(response.data.data)
+      console.log(response.data.data);
       if (response && response.data && response.data.data) {
         setData(response.data.data);
         setTotalPages(response.data.pagination.totalPages);
@@ -240,7 +242,7 @@ const TestType = () => {
 
   const headers = data.length ? Object.keys(data[0]) : [];
 
-  const dateFields = ['D. Registo', 'DiaEntrega'];
+  const dateFields = dateFieldsArray;
 
   return (
     <>
@@ -260,36 +262,40 @@ const TestType = () => {
           <p>No data to show</p>
         ) : (
           <table className='responsive-table'>
-      <thead>
-        <tr>
-          {headers.map((header) => (
-            <th key={header} onClick={() => handleHeaderClick(header)} style={{ cursor: 'pointer' }}>
-              {header.toUpperCase()}
-              {sortConfig.key === header && (
-                <span>{sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽'}</span>
-              )}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {sortedData.map((row, index) => (
-          <tr
-            key={index}
-            onDoubleClick={() => handleRowDoubleClick(row)}
-            onContextMenu={(e) => handleContextMenu(e, row)}
-          >
-            {headers.map((header) => (
-              <td key={header} data-label={header}>
-  {dateFields.includes(header)
-    ? new Date(row[header]).toLocaleDateString('pt-PT')
-    : row[header]}
-</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            <thead>
+              <tr>
+                {headers.map((header) => (
+                  <th
+                    key={header}
+                    onClick={() => handleHeaderClick(header)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {header.toUpperCase()}
+                    {sortConfig.key === header && (
+                      <span>{sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽'}</span>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.map((row, index) => (
+                <tr
+                  key={index}
+                  onDoubleClick={() => handleRowDoubleClick(row)}
+                  onContextMenu={(e) => handleContextMenu(e, row)}
+                >
+                  {headers.map((header) => (
+                    <td key={header} data-label={header}>
+                      {dateFields.includes(header)
+                        ? new Date(row[header]).toLocaleDateString('pt-PT')
+                        : row[header]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
 
         {contextMenu && (
