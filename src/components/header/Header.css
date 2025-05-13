@@ -1,0 +1,30 @@
+/* Header.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #003e2d; /* or your preferred background color */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  z-index: 1000;
+}
+
+.logo-span {
+  color: #ffc928c7;
+}
+
+.top-logo {
+  height: 38px; /* Adjust logo size */
+  width: auto;
+  object-fit: contain;
+  margin-left: 10px; /* Adjust the left margin if necessary */
+}
+
+@media (max-width: 600px) {
+  .top-logo {
+    height: 40px; /* Adjust logo size for mobile */
+  }
+}

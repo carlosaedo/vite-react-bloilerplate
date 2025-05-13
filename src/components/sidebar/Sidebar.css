@@ -1,0 +1,87 @@
+/* Sidebar container */
+.sidebar {
+  height: 100vh;
+  width: 250px;
+  background-color: #ffffff;
+  color: #003e2d;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Collapsed state */
+.sidebar.collapsed {
+  width: 60px;
+}
+
+/* Header with toggle button */
+.sidebar-header {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  color: #003e2d;
+  font-size: 24px;
+  cursor: pointer;
+  display: contents;
+}
+
+.menu-toggle:hover {
+  color: #ffc928;
+}
+
+/* Menu list */
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar li {
+  border-bottom: 1px solid #003e2d1a;
+}
+
+/* NavLink styling */
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  color: #003e2d;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.sidebar a .icon {
+  width: 30px;
+  font-size: 18px;
+  display: contents;
+}
+
+.sidebar a .text {
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+/* Collapsed: hide text */
+.sidebar.collapsed .text {
+  display: none;
+}
+
+/* Hover and active states */
+.sidebar a:hover {
+  background-color: #003e2d18;
+}
+
+.sidebar a.active {
+  background-color: #ffc928;
+  color: #003e2d;
+  font-weight: bold;
+}
