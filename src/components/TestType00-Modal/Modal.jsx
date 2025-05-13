@@ -33,6 +33,8 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
     }
   };
 
+  const dateFields = ['D. Registo', 'DiaEntrega'];
+
   return (
     <div className='modal-overlay' onClick={closeModal}>
       <div className='modal-content' onClick={(e) => e.stopPropagation()}>
@@ -46,26 +48,24 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
               <div>
                 <p key={key}>
                   <strong>{key.toUpperCase()}:</strong>{' '}
-                  {
-                    ['lojas', 'hora_de', 'hora_ate'].includes(key) ? (
-                      <input
-                        type='text'
-                        value={key === 'lojas' ? lojas : key === 'hora_de' ? horaDe : horaAte}
-                        onChange={(e) =>
-                          key === 'lojas'
-                            ? setLojas(e.target.value)
-                            : key === 'hora_de'
-                            ? setHoraDe(e.target.value)
-                            : setHoraAte(e.target.value)
-                        }
-                      />
-                    ) : // Check if the cell value is a date and format it
-                    value && new Date(value) instanceof Date && !isNaN(new Date(value)) ? (
-                      new Date(value).toLocaleDateString('pt-PT') // Format to YYYY-MM-DD
-                    ) : (
-                      value
-                    ) // Otherwise, show the value as is
-                  }
+                  {['lojas', 'hora_de', 'hora_ate'].includes(key) ? (
+                    <input
+                      type='text'
+                      value={key === 'lojas' ? lojas : key === 'hora_de' ? horaDe : horaAte}
+                      onChange={(e) =>
+                        key === 'lojas'
+                          ? setLojas(e.target.value)
+                          : key === 'hora_de'
+                          ? setHoraDe(e.target.value)
+                          : setHoraAte(e.target.value)
+                      }
+                    />
+                  ) : // Check if the cell value is a date and format it
+                  dateFields.includes(key) ? (
+                    new Date(value).toLocaleDateString('pt-PT')
+                  ) : (
+                    value
+                  )}
                 </p>
               </div>
             </div>

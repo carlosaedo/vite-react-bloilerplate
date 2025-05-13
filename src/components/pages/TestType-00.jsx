@@ -39,6 +39,8 @@ const TestType = () => {
 
   const [contextMenu, setContextMenu] = useState(null); // { x, y, rowIndex }
 
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
   const handleContextMenu = (event, row) => {
     event.preventDefault();
     setContextMenu({
@@ -69,6 +71,8 @@ const TestType = () => {
           selectedDate: selectedDate,
         },
       });
+
+      console.log(response.data.data)
       if (response && response.data && response.data.data) {
         setData(response.data.data);
         setTotalPages(response.data.pagination.totalPages);
@@ -121,6 +125,40 @@ const TestType = () => {
   useEffect(() => {
     console.log('Updated context note:', contextApiData.note);
   }, [contextApiData.note]);
+
+  const sortedData = React.useMemo(() => {
+    if (!sortConfig.key) return data;
+
+    return [...data].sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+
+      // Try to parse as date
+      const aDate = new Date(aValue);
+      const bDate = new Date(bValue);
+      const isDate = !isNaN(aDate) && !isNaN(bDate);
+
+      let comparison = 0;
+      if (isDate) {
+        comparison = aDate - bDate;
+      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+        comparison = aValue.localeCompare(bValue);
+      } else {
+        comparison = aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+      }
+
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
+    });
+  }, [data, sortConfig]);
+
+  const handleHeaderClick = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      }
+      return { key, direction: 'asc' };
+    });
+  };
 
   const handleRowDoubleClick = (row) => {
     setSelectedRow(row);
@@ -202,6 +240,8 @@ const TestType = () => {
 
   const headers = data.length ? Object.keys(data[0]) : [];
 
+  const dateFields = ['D. Registo', 'DiaEntrega'];
+
   return (
     <>
       <div style={{ padding: '1rem', fontFamily: 'Arial' }}>
@@ -220,36 +260,36 @@ const TestType = () => {
           <p>No data to show</p>
         ) : (
           <table className='responsive-table'>
-            <thead>
-              <tr>
-                {headers.map((header) => (
-                  <th key={header}>{header.toUpperCase()}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row, index) => (
-                <tr
-                  key={index}
-                  onDoubleClick={() => handleRowDoubleClick(row)}
-                  onContextMenu={(e) => handleContextMenu(e, row)}
-                >
-                  {headers.map((header) => (
-                    <td key={header} data-label={header}>
-                      {
-                        // Check if the cell value is a date and format it
-                        row[header] &&
-                        new Date(row[header]) instanceof Date &&
-                        !isNaN(new Date(row[header]))
-                          ? new Date(row[header]).toLocaleDateString('pt-PT') // Format to YYYY-MM-DD
-                          : row[header] // Otherwise, show the value as is
-                      }
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <thead>
+        <tr>
+          {headers.map((header) => (
+            <th key={header} onClick={() => handleHeaderClick(header)} style={{ cursor: 'pointer' }}>
+              {header.toUpperCase()}
+              {sortConfig.key === header && (
+                <span>{sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽'}</span>
+              )}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {sortedData.map((row, index) => (
+          <tr
+            key={index}
+            onDoubleClick={() => handleRowDoubleClick(row)}
+            onContextMenu={(e) => handleContextMenu(e, row)}
+          >
+            {headers.map((header) => (
+              <td key={header} data-label={header}>
+  {dateFields.includes(header)
+    ? new Date(row[header]).toLocaleDateString('pt-PT')
+    : row[header]}
+</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
         )}
 
         {contextMenu && (

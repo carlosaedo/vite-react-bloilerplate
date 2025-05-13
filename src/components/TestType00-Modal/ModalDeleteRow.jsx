@@ -16,6 +16,8 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
     }
   };
 
+  const dateFields = ['D. Registo', 'DiaEntrega'];
+
   return (
     <div className='modal-overlay' onClick={closeModalDeleteRow}>
       <div className='modal-content' onClick={(e) => e.stopPropagation()}>
@@ -30,9 +32,11 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
                 <p key={key}>
                   <strong>{key.toUpperCase()}:</strong>{' '}
                   {
-                    value && new Date(value) instanceof Date && !isNaN(new Date(value))
-                      ? new Date(value).toLocaleDateString('pt-PT') // Format to YYYY-MM-DD
-                      : value // Otherwise, show the value as is
+
+
+                      dateFields.includes(key)
+    ? new Date(value).toLocaleDateString('pt-PT')
+    : value
                   }
                 </p>
               </div>
