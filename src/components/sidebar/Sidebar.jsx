@@ -49,55 +49,99 @@ const Sidebar = ({ onToggle }) => {
       </div>
 
       <ul>
-        <li>
-          <NavLink
-            exact='true'
-            to='/'
-            onClick={toggleSidebarMenuItem}
-            className={({ isActive }) => (isActive ? 'active' : '')}
-          >
-            <span className='icon'>
-              <FaHome />
-            </span>
-            <span className='text'>Home</span>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to='/tracking'
-            onClick={toggleSidebarMenuItem}
-            className={({ isActive }) => (isActive ? 'active' : '')}
-          >
-            <span className='icon'>
-              <FaBoxOpen />
-            </span>
-            <span className='text'>Tracking System</span>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to='/test-type-00'
-            onClick={toggleSidebarMenuItem}
-            className={({ isActive }) => (isActive ? 'active' : '')}
-          >
-            <span className='icon'>
-              <FaTable />
-            </span>
-            <span className='text'>Test Type 00</span>
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to='/login'
-            onClick={toggleSidebarMenuItem}
-            className={({ isActive }) => (isActive ? 'active' : '')}
-          >
-            <span className='icon'>
-              <FaRegUserCircle />
-            </span>
-            <span className='text'>{loginStatus ? 'Logout' : 'Login'}</span>
-          </NavLink>
-        </li>
+        {loginStatus ? (
+          <>
+            <li>
+              <NavLink
+                exact='true'
+                to='/'
+                onClick={toggleSidebarMenuItem}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <span className='icon'>
+                  <FaHome />
+                </span>
+                <span className='text'>Home</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to='/tracking'
+                onClick={toggleSidebarMenuItem}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <span className='icon'>
+                  <FaBoxOpen />
+                </span>
+                <span className='text'>Tracking System</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to='/test-type-00'
+                onClick={toggleSidebarMenuItem}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <span className='icon'>
+                  <FaTable />
+                </span>
+                <span className='text'>Test Type 00</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to='/login'
+                onClick={toggleSidebarMenuItem}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <span className='icon'>
+                  <FaRegUserCircle />
+                </span>
+                <span className='text'>{loginStatus ? 'Logout' : 'Login'}</span>
+              </NavLink>
+            </li>{' '}
+          </>
+        ) : (
+          <>
+            <li>
+              <NavLink
+                exact='true'
+                to='/'
+                onClick={toggleSidebarMenuItem}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <span className='icon'>
+                  <FaHome />
+                </span>
+                <span className='text'>Home</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to='/tracking'
+                onClick={toggleSidebarMenuItem}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <span className='icon'>
+                  <FaBoxOpen />
+                </span>
+                <span className='text'>Tracking System</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to='/login'
+                onClick={toggleSidebarMenuItem}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <span className='icon'>
+                  <FaRegUserCircle />
+                </span>
+                <span className='text'>{loginStatus ? 'Logout' : 'Login'}</span>
+              </NavLink>
+            </li>{' '}
+          </>
+        )}
       </ul>
     </div>
   );
