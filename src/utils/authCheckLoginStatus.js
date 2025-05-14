@@ -16,8 +16,12 @@ async function checkLoginStatus() {
       localStorage.removeItem('token');
       return false;
     }
-
-    return true;
+    if (response?.data?.isValid) {
+      return true;
+    } else {
+      localStorage.removeItem('token');
+      return false;
+    }
   } catch (error) {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
