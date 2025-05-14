@@ -13,16 +13,20 @@ async function checkLoginStatus() {
     });
 
     if (!response || !response.data || !response.data.isValid) {
+      localStorage.removeItem('token');
       return false;
     }
 
     return true;
   } catch (error) {
     if (error.response?.status === 401) {
+      localStorage.removeItem('token');
       return false;
     } else if (error.response?.status === 500) {
+      localStorage.removeItem('token');
       return false;
     } else {
+      localStorage.removeItem('token');
       console.error(error);
     }
   }
