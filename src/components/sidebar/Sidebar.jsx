@@ -34,7 +34,12 @@ const Sidebar = ({ onToggle }) => {
     }
 
     checkLoginStatus();
-  }, [collapsed, onToggle, contextApiData?.login]);
+  }, [contextApiData?.login]);
+
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', collapsed);
+    onToggle(collapsed ? 60 : 250);
+  }, [collapsed, onToggle]);
 
   const toggleSidebar = () => {
     setCollapsed((prev) => !prev);

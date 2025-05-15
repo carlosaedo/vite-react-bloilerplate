@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import api from '../api/api';
+import { useNavigate } from 'react-router-dom';
+import torrestirApi from '../api/torrestirApi';
 import { Link } from 'react-router-dom';
-import './login.css';
+import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material';
 
 const ResetPassword = () => {
+  const navigateTo = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
   });
@@ -11,15 +14,24 @@ const ResetPassword = () => {
 
   async function handleRequestResetPassword() {
     try {
-      const response = await api.post(
-        `/auth/request-reset-password?email=${formData.email}`,
-        formData,
-      );
-      console.log(response);
-      setMessage('Pedido de reset concluido. Verifique a sua caixa de email.');
+      const response = await torrestirApi.post('/auth/request-password-reset', formData);
+      console.log(response.data);
+      if (response?.data?.message === 'Código de verificação enviado por email.') {
+        setMessage('Código de verificação enviado por email.');
+        setTimeout(() => {
+          navigateTo('/reset-password-next-step');
+        }, 1000);
+      } else {
+        setMessage('Erro a pedir o código de verificação.');
+      }
     } catch (error) {
-      if (error.response && error.response.status === 404) {
+      if (error.response?.status === 404) {
         setMessage('Este email não está registado');
+      } else if (
+        error.response?.status === 400 &&
+        error.response?.data === 'Limite diário de pedidos de reset atingido.'
+      ) {
+        setMessage('Limite diário de pedidos de reset atingido.');
       } else {
         console.error(error);
       }
@@ -41,27 +53,48 @@ const ResetPassword = () => {
 
   return (
     <>
-      <h2>Login</h2>
-      <form className='login-form' onSubmit={handleSubmit}>
-        {message && <div className='error'>{message}</div>}
-        <div>
-          <label>Email:</label>
-          <input
+      <div
+        style={{
+          padding: '0px 20px 0 20px',
+        }}
+      >
+        <Typography variant='h5' gutterBottom>
+          Request reset password
+        </Typography>
+
+        <Box
+          component='form'
+          onSubmit={handleSubmit}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
+          {message && (
+            <Typography color='error' variant='body2'>
+              {message}
+            </Typography>
+          )}
+
+          <TextField
+            label='Email'
             type='email'
             name='email'
             value={formData.email}
             onChange={handleChange}
             required
+            fullWidth
+            size='small'
           />
-        </div>
 
-        <button type='submit'>Reset</button>
-      </form>
-      <p>
-        <Link className='custom-link' to='/login'>
-          Voltar ao login
-        </Link>
-      </p>
+          <Button type='submit' variant='contained' color='primary'>
+            Request reset password
+          </Button>
+        </Box>
+
+        <Typography variant='body2' sx={{ mt: 2 }}>
+          <MuiLink component={Link} to='/login' underline='hover'>
+            Back to login
+          </MuiLink>
+        </Typography>
+      </div>
     </>
   );
 };

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import torrestirApi from '../api/torrestirApi';
 
-const useBackendStatus = (interval = 10000) => {
+const useBackendStatus = (interval = 60000) => {
   const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
@@ -14,7 +14,6 @@ const useBackendStatus = (interval = 10000) => {
           headers: { 'Cache-Control': 'no-store' },
         });
         const text = response.data;
-        console.log('response: ', text);
         if (isMounted) setIsOnline(text === 'pong');
       } catch (error) {
         if (isMounted) setIsOnline(false);

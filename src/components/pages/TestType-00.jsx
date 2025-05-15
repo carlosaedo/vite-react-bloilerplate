@@ -90,11 +90,9 @@ const TestType = () => {
         },
       });
 
-      console.log(response.data.data);
       if (response && response.data && response.data.data) {
         setData(response.data.data);
         setTotalPages(response.data.pagination.totalPages);
-        console.log(response.data.data);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -106,9 +104,10 @@ const TestType = () => {
 
   useEffect(() => {
     // Run on mount: check login and set startup date
+    console.log('// Run on mount: check login and set startup date');
     async function checkLoginStatus() {
       const loginStatus = await authCheckLoginStatus();
-      console.log('login status:', loginStatus);
+      console.log('login status here on testtype :', loginStatus);
       if (!loginStatus) {
         navigateTo('/login');
       }
@@ -116,18 +115,30 @@ const TestType = () => {
 
     checkLoginStatus();
 
-    if (startupDateFirstTime) {
-      setSelectedDate(getLastFridayOfPreviousWeek());
-      setStartupDateFirstTime(false);
-    }
-
     // Set initial context data
     setContextApiData((prev) => ({
       ...prev,
       note: 'Lol this works fine.',
     }));
-    console.log(contextApiData.note); // This will still log old value, because `setState` is async
   }, []); // Only on initial mount
+
+  useEffect(() => {
+    console.log('Updated context note:', contextApiData.note);
+  }, [contextApiData.note]);
+
+  useEffect(() => {
+    if (startupDateFirstTime) {
+      const friday = getLastFridayOfPreviousWeek();
+      setSelectedDate(friday);
+      setStartupDateFirstTime(false);
+    }
+  }, [startupDateFirstTime]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchData();
+    }
+  }, [selectedDate, currentPage, pageSize]);
 
   useEffect(() => {
     // Re-fetch data when selectedDate, page, or page size changes
@@ -244,7 +255,9 @@ const TestType = () => {
   };
 
   const handleJumpToPage = () => {
-    const pageNumber = Math.max(1, Math.min(totalPages, parseInt(inputPage, 10)));
+    const parsed = parseInt(inputPage, 10);
+    if (isNaN(parsed)) return;
+    const pageNumber = Math.max(1, Math.min(totalPages, parsed));
     handlePageChange(pageNumber);
   };
 
@@ -262,6 +275,11 @@ const TestType = () => {
 
   return (
     <>
+      {error && (
+        <Alert severity='error' onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
       <Box sx={{ padding: 2 }}>
         <Typography variant='subtitle1' gutterBottom>
           Select a date:
@@ -307,7 +325,7 @@ const TestType = () => {
               <TableBody>
                 {sortedData.map((row, index) => (
                   <TableRow
-                    key={index}
+                    key={row.id || index}
                     hover
                     onDoubleClick={() => handleRowDoubleClick(row)}
                     onContextMenu={(e) => handleContextMenu(e, row)}
@@ -315,7 +333,7 @@ const TestType = () => {
                     {headers.map((header) => (
                       <TableCell key={header}>
                         {dateFields.includes(header)
-                          ? new Date(row[header]).toLocaleDateString('pt-PT')
+                          ? new Intl.DateTimeFormat('pt-PT').format(new Date(row[header]))
                           : row[header]}
                       </TableCell>
                     ))}

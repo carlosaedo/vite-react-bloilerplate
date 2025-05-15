@@ -4,6 +4,7 @@ import { ApiProvider } from './components/context/ApiContext';
 import Sidebar from './components/sidebar/Sidebar';
 import Login from './components/auth/login';
 import ResetPassword from './components/auth/resetPassword';
+import ResetPasswordNextStep from './components/auth/resetPasswordNextStep';
 import ResetPassNew from './components/pages/resetPass_new';
 import ResetPassError from './components/pages/resetPass_error';
 import Header from './components/header/Header';
@@ -56,6 +57,7 @@ const App = () => {
               <Route path='/login' element={<Login />} />
               <Route path='/resetpass-new' element={<ResetPassNew />} />
               <Route path='/resetpass-error' element={<ResetPassError />} />
+              <Route path='/reset-password-next-step' element={<ResetPasswordNextStep />} />
 
               <Route path='/' element={<Home />} />
               <Route path='*' element={<Navigate to='/' replace />} />

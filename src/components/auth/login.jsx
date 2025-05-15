@@ -48,7 +48,6 @@ const Login = () => {
   useEffect(() => {
     async function checkLoginStatus() {
       const loginStatus = await authCheckLoginStatus();
-      console.log('login status: ', loginStatus);
       setLoginStatus(loginStatus);
       setContextApiData({
         ...contextApiData,
@@ -69,7 +68,7 @@ const Login = () => {
           ...contextApiData,
           login: true,
         });
-        navigateTo('/');
+        navigateTo(0);
       } else {
         setError('Não tens acesso a isto!');
         toggleShowFlork();
@@ -182,12 +181,11 @@ const Login = () => {
             </Button>
           </form>
 
-          {/* Uncomment the following if you want to include the reset password link */}
-          {/* <p>
+          <p>
             <Link className='custom-link' to='/resetpassword'>
               Reset Password
             </Link>
-          </p> */}
+          </p>
         </div>
       )}
     </>
