@@ -9,7 +9,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { FaBoxOpen, FaHome, FaRegUserCircle, FaTable } from 'react-icons/fa';
+import { FaBoxOpen, FaHome, FaRegUserCircle, FaTable, FaUserCircle } from 'react-icons/fa';
 import './Sidebar.css';
 import { useAuth } from '../context/AuthContext';
 
@@ -140,8 +140,8 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon sx={{ minWidth: '30px' }}>
-                  <FaRegUserCircle />
+                <ListItemIcon className={isLoggedIn ? 'logged-in' : ''} sx={{ minWidth: '30px' }}>
+                  <FaUserCircle />
                 </ListItemIcon>
                 <ListItemText
                   className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}

@@ -78,3 +78,7 @@
 .MuiListItemButton-root.active {
   background-color: #003e2d26 !important;
 }
+
+.logged-in {
+  color: #003e2d !important;
+}
