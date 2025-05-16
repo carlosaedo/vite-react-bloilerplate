@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import PrivateRoute from './components/PrivateRoute';
+import Unauthorized from './components/pages/Unauthorized';
 import { useAuth } from './components/context/AuthContext';
 import Sidebar from './components/sidebar/Sidebar';
 import Login from './components/auth/login';
@@ -44,14 +46,20 @@ const App = () => {
       >
         <div className='content-main'>
           <Header />
+
           <Routes>
             {isLoggedIn ? (
               <>
-                <Route path='/test-type-00' element={<TestType00 />} />
+                {/* Admin-only routes */}
+                <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                  <Route path='/test-type-00' element={<TestType00 />} />
+                </Route>
               </>
             ) : (
               <Route path='*' element={<Navigate to='/login' replace />} />
             )}
+
+            <Route path='/unauthorized' element={<Unauthorized />} />
             <Route path='/resetpassword' element={<ResetPassword />} />
             <Route path='/login' element={<Login />} />
             <Route path='/resetpass-new' element={<ResetPassNew />} />
