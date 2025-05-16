@@ -72,6 +72,7 @@ const Sidebar = ({ onToggle }) => {
               backgroundColor: '#003e2d18',
               transform: 'scale(1.1)',
             },
+            marginTop: '10px',
           }}
         >
           ☰

@@ -273,7 +273,7 @@ const TestType = () => {
           type='date'
           value={selectedDate}
           onChange={handleDateChange}
-          InputLabelProps={{ shrink: true }}
+          slotProps={{ inputLabel: { shrink: true } }}
           sx={{ mb: 2 }}
         />
 
@@ -288,15 +288,28 @@ const TestType = () => {
         {data.length === 0 ? (
           <Typography>No data to show</Typography>
         ) : (
-          <TableContainer component={Paper}>
-            <Table size='small'>
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxHeight: 400, // or any height you prefer
+              overflow: 'auto',
+            }}
+          >
+            <Table stickyHeader size='small'>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
                     <TableCell
                       key={header}
                       onClick={() => handleHeaderClick(header)}
-                      sx={{ cursor: 'pointer', fontWeight: 'bold' }}
+                      sx={{
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        backgroundColor: '#fff', // important for sticky visibility
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 1,
+                      }}
                     >
                       {header.toUpperCase()}
                       {sortConfig.key === header && (
