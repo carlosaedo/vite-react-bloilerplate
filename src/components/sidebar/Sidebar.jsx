@@ -23,7 +23,7 @@ const Sidebar = ({ onToggle }) => {
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
-    onToggle(collapsed ? 60 : 250);
+    onToggle(collapsed ? 50 : 250);
   }, [collapsed, onToggle]);
 
   const toggleSidebar = () => {
@@ -42,10 +42,10 @@ const Sidebar = ({ onToggle }) => {
       open={true}
       className={collapsed ? 'sidebar-collapsed' : ''}
       sx={{
-        width: collapsed ? 60 : 250,
+        width: collapsed ? 50 : 250,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: collapsed ? 60 : 250,
+          width: collapsed ? 50 : 250,
           backgroundColor: '#ffffff',
           color: '#003e2d',
           transition: 'width 0.3s ease',
@@ -89,7 +89,7 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: '30px' }}>
                   <FaHome />
                 </ListItemIcon>
                 <ListItemText
@@ -106,7 +106,7 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: '30px' }}>
                   <FaBoxOpen />
                 </ListItemIcon>
                 <ListItemText
@@ -123,7 +123,7 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: '30px' }}>
                   <FaTable />
                 </ListItemIcon>
                 <ListItemText
@@ -140,7 +140,7 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: '30px' }}>
                   <FaRegUserCircle />
                 </ListItemIcon>
                 <ListItemText
@@ -159,7 +159,7 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: '30px' }}>
                   <FaHome />
                 </ListItemIcon>
                 <ListItemText
@@ -176,7 +176,7 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: '30px' }}>
                   <FaBoxOpen />
                 </ListItemIcon>
                 <ListItemText
@@ -193,7 +193,7 @@ const Sidebar = ({ onToggle }) => {
                 onClick={toggleSidebarMenuItem}
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ minWidth: '30px' }}>
                   <FaRegUserCircle />
                 </ListItemIcon>
                 <ListItemText

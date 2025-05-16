@@ -35,6 +35,13 @@ const TestType = () => {
 
   const { isLoggedIn } = useAuth();
 
+  const [tableHeight, setTableHeight] = useState(() => {
+    const savedState = localStorage.getItem('tableHeight');
+    return savedState ? parseInt(savedState, 10) : 400;
+  });
+
+  console.log(tableHeight);
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,6 +70,11 @@ const TestType = () => {
       y: event.pageY,
       row,
     });
+  };
+
+  const handleTableHeightChange = (height) => {
+    setTableHeight(height);
+    localStorage.setItem('tableHeight', height);
   };
 
   const handleDelete = (row) => {
@@ -283,7 +295,6 @@ const TestType = () => {
           </Typography>
         )}
       </Box>
-
       <Box sx={{ padding: 2 }}>
         {data.length === 0 ? (
           <Typography>No data to show</Typography>
@@ -291,7 +302,7 @@ const TestType = () => {
           <TableContainer
             component={Paper}
             sx={{
-              maxHeight: 400, // or any height you prefer
+              maxHeight: tableHeight, // or any height you prefer
               overflow: 'auto',
             }}
           >
@@ -341,7 +352,6 @@ const TestType = () => {
           </TableContainer>
         )}
       </Box>
-
       {contextMenu && (
         <Box
           sx={{
@@ -359,16 +369,13 @@ const TestType = () => {
           </Button>
         </Box>
       )}
-
       <Modal isOpen={isModalOpen} closeModal={closeModal} data={selectedRow} onUpdate={fetchData} />
-
       <ModalDeleteRow
         isOpenDeleteRow={isModalDeleteRowOpen}
         closeModalDeleteRow={closeModalDeleteRow}
         data={selectedRow}
         onUpdate={fetchData}
       />
-
       {/* Pagination Controls */}
       <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
         <Button
@@ -378,7 +385,6 @@ const TestType = () => {
         >
           &laquo; Previous
         </Button>
-
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {generatePageNumbers().map((page, index) => (
             <Button
@@ -392,7 +398,6 @@ const TestType = () => {
             </Button>
           ))}
         </Box>
-
         <TextField
           type='number'
           value={inputPage}
@@ -408,7 +413,6 @@ const TestType = () => {
           label='Go to page'
           sx={{ width: 120 }}
         />
-
         <Button
           variant='outlined'
           onClick={() => handlePageChange(currentPage + 1)}
@@ -416,7 +420,6 @@ const TestType = () => {
         >
           Next &raquo;
         </Button>
-
         <FormControl size='small'>
           <InputLabel>Rows per page</InputLabel>
           <Select value={pageSize} label='Rows per page' onChange={handlePerPageChange}>
@@ -427,6 +430,37 @@ const TestType = () => {
             ))}
           </Select>
         </FormControl>
+        Table Height
+        <Button
+          variant={tableHeight === 300 ? 'contained' : 'outlined'}
+          onClick={() => handleTableHeightChange(300)}
+        >
+          XS
+        </Button>
+        <Button
+          variant={tableHeight === 400 ? 'contained' : 'outlined'}
+          onClick={() => handleTableHeightChange(400)}
+        >
+          S
+        </Button>
+        <Button
+          variant={tableHeight === 500 ? 'contained' : 'outlined'}
+          onClick={() => handleTableHeightChange(500)}
+        >
+          M
+        </Button>
+        <Button
+          variant={tableHeight === 600 ? 'contained' : 'outlined'}
+          onClick={() => handleTableHeightChange(600)}
+        >
+          L
+        </Button>
+        <Button
+          variant={tableHeight === 700 ? 'contained' : 'outlined'}
+          onClick={() => handleTableHeightChange(700)}
+        >
+          XL
+        </Button>
       </Box>
     </>
   );

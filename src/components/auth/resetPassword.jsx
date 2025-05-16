@@ -52,12 +52,16 @@ const ResetPassword = () => {
   };
 
   return (
-    <>
-      <div
-        style={{
-          padding: '0px 20px 0 20px',
-        }}
-      >
+    <Box
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'top',
+        padding: 2,
+      }}
+    >
+      <Box sx={{ width: '100%', maxWidth: 400 }}>
         <Typography variant='h5' gutterBottom>
           Request reset password
         </Typography>
@@ -94,8 +98,8 @@ const ResetPassword = () => {
             Back to login
           </MuiLink>
         </Typography>
-      </div>
-    </>
+      </Box>
+    </Box>
   );
 };
 

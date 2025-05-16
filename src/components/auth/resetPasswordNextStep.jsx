@@ -18,7 +18,7 @@ import {
 import FlorkHide from '../../assets/flork-114-png.png';
 import FlorkYay from '../../assets/yay-flork.png';
 
-const ResetPassword = () => {
+const ResetPasswordNextStep = () => {
   const navigateTo = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -79,12 +79,16 @@ const ResetPassword = () => {
   };
 
   return (
-    <>
-      <div
-        style={{
-          padding: '0px 20px 0 20px',
-        }}
-      >
+    <Box
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'top',
+        padding: 2,
+      }}
+    >
+      <Box sx={{ width: '100%', maxWidth: 400 }}>
         <Typography variant='h5' gutterBottom>
           Reset password
         </Typography>
@@ -176,9 +180,9 @@ const ResetPassword = () => {
             Back to login
           </MuiLink>
         </Typography>
-      </div>
-    </>
+      </Box>
+    </Box>
   );
 };
 
-export default ResetPassword;
+export default ResetPasswordNextStep;
