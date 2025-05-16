@@ -25,6 +25,7 @@ import Logout from '../auth/logout';
 
 const Login = () => {
   const { isLoggedIn, logout, login } = useAuth();
+  const isTokenPresent = !!localStorage.getItem('token'); // convert to boolean
   const navigateTo = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -90,7 +91,7 @@ const Login = () => {
 
   return (
     <>
-      {isLoggedIn ? (
+      {isTokenPresent ? (
         <div>
           <Logout />
         </div>
