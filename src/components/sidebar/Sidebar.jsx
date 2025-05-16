@@ -11,30 +11,15 @@ import {
 } from '@mui/material';
 import { FaBoxOpen, FaHome, FaRegUserCircle, FaTable } from 'react-icons/fa';
 import './Sidebar.css';
-import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
-import { useContextApi } from '../context/ApiContext';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = ({ onToggle }) => {
-  const { contextApiData, setContextApiData } = useContextApi();
-
   const [collapsed, setCollapsed] = useState(() => {
     const savedState = localStorage.getItem('sidebarCollapsed');
     return savedState === 'true';
   });
 
-  const [loginStatus, setLoginStatus] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', collapsed);
-    onToggle(collapsed ? 60 : 250);
-
-    async function checkLoginStatus() {
-      const isLoggedIn = await authCheckLoginStatus();
-      setLoginStatus(isLoggedIn);
-    }
-
-    checkLoginStatus();
-  }, [contextApiData?.login]);
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
@@ -94,7 +79,7 @@ const Sidebar = ({ onToggle }) => {
       </div>
 
       <List>
-        {loginStatus ? (
+        {isLoggedIn ? (
           <>
             <ListItem disablePadding>
               <ListItemButton
@@ -159,7 +144,7 @@ const Sidebar = ({ onToggle }) => {
                 </ListItemIcon>
                 <ListItemText
                   className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
-                  primary={loginStatus ? 'Logout' : 'Login'}
+                  primary={isLoggedIn ? 'Logout' : 'Login'}
                 />
               </ListItemButton>
             </ListItem>
@@ -212,7 +197,7 @@ const Sidebar = ({ onToggle }) => {
                 </ListItemIcon>
                 <ListItemText
                   className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
-                  primary={loginStatus ? 'Logout' : 'Login'}
+                  primary={isLoggedIn ? 'Logout' : 'Login'}
                 />
               </ListItemButton>
             </ListItem>

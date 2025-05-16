@@ -1,23 +1,18 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 import authLogout from '../../utils/authLogout';
 import { Button, Typography } from '@mui/material';
 
-import { useContextApi } from '../context/ApiContext';
-
 const Logout = () => {
   const navigateTo = useNavigate();
 
-  const { contextApiData, setContextApiData } = useContextApi();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
-    const result = await authLogout();
+    const result = await logout();
     if (result) {
-      setContextApiData({
-        ...contextApiData,
-        login: false,
-      });
-      navigateTo(0);
+      navigateTo('/');
     }
   };
 

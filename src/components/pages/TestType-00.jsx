@@ -28,16 +28,13 @@ import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek
 
 import api from '../api/api';
 
-import { useContextApi } from '../context/ApiContext';
+import { useAuth } from '../context/AuthContext';
 
 const TestType = () => {
   const navigateTo = useNavigate();
 
-  const { contextApiData, setContextApiData } = useContextApi();
+  const { isLoggedIn } = useAuth();
 
-  if (contextApiData) {
-    console.log(contextApiData.note);
-  }
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -104,6 +101,7 @@ const TestType = () => {
 
   useEffect(() => {
     // Run on mount: check login and set startup date
+    console.log('LOginstatus from context: ', isLoggedIn);
     console.log('// Run on mount: check login and set startup date');
     async function checkLoginStatus() {
       const loginStatus = await authCheckLoginStatus();
@@ -114,17 +112,7 @@ const TestType = () => {
     }
 
     checkLoginStatus();
-
-    // Set initial context data
-    setContextApiData((prev) => ({
-      ...prev,
-      note: 'Lol this works fine.',
-    }));
   }, []); // Only on initial mount
-
-  useEffect(() => {
-    console.log('Updated context note:', contextApiData.note);
-  }, [contextApiData.note]);
 
   useEffect(() => {
     if (startupDateFirstTime) {
@@ -150,10 +138,6 @@ const TestType = () => {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    console.log('Updated context note:', contextApiData.note);
-  }, [contextApiData.note]);
 
   const sortedData = React.useMemo(() => {
     if (!sortConfig.key) return data;

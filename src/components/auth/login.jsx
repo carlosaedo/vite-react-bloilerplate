@@ -19,19 +19,17 @@ import FlorkYay from '../../assets/yay-flork.png';
 import CryingFlork from '../../assets/crying_flork.png';
 import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 
-import { useContextApi } from '../context/ApiContext';
+import { useAuth } from '../context/AuthContext';
 
 import Logout from '../auth/logout';
 
 const Login = () => {
+  const { isLoggedIn, logout, login } = useAuth();
   const navigateTo = useNavigate();
-  const { contextApiData, setContextApiData } = useContextApi();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [loginStatus, setLoginStatus] = useState(false);
-  const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null);
   const [showFlork, setShowFlork] = useState(false);
   const [showCryingFlork, setShowCryingFlork] = useState(false);
@@ -45,30 +43,13 @@ const Login = () => {
     setShowCryingFlork(!showCryingFlork);
   };
 
-  useEffect(() => {
-    async function checkLoginStatus() {
-      const loginStatus = await authCheckLoginStatus();
-      setLoginStatus(loginStatus);
-      setContextApiData({
-        ...contextApiData,
-        login: loginStatus,
-      });
-      setLoading(false); // Set loading to false once login status is checked
-    }
-    checkLoginStatus();
-  }, []);
-
   async function handleLogin() {
     try {
       const response = await torrestirApi.post('/auth/login', formData, {});
       const { token } = response.data;
       if (token) {
-        localStorage.setItem('token', token);
-        setContextApiData({
-          ...contextApiData,
-          login: true,
-        });
-        navigateTo(0);
+        login(token);
+        navigateTo('/');
       } else {
         setError('Não tens acesso a isto!');
         toggleShowFlork();
@@ -107,13 +88,9 @@ const Login = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  if (loading) {
-    return <div>Loading...</div>; // Show loading message while checking login status
-  }
-
   return (
     <>
-      {loginStatus ? (
+      {isLoggedIn ? (
         <div>
           <Logout />
         </div>
