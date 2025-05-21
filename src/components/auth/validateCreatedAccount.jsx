@@ -1,44 +1,53 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import torrestirApi from '../api/torrestirApi';
 import { Link } from 'react-router-dom';
-import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  InputAdornment,
+  IconButton,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  Link as MuiLink,
+} from '@mui/material';
 
-const ResetPassword = () => {
+import FlorkHide from '../../assets/flork-114-png.png';
+import FlorkYay from '../../assets/yay-flork.png';
+
+const CreateAccount = () => {
   const navigateTo = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
+    token: '',
   });
+
   const [message, setMessage] = useState(null);
 
   async function handleRequestResetPassword() {
     try {
-      const response = await torrestirApi.post('/Account/request-password-reset', formData);
-      console.log(response.data);
-      if (
-        response?.status === 200 &&
-        response?.data === 'Se o email existir, foi enviado um link para repor a password.'
-      ) {
-        setMessage('Se o email existir, foi enviado um link para repor a password.');
+      const response = await torrestirApi.post('/Account/activate-account', formData);
+      console.log(response);
+      if (response?.status === 200 && response?.data?.message === 'Conta criada com sucesso.') {
+        setMessage('Password atualizada com sucesso.');
         setTimeout(() => {
           navigateTo('/login');
         }, 1000);
       } else {
-        setMessage('Erro a pedir o código de verificação.');
+        setMessage('Algo correu mal.');
       }
     } catch (error) {
-      if (error.response?.status === 404) {
+      if (error.response && error.response.status === 404) {
         setMessage('Este email não está registado');
       } else if (
         error.response?.status === 400 &&
-        error.response?.data === 'Limite diário de pedidos de reset atingido.'
+        error.response?.data?.error === 'Código inválido ou expirado.'
       ) {
-        setMessage('Limite diário de pedidos de reset atingido.');
-      } else if (error.response?.status === 500) {
-        setMessage('Erro a pedir o reset da password.');
+        setMessage('Código inválido ou expirado.');
       } else {
-        setMessage('Erro a pedir o reset da password.');
         console.error(error);
       }
     }
@@ -69,7 +78,7 @@ const ResetPassword = () => {
     >
       <Box sx={{ width: '100%', maxWidth: 400 }}>
         <Typography variant='h5' gutterBottom>
-          Request reset password
+          Validate created account
         </Typography>
 
         <Box
@@ -84,10 +93,10 @@ const ResetPassword = () => {
           )}
 
           <TextField
-            label='Email'
-            type='email'
-            name='email'
-            value={formData.email}
+            label='Token'
+            type='text'
+            name='token'
+            value={formData.token}
             onChange={handleChange}
             required
             fullWidth
@@ -95,7 +104,7 @@ const ResetPassword = () => {
           />
 
           <Button type='submit' variant='contained' color='primary'>
-            Request reset password
+            Validate account
           </Button>
         </Box>
 
@@ -109,4 +118,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default CreateAccount;

@@ -11,6 +11,8 @@ import jpTranslation from './translations/jp.json';
 import deTranslation from './translations/de.json';
 import itTranslation from './translations/it.json';
 
+let selectedLanguage = localStorage.getItem('selectedLanguage') || 'pt';
+
 i18n.use(initReactI18next).init({
   resources: {
     en: {
@@ -38,7 +40,7 @@ i18n.use(initReactI18next).init({
       translation: itTranslation,
     },
   },
-  lng: 'jp', // Default language
+  lng: selectedLanguage, // Default language
   fallbackLng: 'pt',
   interpolation: {
     escapeValue: false, // React already escapes values

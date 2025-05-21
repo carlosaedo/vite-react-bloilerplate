@@ -34,7 +34,7 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
   return (
     <Dialog open={isOpenDeleteRow} onClose={closeModalDeleteRow} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography component='span' variant='h6' sx={{ color: '#003e2d' }}>
+        <Typography component='span' variant='h6' sx={{ color: '#003D2C' }}>
           Confirm Operation
         </Typography>{' '}
         {/* Applying primary green color */}
@@ -46,7 +46,7 @@ const ModalDeleteRow = ({ isOpenDeleteRow, closeModalDeleteRow, data, onUpdate }
       <DialogContent dividers>
         {Object.entries(data).map(([key, value], index) => (
           <div key={key}>
-            <Typography variant='subtitle2' gutterBottom sx={{ color: '#003e2d' }}>
+            <Typography variant='subtitle2' gutterBottom sx={{ color: '#003D2C' }}>
               {key.toUpperCase()}
             </Typography>
 

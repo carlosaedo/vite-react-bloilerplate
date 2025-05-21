@@ -18,30 +18,27 @@ import {
 import FlorkHide from '../../assets/flork-114-png.png';
 import FlorkYay from '../../assets/yay-flork.png';
 
-const ResetPasswordNextStep = () => {
+const CreateAccount = () => {
   const navigateTo = useNavigate();
 
   const [formData, setFormData] = useState({
+    displayName: '',
+    realName: '',
     email: '',
-    code: '',
-    newPassword: '',
-    confirmPassword: '',
+    password: '',
   });
+
   const [message, setMessage] = useState(null);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleRequestResetPassword() {
     try {
-      const response = await torrestirApi.post('/auth/confirm-password-reset', formData);
+      const response = await torrestirApi.post('/Account/register', formData);
       console.log(response);
-      if (
-        response?.status === 200 &&
-        response?.data?.message === 'Password atualizada com sucesso.'
-      ) {
-        setMessage('Password atualizada com sucesso.');
+      if (response?.status === 200) {
+        setMessage('Conta criada. Verifique o seu email para ativar a conta.');
         setTimeout(() => {
-          navigateTo('/login');
+          navigateTo('/validate-created-account');
         }, 1000);
       } else {
         setMessage('Algo correu mal.');
@@ -51,9 +48,9 @@ const ResetPasswordNextStep = () => {
         setMessage('Este email não está registado');
       } else if (
         error.response?.status === 400 &&
-        error.response?.data?.error === 'Código inválido ou expirado.'
+        error.response?.data?.error === 'Esse email já se encontra registado.'
       ) {
-        setMessage('Código inválido ou expirado.');
+        setMessage('Esse email já se encontra registado.');
       } else {
         console.error(error);
       }
@@ -73,12 +70,8 @@ const ResetPasswordNextStep = () => {
     });
   };
 
-  const handleToggleNewPasswordVisibility = () => {
-    setShowNewPassword((prevShowNewPassword) => !prevShowNewPassword);
-  };
-
-  const handleToggleConfirmNewPasswordVisibility = () => {
-    setShowConfirmNewPassword((prevShowConfirmNewPassword) => !prevShowConfirmNewPassword);
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
   return (
@@ -93,7 +86,7 @@ const ResetPasswordNextStep = () => {
     >
       <Box sx={{ width: '100%', maxWidth: 400 }}>
         <Typography variant='h5' gutterBottom>
-          Reset password
+          Create an account
         </Typography>
 
         <Box
@@ -108,6 +101,28 @@ const ResetPasswordNextStep = () => {
           )}
 
           <TextField
+            label='Display Name'
+            type='text'
+            name='displayName'
+            value={formData.displayName}
+            onChange={handleChange}
+            required
+            fullWidth
+            size='small'
+          />
+
+          <TextField
+            label='Real Name'
+            type='text'
+            name='realName'
+            value={formData.realName}
+            onChange={handleChange}
+            required
+            fullWidth
+            size='small'
+          />
+
+          <TextField
             label='Email'
             type='email'
             name='email'
@@ -118,52 +133,19 @@ const ResetPasswordNextStep = () => {
             size='small'
           />
 
-          <TextField
-            label='Code'
-            type='text'
-            name='code'
-            value={formData.code}
-            onChange={handleChange}
-            required
-            fullWidth
-            size='small'
-          />
-
           <FormControl fullWidth margin='normal' variant='outlined'>
             <InputLabel>Password</InputLabel>
             <OutlinedInput
-              type={showNewPassword ? 'text' : 'password'}
-              name='newPassword'
-              value={formData.newPassword}
+              type={showPassword ? 'text' : 'password'}
+              name='password'
+              value={formData.password}
               onChange={handleChange}
               endAdornment={
                 <InputAdornment position='end'>
-                  <IconButton onClick={handleToggleNewPasswordVisibility}>
+                  <IconButton onClick={handleTogglePasswordVisibility}>
                     <img
                       className='flork-pass-login'
-                      src={showNewPassword ? FlorkYay : FlorkHide}
-                      alt='Toggle Password Visibility'
-                    />
-                  </IconButton>
-                </InputAdornment>
-              }
-              label='Password'
-            />
-          </FormControl>
-
-          <FormControl fullWidth margin='normal' variant='outlined'>
-            <InputLabel>Password</InputLabel>
-            <OutlinedInput
-              type={showConfirmNewPassword ? 'text' : 'password'}
-              name='confirmPassword'
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              endAdornment={
-                <InputAdornment position='end'>
-                  <IconButton onClick={handleToggleConfirmNewPasswordVisibility}>
-                    <img
-                      className='flork-pass-login'
-                      src={showConfirmNewPassword ? FlorkYay : FlorkHide}
+                      src={showPassword ? FlorkYay : FlorkHide}
                       alt='Toggle Password Visibility'
                     />
                   </IconButton>
@@ -174,7 +156,7 @@ const ResetPasswordNextStep = () => {
           </FormControl>
 
           <Button type='submit' variant='contained' color='primary'>
-            Reset password
+            Create account
           </Button>
         </Box>
 
@@ -188,4 +170,4 @@ const ResetPasswordNextStep = () => {
   );
 };
 
-export default ResetPasswordNextStep;
+export default CreateAccount;

@@ -29,12 +29,12 @@
 
 .menu a:hover {
   background-color: #ffffff;
-  color: #003e2d;
+  color: #003d2c;
 }
 
 .menu a.active {
   background-color: #ffd700;
-  color: #003e2d;
+  color: #003d2c;
   font-weight: 900;
 }
 
@@ -70,7 +70,7 @@
     top: 50px;
     left: 0;
     width: 100%;
-    background-color: #003e2d;
+    background-color: #003d2c;
   }
 
   .menu.show {

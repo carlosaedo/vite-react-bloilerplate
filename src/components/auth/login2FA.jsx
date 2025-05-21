@@ -1,28 +1,32 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import torrestirApi from '../api/torrestirApi';
 import { Link } from 'react-router-dom';
-import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material';
+import { Box, Button, TextField, Typography, Stack, Link as MuiLink } from '@mui/material';
 
-const ResetPassword = () => {
+import { useAuth } from '../context/AuthContext';
+
+const Login2FA = () => {
   const navigateTo = useNavigate();
+  const { userEmail } = useParams();
+  const { login } = useAuth();
+  console.log('params: ', userEmail);
 
   const [formData, setFormData] = useState({
-    email: '',
+    userEmail: userEmail,
+    code: '',
   });
   const [message, setMessage] = useState(null);
 
   async function handleRequestResetPassword() {
     try {
-      const response = await torrestirApi.post('/Account/request-password-reset', formData);
+      const response = await torrestirApi.post('/Auth/verify-2fa', formData);
       console.log(response.data);
-      if (
-        response?.status === 200 &&
-        response?.data === 'Se o email existir, foi enviado um link para repor a password.'
-      ) {
-        setMessage('Se o email existir, foi enviado um link para repor a password.');
+      if (response?.data?.token) {
+        setMessage('Código aceite');
+        login(response?.data?.token);
         setTimeout(() => {
-          navigateTo('/login');
+          navigateTo('/');
         }, 1000);
       } else {
         setMessage('Erro a pedir o código de verificação.');
@@ -35,10 +39,12 @@ const ResetPassword = () => {
         error.response?.data === 'Limite diário de pedidos de reset atingido.'
       ) {
         setMessage('Limite diário de pedidos de reset atingido.');
-      } else if (error.response?.status === 500) {
-        setMessage('Erro a pedir o reset da password.');
+      } else if (
+        error.response?.status === 401 &&
+        error.response?.data === 'Código inválido ou expirado.'
+      ) {
+        setMessage('Código inválido ou expirado.');
       } else {
-        setMessage('Erro a pedir o reset da password.');
         console.error(error);
       }
     }
@@ -69,7 +75,7 @@ const ResetPassword = () => {
     >
       <Box sx={{ width: '100%', maxWidth: 400 }}>
         <Typography variant='h5' gutterBottom>
-          Request reset password
+          Login 2FA
         </Typography>
 
         <Box
@@ -84,10 +90,10 @@ const ResetPassword = () => {
           )}
 
           <TextField
-            label='Email'
-            type='email'
-            name='email'
-            value={formData.email}
+            label='2FA Code'
+            type='text'
+            name='code'
+            value={formData.code}
             onChange={handleChange}
             required
             fullWidth
@@ -95,18 +101,27 @@ const ResetPassword = () => {
           />
 
           <Button type='submit' variant='contained' color='primary'>
-            Request reset password
+            Validate
           </Button>
         </Box>
 
-        <Typography variant='body2' sx={{ mt: 2 }}>
-          <MuiLink component={Link} to='/login' underline='hover'>
+        <Stack direction='row' spacing={2} justifyContent='center' mt={2}>
+          <MuiLink
+            component={Link}
+            to={`/login-2fa-request-new-code/${userEmail}`}
+            underline='hover'
+            variant='body2'
+            color='primary'
+          >
+            Request new 2FA code
+          </MuiLink>
+          <MuiLink component={Link} to='/login' underline='hover' variant='body2' color='primary'>
             Back to login
           </MuiLink>
-        </Typography>
+        </Stack>
       </Box>
     </Box>
   );
 };
 
-export default ResetPassword;
+export default Login2FA;

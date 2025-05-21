@@ -1,9 +1,14 @@
-import { useParams } from 'react-router-dom';
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import TrackingMap from '../trackingMap/TrackingMap';
 import api from '../api/api';
+import './Tracking.css';
+import { motion } from 'framer-motion';
+import { GiWeight, GiWoodenCrate } from 'react-icons/gi';
+import { IoIosArrowBack, IoMdMore, IoMdArrowDropdown } from 'react-icons/io'; // For icons
 import {
+  FaBox,
   FaCheck,
   FaThLarge,
   FaTruck,
@@ -12,14 +17,68 @@ import {
   FaPlus,
   FaMinus,
   FaExclamationTriangle,
-} from 'react-icons/fa';
-import './Tracking.css';
+} from 'react-icons/fa'; // Example for the small box icon
+
 import { useTranslation } from 'react-i18next';
 
 const TTL = 10 * 60 * 1000; // 10 minutes in ms
 
-const TrackingPage = () => {
+const trackingData = [
+  {
+    date: '19 de maio de',
+    year: '2025',
+    time: '01:00',
+    status: 'O seu pacote está em trânsito com a transportadora.',
+    location: 'Portugal, Vila Nova da Telha',
+    action: 'Unloaded',
+    company: 'TORRESTIR GROUP',
+    logo: 'TORRESTIR', // Placeholder for a small logo text
+    isExpanded: true, // For the first item to show the dropdown
+  },
+  {
+    date: '13 de maio de',
+    year: '2025',
+    time: '01:00',
+    status:
+      'O seu pacote está em trânsito com a transportadora.Seu pacote está em trânsito com a transportadora.',
+    location: 'Poland, Gliwice',
+    company: 'TORRESTIR GROUP',
+    logo: 'TORRESTIR',
+  },
+  {
+    date: '8 de maio de',
+    year: '2025',
+    time: '01:00',
+    status: 'A sua encomenda chegou a um centro de trânsito, está a caminho.',
+    location: 'Inventory in a warehouse',
+    company: 'TORRESTIR GROUP',
+    logo: 'TORRESTIR',
+  },
+  {
+    date: '7 de maio de',
+    year: '2025',
+    time: '01:00',
+    status: 'O seu pacote está em trânsito com a transportadora.',
+    location: 'Bydgoszcz',
+    action: 'Collected',
+    company: 'TORRESTIR GROUP',
+    logo: 'TORRESTIR',
+  },
+  {
+    date: '6 de maio de',
+    year: '2025',
+    time: '01:00',
+    status: 'A transportadora foi informada e em breve irá recolher o seu pacote.',
+    location: 'Chlebnia',
+    action: 'Registered in the system',
+    company: 'TORRESTIR GROUP',
+    logo: 'TORRESTIR',
+  },
+];
+
+const Tracking = () => {
   const { t } = useTranslation();
+  const navigateTo = useNavigate();
 
   const stages = [
     { label: t('documented'), icon: <FaCheck /> },
@@ -106,14 +165,11 @@ const TrackingPage = () => {
     setShowMap(true);
   };
 
+  const progressPercentage = 60; // Example value, adjust as needed
+
   return (
     <>
-      <div
-        className='page-wrapper'
-        style={{
-          padding: '20px 20px 0 20px',
-        }}
-      >
+      <div className='tracking-wrapper'>
         <div className='tracker-container'>
           {modifiedStages.map((stage, index) => {
             const isActive = hasException ? index <= currentStage + 1 : index <= currentStage;
@@ -137,33 +193,120 @@ const TrackingPage = () => {
             );
           })}
         </div>
+        <div className='tracking-header-bar'>
+          <IoIosArrowBack
+            className='header-icon'
+            onClick={() => {
+              navigateTo('/tracking');
+            }}
+          />
+          <h1 className='tracking-title'>Detalhes do seu envio</h1>
+          <IoMdMore className='header-icon' />
+        </div>
 
-        <div className='card'>
-          <div className='info-grid'>
-            <div>
-              <strong>{t('entity')}:</strong> {entity}
+        <div className='timeline-container'>
+          <div className='status-summary'>
+            <div className='status-text'>
+              <FaBox className='box-icon' />
+              <h2 className='timeline-header'>O seu envio está em trânsito há 15 dia(s)</h2>
             </div>
-            <div>
-              <strong>{t('entityRef')}:</strong> {entityRef}
+            <p className='timeline-subtext'>
+              A entrega é esperada em 1-5 dias {'('}
+              {t('estimated')}
+              {': '}
+              {estimated} {')'} (com base em 1000 entregas semelhantes)
+            </p>
+            <div className='progress-bar-container'>
+              <div className='progress-bar-fill' style={{ width: `${progressPercentage}%` }}></div>
             </div>
-            <div>
-              <strong>{t('ourReference')}:</strong> {ourRef}
+          </div>
+          <div className='card'>
+            <div className='generic-header-bar'>
+              <strong>{t('entity')}: </strong> {entity}
             </div>
-            <div>
-              <strong>{t('estimated')}:</strong> {estimated}
+            <div className='info-grid'>
+              {/* Caixa 1: ROTA */}
+              <div className='info-box'>
+                <h4>Rota</h4>
+                <p>
+                  <strong>{t('from')}:</strong> {from}
+                </p>
+                <p>
+                  <strong>{t('to')}:</strong> {to}
+                </p>
+              </div>
+
+              {/* Caixa 2: REFERÊNCIAS */}
+              <div className='info-box'>
+                <h4>Referências</h4>
+                <p>
+                  <strong>{t('entityRef')}:</strong> {entityRef}
+                </p>
+                <p>
+                  <strong>{t('ourReference')}:</strong> {ourRef}
+                </p>
+              </div>
+
+              {/* Caixa 3: VOLUMES & PESO */}
+              <div className='info-box'>
+                <h4>Volumes & Peso</h4>
+                <p>
+                  <strong>
+                    <FaBox style={{ fontSize: '22px', verticalAlign: 'bottom' }} /> {t('packages')}:
+                  </strong>{' '}
+                  {packages}
+                </p>
+                <p>
+                  <strong>
+                    <GiWeight style={{ fontSize: '25px', verticalAlign: 'bottom' }} /> Peso:
+                  </strong>{' '}
+                  50 kg
+                </p>
+              </div>
+
+              {/* Caixa 4: PALETES */}
+              <div className='info-box'>
+                <h4>Paletes</h4>
+                <p>
+                  <strong>
+                    <GiWoodenCrate style={{ fontSize: '25px', verticalAlign: 'bottom' }} />{' '}
+                    {t('pallets')}:
+                  </strong>{' '}
+                  {pallets}
+                </p>
+              </div>
             </div>
-            <div>
-              <strong>{t('from')}:</strong> {from}
-            </div>
-            <div>
-              <strong>{t('to')}:</strong> {to}
-            </div>
-            <div>
-              <strong>{t('packages')}:</strong> {packages}
-            </div>
-            <div>
-              <strong>{t('pallets')}:</strong> {pallets}
-            </div>
+          </div>
+          <div className='timeline'>
+            {trackingData.map((item, index) => (
+              <div key={index} className='timeline-item'>
+                {/* Timeline Dot (Line will be a pseudo-element on timeline-item) */}
+                <div className='timeline-marker'>
+                  <div className='timeline-dot'></div>
+                </div>
+
+                {/* Right: Card */}
+                <div className={`timeline-card ${item.isExpanded ? 'expanded' : ''}`}>
+                  <div className='card-header'>
+                    <div className='date-time-left'>
+                      <p className='date'>{item.date}</p>
+                      <p className='year'>{item.year}</p>
+                      <p className='time'>{item.time}</p>
+                    </div>
+                    <div className='company-info'>
+                      <span className='company-name'>{item.company}</span>
+                      <span className='company-logo'>{item.logo}</span>
+                    </div>
+                    {/*item.isExpanded && <IoMdArrowDropdown className='dropdown-icon' />*/}
+                  </div>
+                  <div className='card-body'>
+                    <p className='status'>{item.status}</p>
+                    <p className='location'>{item.location}</p>
+                    {item.action && <p className='action'>{item.action}</p>}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -182,6 +325,7 @@ const TrackingPage = () => {
             )}
           </motion.button>
         </div>
+
         <br />
         {showDetails && (
           <div className='details-section'>
@@ -228,27 +372,28 @@ const TrackingPage = () => {
             </div>
           </div>
         )}
-      </div>
-      {showMap && (
-        <div className='modal-overlay_tracking'>
-          <div className='modal-content_tracking'>
-            <TrackingMap coordinates={coordinates} title={mapCurrentLocal} />
-            <br />
-            <br />
-            <br />
-            <motion.button
-              className='button modal_close_button'
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowMap(false)}
-            >
-              {t('close')}
-            </motion.button>
+
+        {showMap && (
+          <div className='modal-overlay_tracking'>
+            <div className='modal-content_tracking'>
+              <TrackingMap coordinates={coordinates} title={mapCurrentLocal} />
+              <br />
+              <br />
+              <br />
+              <motion.button
+                className='button modal_close_button'
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowMap(false)}
+              >
+                {t('close')}
+              </motion.button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };
 
-export default TrackingPage;
+export default Tracking;

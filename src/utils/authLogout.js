@@ -8,7 +8,7 @@ async function logout() {
       return true;
     }
 
-    const response = await torrestirApi.post('/auth/revoke-token', {
+    /*const response = await torrestirApi.post('/auth/revoke-token', {
       token: token,
     });
 
@@ -21,9 +21,12 @@ async function logout() {
     if (revoked) {
       localStorage.removeItem('token');
       return true;
-    }
+    }*/
 
-    return false;
+    localStorage.removeItem('token');
+    return true;
+
+    //return false;
   } catch (error) {
     if (error.response?.status === 400) {
       localStorage.removeItem('token');

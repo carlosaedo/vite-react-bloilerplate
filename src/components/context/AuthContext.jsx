@@ -6,7 +6,7 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('token'));
-  const [userRole, setUserRole] = useState('visitor');
+  const [userRole, setUserRole] = useState('admin');
   const isLoggedIn = !!token;
 
   const user = {
@@ -26,8 +26,9 @@ export function AuthProvider({ children }) {
     const result = await authLogout();
     if (result) {
       setToken(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('userEmail');
     }
-    //localStorage.removeItem('token');
   };
 
   return (

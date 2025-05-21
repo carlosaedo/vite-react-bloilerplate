@@ -1,28 +1,25 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import torrestirApi from '../api/torrestirApi';
+import { Box, Button, Typography, Link as MuiLink } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material';
 
-const ResetPassword = () => {
+const Login2FARequestNewCode = () => {
   const navigateTo = useNavigate();
-
+  const { userEmail } = useParams();
   const [formData, setFormData] = useState({
-    email: '',
+    userEmail: userEmail,
   });
   const [message, setMessage] = useState(null);
 
   async function handleRequestResetPassword() {
     try {
-      const response = await torrestirApi.post('/Account/request-password-reset', formData);
+      const response = await torrestirApi.post('/Auth/request-2fa', formData);
       console.log(response.data);
-      if (
-        response?.status === 200 &&
-        response?.data === 'Se o email existir, foi enviado um link para repor a password.'
-      ) {
-        setMessage('Se o email existir, foi enviado um link para repor a password.');
+      if (response?.status === 200 && response?.data === 'Código enviado.') {
+        setMessage('Código enviado.');
         setTimeout(() => {
-          navigateTo('/login');
+          navigateTo(`/login-2fa/${userEmail}`);
         }, 1000);
       } else {
         setMessage('Erro a pedir o código de verificação.');
@@ -31,14 +28,11 @@ const ResetPassword = () => {
       if (error.response?.status === 404) {
         setMessage('Este email não está registado');
       } else if (
-        error.response?.status === 400 &&
-        error.response?.data === 'Limite diário de pedidos de reset atingido.'
+        error.response?.status === 401 &&
+        error.response?.data === 'Utilizador inválido.'
       ) {
-        setMessage('Limite diário de pedidos de reset atingido.');
-      } else if (error.response?.status === 500) {
-        setMessage('Erro a pedir o reset da password.');
+        setMessage('Utilizador inválido.');
       } else {
-        setMessage('Erro a pedir o reset da password.');
         console.error(error);
       }
     }
@@ -47,14 +41,6 @@ const ResetPassword = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     await handleRequestResetPassword();
-  };
-
-  const handleChange = (event) => {
-    setMessage(null);
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value,
-    });
   };
 
   return (
@@ -69,7 +55,7 @@ const ResetPassword = () => {
     >
       <Box sx={{ width: '100%', maxWidth: 400 }}>
         <Typography variant='h5' gutterBottom>
-          Request reset password
+          Request new 2FA code
         </Typography>
 
         <Box
@@ -83,19 +69,8 @@ const ResetPassword = () => {
             </Typography>
           )}
 
-          <TextField
-            label='Email'
-            type='email'
-            name='email'
-            value={formData.email}
-            onChange={handleChange}
-            required
-            fullWidth
-            size='small'
-          />
-
           <Button type='submit' variant='contained' color='primary'>
-            Request reset password
+            Request new code
           </Button>
         </Box>
 
@@ -109,4 +84,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default Login2FARequestNewCode;

@@ -2,10 +2,15 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
+  typography: {
+    fontFamily: ['Roboto', 'sans-serif'].join(','),
+    // Optionally set other defaults
+    fontSize: 14, // base font size
+  },
   palette: {
     mode: 'light',
     primary: {
-      main: '#003e2d', // your green
+      main: '#003D2C', // your green
     },
     secondary: {
       main: '#ffc928', // your yellow
@@ -18,9 +23,6 @@ const theme = createTheme({
       primary: '#1a1a1a',
       secondary: '#4f4f4f',
     },
-  },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
   },
   components: {
     MuiButton: {

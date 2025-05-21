@@ -1,0 +1,259 @@
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Chip,
+  Stack,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
+import torrestirApi from '../api/torrestirApi';
+
+const ClientDetails = () => {
+  const navigateTo = useNavigate();
+  const params = useParams();
+  const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
+
+  const clientId = params.clientId ?? clientIdFromStorage?.clientId;
+
+  const navigate = useNavigate();
+  const [client, setClient] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({ name: '', vat: '', country: '' });
+  const [userInfo, setUserInfo] = useState(null);
+
+  const token = localStorage.getItem('token');
+
+  async function fetchClient() {
+    try {
+      const response = await torrestirApi.get(`/api/clients/${clientId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setClient(response.data);
+      setFormData({
+        name: response.data.name,
+        vat: response.data.vat,
+        country: response.data.country,
+        isActive: response.data.isActive,
+        isDeleted: response.data.isDeleted,
+      });
+
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to fetch client data');
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    // Run on mount: check login and set startup date
+    async function checkLoginStatus() {
+      const loginStatus = await authCheckLoginStatus();
+
+      if (!loginStatus) {
+        navigateTo('/login');
+      }
+    }
+
+    checkLoginStatus();
+    fetchClient();
+  }, [clientId]); // Only on initial mount
+
+  const handleChange = (event) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await torrestirApi.put(`/api/clients/${clientId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setClient((prev) => ({ ...prev, ...formData }));
+      setEditMode(false);
+    } catch (error) {
+      setError('Failed to update client');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const updatedData = { ...formData, isDeleted: true };
+
+      await torrestirApi.delete(`/api/clients/${clientId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setClient((prev) => ({ ...prev, isDeleted: true }));
+      setFormData(updatedData);
+      setEditMode(false);
+    } catch (error) {
+      setError('Failed to delete client');
+    }
+  };
+
+  const handleCreateNew = () => {
+    navigate('/client-new');
+  };
+
+  const handleRestore = async () => {
+    try {
+      const updatedData = { ...formData, isDeleted: false };
+
+      await torrestirApi.put(`/api/clients/${clientId}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setClient((prev) => ({ ...prev, isDeleted: false }));
+      setFormData(updatedData);
+      setEditMode(false);
+    } catch (error) {
+      setError('Failed to restore client');
+    }
+  };
+
+  const handleDisable = async () => {
+    try {
+      const updatedData = { ...formData, isActive: false };
+
+      await torrestirApi.put(`/api/clients/${clientId}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setClient((prev) => ({ ...prev, isActive: false }));
+      setFormData(updatedData);
+      setEditMode(false);
+    } catch (error) {
+      setError('Failed to restore client');
+    }
+  };
+
+  const handleEnable = async () => {
+    try {
+      const updatedData = { ...formData, isActive: true };
+
+      await torrestirApi.put(`/api/clients/${clientId}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setClient((prev) => ({ ...prev, isActive: true }));
+      setFormData(updatedData);
+      setEditMode(false);
+    } catch (error) {
+      setError('Failed to restore client');
+    }
+  };
+  if (loading) return <CircularProgress />;
+  if (error) return <Alert severity='error'>{error}</Alert>;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'top',
+        padding: 2,
+      }}
+    >
+      <Box sx={{ width: '100%', maxWidth: 400 }}>
+        <Typography variant='h5' gutterBottom>
+          Client Details
+        </Typography>
+
+        {client && (
+          <Stack direction='row' spacing={1} mb={2}>
+            <Chip
+              label={client.isDeleted ? 'Deleted' : 'Not Deleted'}
+              color={client.isDeleted ? 'error' : 'default'}
+            />
+            <Chip
+              label={client.isActive ? 'Active' : 'Inactive'}
+              color={client.isActive ? 'success' : 'default'}
+            />
+          </Stack>
+        )}
+
+        <Box display='flex' flexDirection='column' gap={2} maxWidth={400}>
+          <TextField
+            label='Name'
+            name='name'
+            value={formData.name}
+            onChange={handleChange}
+            disabled={!editMode}
+          />
+          <TextField
+            label='VAT'
+            name='vat'
+            value={formData.vat}
+            onChange={handleChange}
+            disabled={!editMode}
+          />
+          <TextField
+            label='Country'
+            name='country'
+            value={formData.country}
+            onChange={handleChange}
+            disabled={!editMode}
+          />
+        </Box>
+
+        <Stack direction='row' spacing={2} mt={3}>
+          {editMode ? (
+            <>
+              <Button variant='contained' onClick={handleUpdate} color='primary'>
+                Save
+              </Button>
+              <Button variant='outlined' onClick={() => setEditMode(false)}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button variant='contained' onClick={() => setEditMode(true)}>
+              Edit
+            </Button>
+          )}
+          <Button
+            variant='outlined'
+            color='error'
+            onClick={client.isDeleted ? handleRestore : handleDelete}
+          >
+            {client.isDeleted ? 'Restore' : 'Delete'}
+          </Button>
+
+          <Button
+            variant='outlined'
+            color='primary'
+            onClick={client.isActive ? handleDisable : handleEnable}
+          >
+            {client.isActive ? 'Disable' : 'Enable'}
+          </Button>
+          <Button variant='contained' color='secondary' onClick={handleCreateNew}>
+            Create New
+          </Button>
+        </Stack>
+      </Box>
+    </Box>
+  );
+};
+
+export default ClientDetails;

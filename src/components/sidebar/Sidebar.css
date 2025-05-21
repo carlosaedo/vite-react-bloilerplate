@@ -1,84 +1,172 @@
-/* Base Drawer styles */
+/* Modern Sidebar Styling
 .MuiDrawer-paper {
-  background-color: #ffffff;
-  color: #003e2d;
-  font-family: Arial, sans-serif;
-  transition: width 0.3s ease;
+  background: #ffffff;
+  color: #003d2c;
+  font-family: 'Roboto', sans-serif;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-x: hidden;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #f0f0f0;
 }
 
-/* Collapsed state (only when 'collapsed' class is present) */
+/* Collapsed state */
 .MuiDrawer-paper.sidebar-collapsed {
   width: 60px !important;
 }
 
+/* Text transition for collapsible sidebar */
 .sidebar-collapsed-text {
-  white-space: nowrap; /* Prevent text from wrapping */
-  overflow: hidden; /* Hide overflowing text */
-  width: 0; /* Start with width 0 when collapsed */
-  opacity: 0; /* Start with opacity 0 when collapsed */
-  visibility: hidden; /* Hide it from layout */
-  transition: width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: width 0.3s ease, opacity 0.2s ease, visibility 0.2s ease;
 }
 
 .sidebar-expanded-text {
-  visibility: visible; /* Make it visible when expanded */
-  opacity: 1; /* Full opacity */
-  width: auto; /* Let it take up its natural width */
+  visibility: visible;
+  opacity: 1;
+  width: auto;
+  color: #757575;
+  font-weight: 400;
+  letter-spacing: 0.2px;
 }
 
-/* Header with toggle button */
+/* Header styling */
 .sidebar-header {
   display: flex;
   justify-content: flex-end;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin: 0 auto;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-/* Menu list */
+@media (max-width: 768px) {
+  .sidebar-header {
+    justify-content: center;
+  }
+}
+
+.sidebar-header .MuiIconButton-root {
+  color: #003d2c !important;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.sidebar-header .MuiIconButton-root:hover {
+  background-color: rgba(0, 62, 45, 0.05) !important;
+  transform: rotate(180deg);
+}
+
+/* Menu list styling */
 .MuiList-root {
-  padding: 0;
+  padding: 8px 0;
 }
 
 .MuiListItem-root {
-  border-bottom: 1px solid #003e2d1a;
+  border-bottom: none;
+  margin-bottom: 4px;
 }
 
 /* NavLink styling */
 .MuiListItemButton-root {
   display: flex;
   align-items: center;
-  padding: 14px 20px;
-  color: #003e2d;
+  padding: 12px 16px;
+  color: #003d2c;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  margin: 0 8px;
+  border-radius: 8px;
 }
 
 .MuiListItemIcon-root {
   min-width: 35px;
+  color: #003d2c;
+  margin-right: 12px;
 }
 
-/* Only hide text when collapsed */
+/* Hide text when collapsed */
 .MuiDrawer-paper.sidebar-collapsed .MuiListItemText-root {
   display: none;
 }
 
-/* Hover and active states */
+/* Hover state */
 .MuiListItemButton-root:hover {
-  background-color: #003e2d18;
+  background-color: rgba(0, 62, 45, 0.05);
 }
 
-.MuiListItemButton-root.Mui-selected {
-  background-color: #ffc928;
-  color: #003e2d;
-  font-weight: bold;
+.MuiListItemButton-root:hover .MuiListItemIcon-root {
+  color: #ffc928;
 }
 
-/* Alternatively, you can target the ListItemButton itself */
+/* This ensures text changes color when hovering anywhere on the button */
+.MuiListItemButton-root:hover .sidebar-expanded-text .MuiTypography-root,
+.MuiListItemButton-root:hover .MuiListItemText-primary {
+  color: #ffc928;
+  transition: color 0.2s ease;
+}
+
+/* Active state */
 .MuiListItemButton-root.active {
-  background-color: #003e2d26 !important;
+  background-color: rgba(0, 62, 45, 0.1) !important;
+  color: #003d2c !important;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.MuiListItemButton-root.active .MuiListItemIcon-root {
+  color: #003d2c;
+}
+
+/* Special styling for login/logout */
 .logged-in {
-  color: #003e2d !important;
+  color: #003d2c !important;
+}
+
+/* Animation for icon when collapsed */
+.MuiDrawer-paper.sidebar-collapsed .MuiListItemIcon-root {
+  min-width: 24px;
+  margin: 0 auto;
+  transition: transform 0.3s ease;
+  display: flex;
+  justify-content: center;
+}
+
+.MuiDrawer-paper.sidebar-collapsed .MuiListItemButton-root:hover .MuiListItemIcon-root {
+  transform: scale(1.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .MuiDrawer-paper.sidebar-collapsed {
+    width: 60px !important;
+  }
+
+  .sidebar-header {
+    display: none;
+  }
+
+  /* Hide text on mobile by default */
+  .sidebar-expanded-text {
+    display: none;
+  }
+
+  /* Ensure icons are centered */
+  .MuiListItemIcon-root {
+    min-width: 24px !important;
+    margin: 0 auto !important;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Adjust padding for mobile */
+  .MuiListItemButton-root {
+    padding: 12px 8px;
+    justify-content: center;
+  }
+
+  /* Remove right margin from icons on mobile */
+  .MuiListItemIcon-root {
+    margin-right: 0 !important;
+  }
 }

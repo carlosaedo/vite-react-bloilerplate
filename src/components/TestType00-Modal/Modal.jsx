@@ -52,7 +52,7 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
     <Dialog open={isOpen} onClose={closeModal} maxWidth='sm' fullWidth>
       {/* FIX: Changed the nested typography element to use component="span" */}
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography component='span' variant='h6' sx={{ color: '#003e2d' }}>
+        <Typography component='span' variant='h6' sx={{ color: '#003D2C' }}>
           Details
         </Typography>
         <IconButton onClick={closeModal}>
@@ -64,7 +64,7 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
         {data &&
           Object.entries(data).map(([key, value], index) => (
             <div key={key}>
-              <Typography variant='subtitle2' gutterBottom sx={{ color: '#003e2d' }}>
+              <Typography variant='subtitle2' gutterBottom sx={{ color: '#003D2C' }}>
                 {key.toUpperCase()}
               </Typography>
 
@@ -101,7 +101,7 @@ const Modal = ({ isOpen, closeModal, data, onUpdate }) => {
           onClick={handleSave}
           variant='contained'
           sx={{
-            backgroundColor: '#003e2d',
+            backgroundColor: '#003D2C',
             color: 'white',
             '&:hover': { backgroundColor: '#00221b' },
           }}

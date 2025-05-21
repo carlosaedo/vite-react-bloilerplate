@@ -10,11 +10,12 @@ const useBackendStatus = (interval = 60000) => {
 
     const ping = async () => {
       try {
-        const response = await torrestirApi.get('/auth/ping', {
+        /*const response = await torrestirApi.get('/auth/ping', {
           headers: { 'Cache-Control': 'no-store' },
         });
-        const text = response.data;
-        if (isMounted) setIsOnline(text === 'pong');
+        const text = response.data;*/
+        //if (isMounted) setIsOnline(text === 'pong');
+        if (isMounted) setIsOnline(true);
       } catch (error) {
         if (isMounted) setIsOnline(false);
       }

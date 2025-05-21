@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import torrestirApi from '../api/torrestirApi';
 import './login.css';
@@ -54,6 +53,8 @@ const Login = () => {
     return userInfo;
   });
 
+  console.log(userInfo);
+
   const toggleShowFlork = () => {
     setShowFlork(!showFlork);
   };
@@ -64,10 +65,15 @@ const Login = () => {
 
   async function handleLogin() {
     try {
-      const response = await torrestirApi.post('/auth/login', formData, {});
-      const { token } = response.data;
-      if (token) {
+      const response = await torrestirApi.post('/Auth/login', formData, {});
+      console.log('response: ', response.data);
+      const { token, requires2FA } = response.data;
+      if (token === '' && requires2FA) {
+        navigateTo(`/login-2fa/${formData?.email?.trim()}`);
+        localStorage.setItem('userEmail', formData?.email?.trim());
+      } else if (token && !requires2FA) {
         login(token);
+        localStorage.setItem('userEmail', formData?.email?.trim());
         navigateTo('/');
       } else {
         setError('Não tens acesso a isto!');
@@ -185,6 +191,15 @@ const Login = () => {
             </form>
 
             <Stack direction='row' spacing={2} justifyContent='center' mt={2}>
+              <MuiLink
+                component={Link}
+                to='/create-account'
+                underline='hover'
+                variant='body2'
+                color='primary'
+              >
+                Create an account
+              </MuiLink>
               <MuiLink
                 component={Link}
                 to='/resetpassword'

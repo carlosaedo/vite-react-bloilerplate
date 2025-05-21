@@ -5,7 +5,7 @@
   margin: 0 auto;
   padding: 20px;
   border-radius: 5px;
-  background-color: #003e2d;
+  background-color: #003d2c;
   z-index: 1;
   box-shadow: 2px 2px 15px#0f0f0f;
 }
@@ -55,7 +55,7 @@
   background-color: #ffffff;
   border: none;
   border-radius: 3px;
-  color: #003e2d;
+  color: #003d2c;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -101,5 +101,5 @@
 }
 
 .custom-link:hover {
-  color: #003e2d;
+  color: #003d2c;
 }

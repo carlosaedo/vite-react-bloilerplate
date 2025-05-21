@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <BrowserRouter basename='/testtype00/'>
+        <BrowserRouter basename='/shipping-portal/'>
           <App />
         </BrowserRouter>
       </ThemeProvider>

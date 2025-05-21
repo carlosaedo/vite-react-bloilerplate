@@ -28,19 +28,13 @@ import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek
 
 import api from '../api/api';
 
-import { useAuth } from '../context/AuthContext';
-
 const TestType = () => {
   const navigateTo = useNavigate();
-
-  const { isLoggedIn } = useAuth();
 
   const [tableHeight, setTableHeight] = useState(() => {
     const savedState = localStorage.getItem('tableHeight');
     return savedState ? parseInt(savedState, 10) : 400;
   });
-
-  console.log(tableHeight);
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +47,10 @@ const TestType = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize, setPageSize] = useState(15);
+  const [pageSize, setPageSize] = useState(() => {
+    const savedState = localStorage.getItem('tablePageSize');
+    return savedState ? parseInt(savedState, 10) : 15;
+  });
   const [inputPage, setInputPage] = useState(currentPage);
 
   const [selectedDate, setSelectedDate] = useState('');
@@ -113,11 +110,9 @@ const TestType = () => {
 
   useEffect(() => {
     // Run on mount: check login and set startup date
-    console.log('LOginstatus from context: ', isLoggedIn);
-    console.log('// Run on mount: check login and set startup date');
     async function checkLoginStatus() {
       const loginStatus = await authCheckLoginStatus();
-      console.log('login status here on testtype :', loginStatus);
+
       if (!loginStatus) {
         navigateTo('/login');
       }
@@ -201,6 +196,7 @@ const TestType = () => {
   const handlePerPageChange = (e) => {
     const newPageSize = parseInt(e.target.value, 10);
     setPageSize(newPageSize);
+    localStorage.setItem('tablePageSize', newPageSize);
     setCurrentPage(1); // Reset to first page when page size changes
     setInputPage(1); // Reset input to first page
   };
