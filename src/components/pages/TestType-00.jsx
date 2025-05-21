@@ -265,6 +265,19 @@ const TestType = () => {
 
   const dateFields = dateFieldsArray;
 
+  const tableSizes = [300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+  const tableSizeLabels = [
+    'Tiny',
+    'Small',
+    'Compact',
+    'Medium',
+    'Large',
+    'Spacious',
+    'Extra Large',
+    'Jumbo',
+    'Max',
+  ];
+
   return (
     <>
       {error && (
@@ -427,36 +440,15 @@ const TestType = () => {
           </Select>
         </FormControl>
         Table Height
-        <Button
-          variant={tableHeight === 300 ? 'contained' : 'outlined'}
-          onClick={() => handleTableHeightChange(300)}
-        >
-          XS
-        </Button>
-        <Button
-          variant={tableHeight === 400 ? 'contained' : 'outlined'}
-          onClick={() => handleTableHeightChange(400)}
-        >
-          S
-        </Button>
-        <Button
-          variant={tableHeight === 500 ? 'contained' : 'outlined'}
-          onClick={() => handleTableHeightChange(500)}
-        >
-          M
-        </Button>
-        <Button
-          variant={tableHeight === 600 ? 'contained' : 'outlined'}
-          onClick={() => handleTableHeightChange(600)}
-        >
-          L
-        </Button>
-        <Button
-          variant={tableHeight === 700 ? 'contained' : 'outlined'}
-          onClick={() => handleTableHeightChange(700)}
-        >
-          XL
-        </Button>
+        {tableSizes.map((size, index) => (
+          <Button
+            key={size}
+            variant={tableHeight === size ? 'contained' : 'outlined'}
+            onClick={() => handleTableHeightChange(size)}
+          >
+            {tableSizeLabels[index]}
+          </Button>
+        ))}
       </Box>
     </>
   );
