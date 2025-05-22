@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import Modal from '../TestType00-Modal/Modal';
 import ModalDeleteRow from '../TestType00-Modal/ModalDeleteRow';
-
+import { useTheme } from '@mui/material/styles';
 import {
+  IconButton,
+  Popper,
+  Grow,
+  ClickAwayListener,
   Box,
   Typography,
   TextField,
@@ -20,20 +24,46 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  useMediaQuery,
 } from '@mui/material';
 
 import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
 
 import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek.util';
 
+import { Visibility } from '@mui/icons-material';
+
 import api from '../api/api';
 
 const TestType = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigateTo = useNavigate();
 
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const autoTableHeight = window.visualViewport.height - (isMobile ? 540 : 290);
+  console.log('Nani: ', autoTableHeight);
   const [tableHeight, setTableHeight] = useState(() => {
     const savedState = localStorage.getItem('tableHeight');
     return savedState ? parseInt(savedState, 10) : 400;
+  });
+
+  const [autoTableHeightFlag, setAutoTableHeightFlag] = useState(() => {
+    const savedState = localStorage.getItem('tableHeightAuto');
+    return savedState ? savedState : false;
   });
 
   const [data, setData] = useState([]);
@@ -69,9 +99,16 @@ const TestType = () => {
     });
   };
 
-  const handleTableHeightChange = (height) => {
+  const handleTableHeightChange = (height, autoFlag) => {
     setTableHeight(height);
     localStorage.setItem('tableHeight', height);
+    if (autoFlag) {
+      localStorage.setItem('tableHeightAuto', true);
+      setAutoTableHeightFlag(true);
+    } else {
+      localStorage.removeItem('tableHeightAuto');
+      setAutoTableHeightFlag(false);
+    }
   };
 
   const handleDelete = (row) => {
@@ -119,6 +156,9 @@ const TestType = () => {
     }
 
     checkLoginStatus();
+    if (autoTableHeightFlag) {
+      handleTableHeightChange(autoTableHeight, true);
+    }
   }, []); // Only on initial mount
 
   useEffect(() => {
@@ -265,8 +305,9 @@ const TestType = () => {
 
   const dateFields = dateFieldsArray;
 
-  const tableSizes = [300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+  const tableSizes = [autoTableHeight, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
   const tableSizeLabels = [
+    'Auto',
     'Tiny',
     'Small',
     'Compact',
@@ -285,22 +326,38 @@ const TestType = () => {
           {error}
         </Alert>
       )}
-      <Box sx={{ padding: 2 }}>
-        <Typography variant='subtitle1' gutterBottom>
-          Select a date:
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 2,
+          height: isMobile ? 'auto' : 80,
+          maxWidth: 800,
+          margin: '0 auto',
+          padding: 2,
+          flexWrap: 'wrap', // optional, keeps it safer on small-mid screens
+          textAlign: isMobile ? 'center' : 'left',
+        }}
+      >
+        <Typography variant='h5' gutterBottom>
+          Titulo da página
         </Typography>
+
+        <Typography variant='subtitle1'>Select a date:</Typography>
 
         <TextField
           type='date'
           value={selectedDate}
           onChange={handleDateChange}
           slotProps={{ inputLabel: { shrink: true } }}
-          sx={{ mb: 2 }}
+          size='small'
         />
 
         {selectedDate && (
-          <Typography variant='body1' sx={{ mt: 2 }}>
-            <strong>Selected date:</strong> {selectedDate}
+          <Typography variant='body1'>
+            <strong>Selected:</strong> {selectedDate}
           </Typography>
         )}
       </Box>
@@ -311,7 +368,7 @@ const TestType = () => {
           <TableContainer
             component={Paper}
             sx={{
-              maxHeight: tableHeight, // or any height you prefer
+              height: tableHeight,
               overflow: 'auto',
             }}
           >
@@ -440,15 +497,50 @@ const TestType = () => {
           </Select>
         </FormControl>
         Table Height
-        {tableSizes.map((size, index) => (
-          <Button
-            key={size}
-            variant={tableHeight === size ? 'contained' : 'outlined'}
-            onClick={() => handleTableHeightChange(size)}
+        <Box>
+          <IconButton ref={anchorRef} onClick={handleToggle}>
+            {open ? <Visibility size={20} /> : <Visibility size={20} />}
+          </IconButton>
+
+          <Popper
+            open={open}
+            anchorEl={anchorRef.current}
+            placement='bottom-start'
+            transition
+            disablePortal
+            sx={{ zIndex: 1 }}
           >
-            {tableSizeLabels[index]}
-          </Button>
-        ))}
+            {({ TransitionProps }) => (
+              <Grow {...TransitionProps}>
+                <Paper sx={{ p: 1 }}>
+                  <ClickAwayListener onClickAway={handleClose}>
+                    <Box display='grid' flexWrap='wrap' gap={1} width={150}>
+                      {tableSizes.map((size, index) => (
+                        <Button
+                          fullWidth
+                          key={size}
+                          variant={
+                            autoTableHeightFlag && tableSizeLabels[index] === 'Auto'
+                              ? 'contained'
+                              : tableHeight === size
+                              ? 'contained'
+                              : 'outlined'
+                          }
+                          onClick={() => {
+                            handleTableHeightChange(size, tableSizeLabels[index] === 'Auto');
+                            setOpen(false); // close menu after selection
+                          }}
+                        >
+                          {tableSizeLabels[index]}
+                        </Button>
+                      ))}
+                    </Box>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
+        </Box>
       </Box>
     </>
   );
