@@ -341,7 +341,7 @@ const TestType = () => {
           textAlign: isMobile ? 'center' : 'left',
         }}
       >
-        <Typography variant='h5' gutterBottom>
+        <Typography sx={{ marginRight: '50px' }} variant='h5' gutterBottom>
           Titulo da página
         </Typography>
 
@@ -508,7 +508,7 @@ const TestType = () => {
             placement='bottom-start'
             transition
             disablePortal
-            sx={{ zIndex: 1 }}
+            sx={{ zIndex: 9999999 }}
           >
             {({ TransitionProps }) => (
               <Grow {...TransitionProps}>

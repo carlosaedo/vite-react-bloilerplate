@@ -171,11 +171,11 @@ const ClientDetails = () => {
       sx={{
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'top',
+        alignItems: 'center',
         padding: 2,
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 400 }}>
+      <Box sx={{ width: '100%', maxWidth: 500 }}>
         <Typography variant='h5' gutterBottom>
           Client Details
         </Typography>
@@ -220,36 +220,38 @@ const ClientDetails = () => {
         <Stack direction='row' spacing={2} mt={3}>
           {editMode ? (
             <>
+              <Button variant='outlined' color='primary' onClick={() => setEditMode(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant='outlined'
+                color='error'
+                onClick={client.isDeleted ? handleRestore : handleDelete}
+              >
+                {client.isDeleted ? 'Restore' : 'Delete'}
+              </Button>
+
+              <Button
+                variant='outlined'
+                color='primary'
+                onClick={client.isActive ? handleDisable : handleEnable}
+              >
+                {client.isActive ? 'Disable' : 'Enable'}
+              </Button>
               <Button variant='contained' onClick={handleUpdate} color='primary'>
                 Save
               </Button>
-              <Button variant='outlined' onClick={() => setEditMode(false)}>
-                Cancel
-              </Button>
             </>
           ) : (
-            <Button variant='contained' onClick={() => setEditMode(true)}>
-              Edit
-            </Button>
+            <>
+              <Button variant='contained' onClick={() => setEditMode(true)}>
+                Edit
+              </Button>
+              <Button variant='contained' color='secondary' onClick={handleCreateNew}>
+                Create New
+              </Button>
+            </>
           )}
-          <Button
-            variant='outlined'
-            color='error'
-            onClick={client.isDeleted ? handleRestore : handleDelete}
-          >
-            {client.isDeleted ? 'Restore' : 'Delete'}
-          </Button>
-
-          <Button
-            variant='outlined'
-            color='primary'
-            onClick={client.isActive ? handleDisable : handleEnable}
-          >
-            {client.isActive ? 'Disable' : 'Enable'}
-          </Button>
-          <Button variant='contained' color='secondary' onClick={handleCreateNew}>
-            Create New
-          </Button>
         </Stack>
       </Box>
     </Box>

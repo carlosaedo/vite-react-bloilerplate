@@ -9,6 +9,7 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
+  CircularProgress,
 } from '@mui/material';
 import {
   FaBoxOpen,
@@ -20,11 +21,11 @@ import {
   FaBars,
   FaChevronRight,
 } from 'react-icons/fa';
+
 import { GrUserNew } from 'react-icons/gr';
 
 import { MdSupervisorAccount } from 'react-icons/md';
 import './Sidebar.css';
-import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = ({ onToggle }) => {
@@ -33,21 +34,7 @@ const Sidebar = ({ onToggle }) => {
     return savedState === 'true';
   });
 
-  const [userInfo, setUserInfo] = useState(null);
-
-  const { isLoggedIn } = useAuth();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUserInfo(decoded);
-      } catch (err) {
-        console.error('Invalid token', err);
-      }
-    }
-  }, []);
+  const { isLoggedIn, loading, userRole } = useAuth();
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
@@ -102,9 +89,7 @@ const Sidebar = ({ onToggle }) => {
     { label: 'Incidents', icon: <FaExclamation />, path: '/incidents', roles: ['user', 'admin'] },
   ];
 
-  const filteredItems = allItems.filter(
-    (item) => !item.roles || item.roles.includes(userInfo?.typ),
-  );
+  const filteredItems = allItems.filter((item) => !item.roles || item.roles.includes(userRole));
 
   const renderMenu = () =>
     filteredItems.map(({ label, icon, path }) => (
@@ -132,6 +117,10 @@ const Sidebar = ({ onToggle }) => {
         </Tooltip>
       </ListItem>
     ));
+
+  if (loading) {
+    return <CircularProgress />;
+  }
 
   return (
     <Drawer
