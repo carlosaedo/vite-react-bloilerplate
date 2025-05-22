@@ -25,6 +25,7 @@ import {
   Container,
   Chip,
   InputLabel,
+  Popper,
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
@@ -255,7 +256,50 @@ const Header = () => {
             {!isMobile ? (
               <NavSection>
                 {/* Client Selector */}
-                {!isTablet && (
+                {isTablet ? (
+                  <ClientSelector>
+                    <MdBusinessCenter size={18} color='#ffc928' />
+                    <Autocomplete
+                      options={clientOptions}
+                      value={selectedClient || null}
+                      onChange={handleClientChange}
+                      inputValue={inputValue}
+                      onInputChange={(event, newInputValue) => {
+                        setInputValue(newInputValue);
+                      }}
+                      onOpen={fetchData}
+                      getOptionLabel={(option) => option?.name || ''}
+                      isOptionEqualToValue={(option, value) => option?.clientId === value?.clientId}
+                      renderInput={(params) => (
+                        <StyledTextField
+                          {...params}
+                          variant='standard'
+                          placeholder='Select client'
+                          sx={{ width: 100 }} // ✅ Input width
+                        />
+                      )}
+                      sx={{ width: 'auto' }}
+                      slots={{
+                        popper: Popper, // ✅ Default Popper can still be used
+                      }}
+                      slotProps={{
+                        popper: {
+                          modifiers: [
+                            {
+                              name: 'setWidth',
+                              enabled: true,
+                              phase: 'beforeWrite',
+                              requires: ['computeStyles'],
+                              fn: ({ state }) => {
+                                state.styles.popper.width = '300px'; // ✅ Dropdown width
+                              },
+                            },
+                          ],
+                        },
+                      }}
+                    />
+                  </ClientSelector>
+                ) : (
                   <ClientSelector>
                     <MdBusinessCenter size={18} color='#ffc928' />
                     <Autocomplete

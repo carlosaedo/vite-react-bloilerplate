@@ -558,7 +558,7 @@ const TestType = () => {
                           variant={
                             autoTableHeightFlag && tableSizeLabels[index] === 'Auto'
                               ? 'contained'
-                              : tableHeight === size
+                              : !autoTableHeightFlag && tableHeight === size
                               ? 'contained'
                               : 'outlined'
                           }
@@ -578,7 +578,7 @@ const TestType = () => {
           </Popper>
         </Box>
         Font Size:
-        <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
           <Button
             onClick={decrementFontSize}
             variant='outlined'
