@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
 import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import {
   Box,
@@ -22,7 +21,6 @@ const ClientNew = () => {
 
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({ name: '', vat: '', country: '' });
-  const [userInfo, setUserInfo] = useState(null);
 
   const token = localStorage.getItem('token');
 
@@ -37,7 +35,7 @@ const ClientNew = () => {
     }
 
     checkLoginStatus();
-  }, []); // Only on initial mount
+  }, [navigateTo]); // Only on initial mount
 
   const handleChange = (event) => {
     setFormData({

@@ -202,6 +202,10 @@ const Header = () => {
   }
 
   useEffect(() => {
+    fetchData(); // Call once on mount
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
@@ -215,11 +219,10 @@ const Header = () => {
   }, []);
 
   const handleClientChange = (event, newValue) => {
-    if (!newValue) return; // Prevent setting null value
+    if (!newValue || !newValue.clientId) return;
     setSelectedClient(newValue);
-    // Store as JSON string
     localStorage.setItem('selectedClient', JSON.stringify(newValue));
-    navigateTo(`/client-details/${newValue?.clientId}`); // Redirect to home page
+    navigateTo(`/client-details/${newValue.clientId}`);
   };
 
   const handleLanguageChange = (lang) => {
@@ -257,12 +260,12 @@ const Header = () => {
                     <MdBusinessCenter size={18} color='#ffc928' />
                     <Autocomplete
                       options={clientOptions}
-                      value={selectedClient}
+                      value={selectedClient || null} // fallback to null to keep controlled
                       onChange={handleClientChange}
                       inputValue={inputValue}
                       onInputChange={(event, newInputValue) => {
                         setInputValue(newInputValue);
-                        fetchData(); // Refetch when user types
+                        // Removed fetchData() here as requested
                       }}
                       onOpen={() => {
                         fetchData(); // Refetch when dropdown opens
@@ -394,12 +397,12 @@ const Header = () => {
                 <ListItem sx={{ pt: 0 }}>
                   <Autocomplete
                     options={clientOptions}
-                    value={selectedClient}
+                    value={selectedClient || null} // fallback to null to keep controlled
                     onChange={handleClientChange}
                     inputValue={inputValue}
                     onInputChange={(event, newInputValue) => {
                       setInputValue(newInputValue);
-                      fetchData(); // Refetch when user types
+                      // Removed fetchData() here as requested
                     }}
                     onOpen={() => {
                       fetchData(); // Refetch when dropdown opens

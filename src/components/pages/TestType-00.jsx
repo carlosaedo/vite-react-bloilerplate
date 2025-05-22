@@ -33,6 +33,8 @@ import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek
 
 import { Visibility } from '@mui/icons-material';
 
+import { MdOutlineTextIncrease, MdOutlineTextDecrease } from 'react-icons/md';
+
 import api from '../api/api';
 
 const TestType = () => {
@@ -66,6 +68,11 @@ const TestType = () => {
     return savedState ? savedState : false;
   });
 
+  const [tableFontSize, setTableFontSize] = useState(() => {
+    const savedState = localStorage.getItem('tableFontSize');
+    return savedState ? parseInt(savedState, 10) : 14;
+  });
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -90,6 +97,8 @@ const TestType = () => {
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
+  const [authLoading, setAuthLoading] = useState(true);
+
   const handleContextMenu = (event, row) => {
     event.preventDefault();
     setContextMenu({
@@ -108,6 +117,22 @@ const TestType = () => {
     } else {
       localStorage.removeItem('tableHeightAuto');
       setAutoTableHeightFlag(false);
+    }
+  };
+
+  const incrementFontSize = () => {
+    const currentIndex = tableFontSizes.indexOf(tableFontSize);
+    if (currentIndex < tableFontSizes.length - 1) {
+      setTableFontSize(tableFontSizes[currentIndex + 1]);
+      localStorage.setItem('tableFontSize', tableFontSizes[currentIndex + 1]);
+    }
+  };
+
+  const decrementFontSize = () => {
+    const currentIndex = tableFontSizes.indexOf(tableFontSize);
+    if (currentIndex > 0) {
+      setTableFontSize(tableFontSizes[currentIndex - 1]);
+      localStorage.setItem('tableFontSize', tableFontSizes[currentIndex - 1]);
     }
   };
 
@@ -146,20 +171,24 @@ const TestType = () => {
   }
 
   useEffect(() => {
-    // Run on mount: check login and set startup date
     async function checkLoginStatus() {
-      const loginStatus = await authCheckLoginStatus();
-
-      if (!loginStatus) {
+      try {
+        const loginStatus = await authCheckLoginStatus();
+        if (!loginStatus) {
+          navigateTo('/login');
+        } else {
+          setAuthLoading(false);
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
         navigateTo('/login');
       }
     }
-
     checkLoginStatus();
     if (autoTableHeightFlag) {
       handleTableHeightChange(autoTableHeight, true);
     }
-  }, []); // Only on initial mount
+  }, [navigateTo]);
 
   useEffect(() => {
     if (startupDateFirstTime) {
@@ -301,9 +330,15 @@ const TestType = () => {
     return <div>{error}</div>;
   }
 
+  if (authLoading) {
+    return <div>Checking login status...</div>;
+  }
+
   const headers = data.length ? Object.keys(data[0]) : [];
 
   const dateFields = dateFieldsArray;
+
+  const tableFontSizes = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28];
 
   const tableSizes = [autoTableHeight, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
   const tableSizeLabels = [
@@ -386,6 +421,7 @@ const TestType = () => {
                         position: 'sticky',
                         top: 0,
                         zIndex: 1,
+                        fontSize: `${tableFontSize}px`,
                       }}
                     >
                       {header.toUpperCase()}
@@ -405,7 +441,7 @@ const TestType = () => {
                     onContextMenu={(e) => handleContextMenu(e, row)}
                   >
                     {headers.map((header) => (
-                      <TableCell key={header}>
+                      <TableCell key={header} sx={{ fontSize: `${tableFontSize}px` }}>
                         {dateFields.includes(header)
                           ? new Intl.DateTimeFormat('pt-PT').format(new Date(row[header]))
                           : row[header]}
@@ -540,6 +576,26 @@ const TestType = () => {
               </Grow>
             )}
           </Popper>
+        </Box>
+        Font Size:
+        <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Button
+            onClick={decrementFontSize}
+            variant='outlined'
+            disabled={tableFontSize === tableFontSizes[0]}
+          >
+            <MdOutlineTextDecrease />
+          </Button>
+          <Box flexGrow={1} textAlign='center'>
+            {tableFontSize}px
+          </Box>
+          <Button
+            onClick={incrementFontSize}
+            variant='outlined'
+            disabled={tableFontSize === tableFontSizes[tableFontSizes.length - 1]}
+          >
+            <MdOutlineTextIncrease />
+          </Button>
         </Box>
       </Box>
     </>

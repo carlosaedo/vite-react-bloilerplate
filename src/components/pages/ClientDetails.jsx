@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+
 import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import {
   Box,
@@ -16,10 +16,20 @@ import torrestirApi from '../api/torrestirApi';
 
 const ClientDetails = () => {
   const navigateTo = useNavigate();
-  const params = useParams();
+
+  const { clientId: paramClientId } = useParams();
   const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
 
-  const clientId = params.clientId ?? clientIdFromStorage?.clientId;
+  const [clientId, setClientId] = useState(paramClientId ?? clientIdFromStorage?.clientId);
+
+  console.log(clientId);
+
+  // Sync with URL when it changes
+  useEffect(() => {
+    if (paramClientId !== undefined && paramClientId !== clientId) {
+      setClientId(paramClientId);
+    }
+  }, [paramClientId]);
 
   const navigate = useNavigate();
   const [client, setClient] = useState(null);
@@ -27,46 +37,58 @@ const ClientDetails = () => {
   const [error, setError] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: '', vat: '', country: '' });
-  const [userInfo, setUserInfo] = useState(null);
 
   const token = localStorage.getItem('token');
 
-  async function fetchClient() {
-    try {
-      const response = await torrestirApi.get(`/api/clients/${clientId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setClient(response.data);
-      setFormData({
-        name: response.data.name,
-        vat: response.data.vat,
-        country: response.data.country,
-        isActive: response.data.isActive,
-        isDeleted: response.data.isDeleted,
-      });
-
-      setLoading(false);
-    } catch (error) {
-      setError('Failed to fetch client data');
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    // Run on mount: check login and set startup date
     async function checkLoginStatus() {
       const loginStatus = await authCheckLoginStatus();
-
       if (!loginStatus) {
         navigateTo('/login');
       }
     }
-
     checkLoginStatus();
+  }, [navigateTo]);
+
+  useEffect(() => {
+    // If no clientId, set loading false and show error, then exit early
+    if (!clientId) {
+      setLoading(false);
+      setError('No client selected. Cannot show client details.');
+      setClient(null);
+      setFormData(null);
+      return;
+    }
+
+    // Reset states for new fetch
+    setLoading(true);
+    setError(null);
+
+    const fetchClient = async () => {
+      try {
+        const response = await torrestirApi.get(`/api/clients/${clientId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setClient(response.data);
+        setFormData({
+          name: response.data.name,
+          vat: response.data.vat,
+          country: response.data.country,
+          isActive: response.data.isActive,
+          isDeleted: response.data.isDeleted,
+        });
+      } catch (error) {
+        setError('Failed to fetch client data.');
+        setClient(null);
+        setFormData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchClient();
-  }, [clientId]); // Only on initial mount
+  }, [clientId, token]);
 
   const handleChange = (event) => {
     setFormData({
