@@ -23,6 +23,9 @@ import Tracking from './components/pages/Tracking';
 import TestType00 from './components/pages/TestType-00';
 import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
 
+import ShippingForm from './components/pages/ShippingForm';
+import ShippingFormSinglePage from './components/pages/ShippingFormSinglePage';
+
 import ClientDetails from './components/pages/ClientDetails';
 import ClientNew from './components/pages/ClientNew';
 import './App.css';
@@ -94,6 +97,8 @@ const App = () => {
             <Route path='/404' element={<Page404 />} />
             <Route path='/tracking' element={<TrackingSearch />} />
             <Route path='/tracking/:trackingNumber' element={<Tracking />} />
+            <Route path='/shipping-form' element={<ShippingForm />} />
+            <Route path='/shipping-form-single-page' element={<ShippingFormSinglePage />} />
           </Routes>
           <Footer />
         </div>

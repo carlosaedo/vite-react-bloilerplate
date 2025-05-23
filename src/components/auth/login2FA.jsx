@@ -23,22 +23,18 @@ const Login2FA = () => {
       const response = await torrestirApi.post('/Auth/verify-2fa', formData);
       console.log(response.data);
       if (response?.data?.token) {
-        setMessage('Código aceite');
         login(response?.data?.token);
-        setTimeout(() => {
-          navigateTo('/');
-        }, 1000);
+        //setTimeout(() => {
+        navigateTo('/');
+        //}, 1000);
       } else {
         setMessage('Erro a pedir o código de verificação.');
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        setMessage('Este email não está registado');
-      } else if (
-        error.response?.status === 400 &&
-        error.response?.data === 'Limite diário de pedidos de reset atingido.'
-      ) {
-        setMessage('Limite diário de pedidos de reset atingido.');
+        setMessage('Código inválido ou expirado.');
+      } else if (error.response?.status === 400) {
+        setMessage('Código inválido ou expirado.');
       } else if (
         error.response?.status === 401 &&
         error.response?.data === 'Código inválido ou expirado.'

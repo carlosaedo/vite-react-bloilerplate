@@ -10,6 +10,7 @@ import {
   ListItemText,
   Tooltip,
   CircularProgress,
+  Collapse,
 } from '@mui/material';
 import {
   FaBoxOpen,
@@ -20,6 +21,8 @@ import {
   FaExclamation,
   FaBars,
   FaChevronRight,
+  FaChevronDown,
+  FaChevronRight as FaChevronUp,
 } from 'react-icons/fa';
 
 import { GrUserNew } from 'react-icons/gr';
@@ -38,7 +41,7 @@ const Sidebar = ({ onToggle }) => {
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
-    onToggle(collapsed ? 60 : 250);
+    onToggle(collapsed ? 50 : 250);
 
     // Force collapse on mobile
     const handleResize = () => {
@@ -65,20 +68,41 @@ const Sidebar = ({ onToggle }) => {
     }
   };
 
+  const [openGroups, setOpenGroups] = useState(() => {
+    const savedState = JSON.parse(localStorage.getItem('openGroups'));
+    return savedState ? savedState : {};
+  });
+
+  const handleToggleGroup = (label) => {
+    setOpenGroups((prev) => {
+      const updated = { ...prev, [label]: !prev[label] };
+      localStorage.setItem('openGroups', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const allItems = [
     { label: 'Home', icon: <FaHome />, path: '/', roles: ['user', 'admin', 'client'] },
     {
-      label: 'Client Details',
+      label: 'Clients',
       icon: <MdSupervisorAccount />,
-      path: '/client-details',
       roles: ['user', 'admin', 'client'],
+      children: [
+        {
+          label: 'Client Details',
+          icon: <MdSupervisorAccount />,
+          path: '/client-details',
+          roles: ['user', 'admin'],
+        },
+        {
+          label: 'Create New Client',
+          icon: <GrUserNew />,
+          path: '/client-new',
+          roles: ['admin'],
+        },
+      ],
     },
-    {
-      label: 'Create New Client',
-      icon: <GrUserNew />,
-      path: '/client-new',
-      roles: ['user', 'admin', 'client'],
-    },
+
     {
       label: 'Tracking',
       icon: <FaBoxOpen />,
@@ -89,34 +113,84 @@ const Sidebar = ({ onToggle }) => {
     { label: 'Incidents', icon: <FaExclamation />, path: '/incidents', roles: ['user', 'admin'] },
   ];
 
-  const filteredItems = allItems.filter((item) => !item.roles || item.roles.includes(userRole));
+  const filterByRole = (items) =>
+    items
+      .filter((item) => !item.roles || item.roles.includes(userRole))
+      .map((item) => {
+        if (item.children) {
+          const filteredChildren = filterByRole(item.children);
+          return filteredChildren.length > 0 ? { ...item, children: filteredChildren } : null;
+        }
+        return item;
+      })
+      .filter(Boolean);
+
+  const filteredItems = filterByRole(allItems);
+
+  const renderMenuItem = ({ label, icon, path }) => (
+    <ListItem disablePadding key={label}>
+      <Tooltip title={collapsed ? label : ''} placement='right' arrow>
+        <ListItemButton
+          component={NavLink}
+          to={path}
+          onClick={toggleSidebarMenuItem}
+          className={({ isActive }) => (isActive ? 'active' : '')}
+        >
+          <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>{icon}</ListItemIcon>
+          <ListItemText
+            sx={{ '& .MuiListItemText-primary': { fontSize: '0.95rem', fontWeight: 400 } }}
+            className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
+            primary={label}
+          />
+        </ListItemButton>
+      </Tooltip>
+    </ListItem>
+  );
 
   const renderMenu = () =>
-    filteredItems.map(({ label, icon, path }) => (
-      <ListItem disablePadding key={label}>
-        <Tooltip title={collapsed ? label : ''} placement='right' arrow>
-          <ListItemButton
-            component={NavLink}
-            to={path}
-            onClick={toggleSidebarMenuItem}
-            className={({ isActive }) => (isActive ? 'active' : '')}
-          >
-            <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>{icon}</ListItemIcon>
-            <ListItemText
-              sx={{
-                '& .MuiListItemText-primary': {
-                  fontSize: '0.95rem',
-                  fontWeight: 400,
-                  transition: 'color 0.2s ease',
-                },
-              }}
-              className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
-              primary={label}
-            />
-          </ListItemButton>
-        </Tooltip>
-      </ListItem>
-    ));
+    filteredItems.map((item) => {
+      if (item.children) {
+        const isOpen = openGroups[item.label] || false;
+        return (
+          <React.Fragment key={item.label}>
+            <ListItem disablePadding>
+              <Tooltip title={collapsed ? item.label : ''} placement='right' arrow>
+                <ListItemButton onClick={() => handleToggleGroup(item.label)}>
+                  <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>
+                    {item.icon}
+                    {collapsed && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: 4,
+                          right: 4,
+                          width: 6,
+                          height: 6,
+                          backgroundColor: isOpen ? '#FFC928' : '#888',
+                          borderRadius: '50%',
+                        }}
+                      />
+                    )}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
+                    sx={{ '& .MuiListItemText-primary': { fontSize: '0.95rem', fontWeight: 400 } }}
+                  />
+                  {!collapsed && (isOpen ? <FaChevronDown size={12} /> : <FaChevronUp size={12} />)}
+                </ListItemButton>
+              </Tooltip>
+            </ListItem>
+            <Collapse in={isOpen} timeout='auto' unmountOnExit>
+              <List component='div' disablePadding sx={{ pl: collapsed ? 0 : 1 }}>
+                {item.children.map(renderMenuItem)}
+              </List>
+            </Collapse>
+          </React.Fragment>
+        );
+      }
+      return renderMenuItem(item);
+    });
 
   if (loading) {
     return <CircularProgress />;
@@ -128,10 +202,10 @@ const Sidebar = ({ onToggle }) => {
       open={true}
       className={collapsed ? 'sidebar-collapsed' : ''}
       sx={{
-        width: collapsed ? 60 : 250,
+        width: collapsed ? 50 : 250,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: collapsed ? 60 : 250,
+          width: collapsed ? 50 : 250,
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'fixed',
           top: 0,
