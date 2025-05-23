@@ -28,6 +28,7 @@ import {
 import { GrUserNew } from 'react-icons/gr';
 
 import { MdSupervisorAccount } from 'react-icons/md';
+import { RiPagesLine } from 'react-icons/ri';
 import './Sidebar.css';
 import { useAuth } from '../context/AuthContext';
 
@@ -102,7 +103,12 @@ const Sidebar = ({ onToggle }) => {
         },
       ],
     },
-
+    {
+      label: 'Shipping Form',
+      icon: <RiPagesLine />,
+      path: '/shipping-form',
+      roles: ['user', 'admin', 'client'],
+    },
     {
       label: 'Tracking',
       icon: <FaBoxOpen />,

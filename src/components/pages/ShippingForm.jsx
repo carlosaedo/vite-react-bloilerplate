@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import {
   Box,
   Grid,
@@ -32,8 +32,7 @@ const shippingPaymentTo = [
   { value: 'destinatario', label: 'Destinatário' },
 ];
 
-function ShippingForm() {
-  const navigateTo = useNavigate();
+function ShippingForm({ handleChangeFormType }) {
   const [step, setStep] = useState(0);
 
   const [formData, setFormData] = useState(() => {
@@ -206,6 +205,10 @@ function ShippingForm() {
     localStorage.setItem('formData', JSON.stringify(updatedData));
   }, []);
 
+  const handleChangeFormTypeToParent = () => {
+    handleChangeFormType(true);
+  };
+
   const validateStep = () => {
     switch (step) {
       case 0:
@@ -260,9 +263,7 @@ function ShippingForm() {
         </Typography>
         <Tooltip title='Single page form' placement='top' arrow>
           <Button
-            onClick={() => {
-              navigateTo('/shipping-form-single-page');
-            }}
+            onClick={handleChangeFormTypeToParent}
             variant='contained'
             color='primary'
             sx={{
@@ -619,7 +620,7 @@ function ShippingForm() {
                         }
                         fullWidth
                         required
-                        inputProps={{ min: 0 }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }}>
@@ -633,7 +634,7 @@ function ShippingForm() {
                         }
                         fullWidth
                         required
-                        inputProps={{ min: 0 }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }}>
@@ -645,7 +646,7 @@ function ShippingForm() {
                         onChange={(e) => handlePackageChange(index, 'packageWidth', e.target.value)}
                         fullWidth
                         required
-                        inputProps={{ min: 0 }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }}>
@@ -659,7 +660,7 @@ function ShippingForm() {
                         }
                         fullWidth
                         required
-                        inputProps={{ min: 0 }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12 }}>
@@ -685,7 +686,7 @@ function ShippingForm() {
                         onChange={(e) => handlePackageChange(index, 'packageValue', e.target.value)}
                         fullWidth
                         required
-                        inputProps={{ min: 0 }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12 }}>

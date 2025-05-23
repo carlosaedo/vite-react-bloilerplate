@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import {
   Grid,
   Box,
@@ -32,8 +32,7 @@ const shippingPaymentTo = [
   { value: 'destinatario', label: 'Destinatário' },
 ];
 
-function ShippingForm() {
-  const navigateTo = useNavigate();
+function ShippingForm({ handleChangeFormType }) {
   const [formData, setFormData] = useState(() => {
     const storedData = localStorage.getItem('formData');
     return storedData
@@ -204,6 +203,10 @@ function ShippingForm() {
     localStorage.setItem('formData', JSON.stringify(updatedData));
   }, []);
 
+  const handleChangeFormTypeToParent = () => {
+    handleChangeFormType(false);
+  };
+
   return (
     <>
       <Paper sx={{ p: 2, maxWidth: 900, margin: 'auto', mt: 5 }}>
@@ -213,9 +216,7 @@ function ShippingForm() {
           </Typography>
           <Tooltip title='Multi tab form' placement='top' arrow>
             <Button
-              onClick={() => {
-                navigateTo('/shipping-form');
-              }}
+              onClick={handleChangeFormTypeToParent}
               variant='contained'
               color='primary'
               sx={{
