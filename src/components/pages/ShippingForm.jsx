@@ -728,7 +728,7 @@ function ShippingForm({ handleChangeFormType }) {
         <Typography variant='h6'>Payment Information</Typography>
 
         <Grid container spacing={2}>
-          <Grid size={{ xs: 6, sm: 3 }}>
+          <Grid size={{ xs: 4 }}>
             <TextField
               select
               label='Shipping Payment'
@@ -747,7 +747,7 @@ function ShippingForm({ handleChangeFormType }) {
               ))}
             </TextField>
           </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
+          <Grid size={{ xs: 4 }}>
             <TextField
               select
               label='Payment'
@@ -766,7 +766,7 @@ function ShippingForm({ handleChangeFormType }) {
               ))}
             </TextField>
           </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
+          <Grid size={{ xs: 4 }}>
             <TextField
               label='NIF Destinatário'
               name='recipientTaxId'
