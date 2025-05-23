@@ -197,6 +197,7 @@ function ShippingForm({ handleChangeFormType }) {
       date: today,
       year: year,
       waybillNumber: waybillRandom,
+      hour: time,
     };
 
     setFormData(updatedData);
@@ -265,7 +266,7 @@ function ShippingForm({ handleChangeFormType }) {
                 label='Hour'
                 name='hour'
                 type='time'
-                value={formData.deliveryTime || ''} // default to HH:MM
+                value={formData.hour || ''} // default to HH:MM
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -697,7 +698,7 @@ function ShippingForm({ handleChangeFormType }) {
                 rows={2}
               />
               <TextField
-                label='Value (USD)'
+                label='Package Value (EUR)'
                 name={`packageValue_${index}`}
                 type='number'
                 value={pkg.packageValue}

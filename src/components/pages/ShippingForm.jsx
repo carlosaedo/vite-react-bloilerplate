@@ -16,6 +16,8 @@ import {
 import { RiPagesLine } from 'react-icons/ri';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
+import ShippingFormReviewDetails from './ShippingFormReviewDetails';
+
 const shippingServices = [
   { value: 'standard', label: 'Standard' },
   { value: 'express', label: 'Express' },
@@ -79,6 +81,8 @@ function ShippingForm({ handleChangeFormType }) {
           ],
         };
   });
+
+  console.log(formData);
 
   const handleStepChange = (event, newValue) => {
     setStep(newValue);
@@ -199,6 +203,7 @@ function ShippingForm({ handleChangeFormType }) {
       date: today,
       year: year,
       waybillNumber: waybillRandom,
+      hour: time,
     };
 
     setFormData(updatedData);
@@ -311,7 +316,7 @@ function ShippingForm({ handleChangeFormType }) {
               label='Hour'
               name='hour'
               type='time'
-              value={formData.deliveryTime || ''} // default to HH:MM
+              value={formData.hour || ''} // default to HH:MM
               onChange={handleChange}
               fullWidth
               size='small'
@@ -679,7 +684,7 @@ function ShippingForm({ handleChangeFormType }) {
                     </Grid>
                     <Grid size={{ xs: 12 }}>
                       <TextField
-                        label='Package Value (for insurance, USD)'
+                        label='Package Value (EUR)'
                         name={`packageValue_${index}`}
                         type='number'
                         value={pkg.packageValue}
@@ -715,14 +720,7 @@ function ShippingForm({ handleChangeFormType }) {
           </>
         )}
 
-        {step === 3 && (
-          <Grid size={{ xs: 12 }}>
-            <Typography variant='h6' gutterBottom>
-              Review your details
-            </Typography>
-            <pre>{JSON.stringify(formData, null, 2)}</pre>
-          </Grid>
-        )}
+        {step === 3 && <ShippingFormReviewDetails formData={formData} />}
       </Grid>
 
       {/* Additional Info */}
