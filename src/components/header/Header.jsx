@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
-import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
+import { useAuth } from '../context/AuthContext';
 import i18n from 'i18next';
 import {
   AppBar,
@@ -141,6 +140,7 @@ const LanguageSelect = styled(FormControl)(({ theme }) => ({
 }));
 
 const Header = () => {
+  const { user, userRole } = useAuth();
   const navigateTo = useNavigate();
   const token = localStorage.getItem('token');
   const isTokenPresent = !!token;
@@ -206,19 +206,6 @@ const Header = () => {
     fetchData(); // Call once on mount
   }, []);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUserInfo(decoded);
-      } catch (err) {
-        console.error('Invalid token', err);
-        setUserInfo(null);
-      }
-    }
-  }, []);
-
   const handleClientChange = (event, newValue) => {
     if (!newValue || !newValue.clientId) return;
     setSelectedClient(newValue);
@@ -236,8 +223,7 @@ const Header = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-  const displayName = userInfo?.email || localStorage.getItem('userEmail') || 'user';
-  const userRole = userInfo?.typ || 'user';
+  const displayName = user?.email || localStorage.getItem('userEmail') || 'user';
 
   return (
     <StyledAppBar position='sticky'>
@@ -256,77 +242,83 @@ const Header = () => {
             {!isMobile ? (
               <NavSection>
                 {/* Client Selector */}
-                {isTablet ? (
-                  <ClientSelector>
-                    <MdBusinessCenter size={18} color='#ffc928' />
-                    <Autocomplete
-                      options={clientOptions}
-                      value={selectedClient || null}
-                      onChange={handleClientChange}
-                      inputValue={inputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setInputValue(newInputValue);
-                      }}
-                      onOpen={fetchData}
-                      getOptionLabel={(option) => option?.name || ''}
-                      isOptionEqualToValue={(option, value) => option?.clientId === value?.clientId}
-                      renderInput={(params) => (
-                        <StyledTextField
-                          {...params}
-                          variant='standard'
-                          placeholder='Select client'
-                          sx={{ width: 100 }} // ✅ Input width
-                        />
-                      )}
-                      sx={{ width: 'auto' }}
-                      slots={{
-                        popper: Popper, // ✅ Default Popper can still be used
-                      }}
-                      slotProps={{
-                        popper: {
-                          modifiers: [
-                            {
-                              name: 'setWidth',
-                              enabled: true,
-                              phase: 'beforeWrite',
-                              requires: ['computeStyles'],
-                              fn: ({ state }) => {
-                                state.styles.popper.width = '300px'; // ✅ Dropdown width
-                              },
+                {isTablet
+                  ? userRole === 'admin' && (
+                      <ClientSelector>
+                        <MdBusinessCenter size={18} color='#ffc928' />
+                        <Autocomplete
+                          options={clientOptions}
+                          value={selectedClient || null}
+                          onChange={handleClientChange}
+                          inputValue={inputValue}
+                          onInputChange={(event, newInputValue) => {
+                            setInputValue(newInputValue);
+                          }}
+                          onOpen={fetchData}
+                          getOptionLabel={(option) => option?.name || ''}
+                          isOptionEqualToValue={(option, value) =>
+                            option?.clientId === value?.clientId
+                          }
+                          renderInput={(params) => (
+                            <StyledTextField
+                              {...params}
+                              variant='standard'
+                              placeholder='Select client'
+                              sx={{ width: 100 }} // ✅ Input width
+                            />
+                          )}
+                          sx={{ width: 'auto' }}
+                          slots={{
+                            popper: Popper, // ✅ Default Popper can still be used
+                          }}
+                          slotProps={{
+                            popper: {
+                              modifiers: [
+                                {
+                                  name: 'setWidth',
+                                  enabled: true,
+                                  phase: 'beforeWrite',
+                                  requires: ['computeStyles'],
+                                  fn: ({ state }) => {
+                                    state.styles.popper.width = '300px'; // ✅ Dropdown width
+                                  },
+                                },
+                              ],
                             },
-                          ],
-                        },
-                      }}
-                    />
-                  </ClientSelector>
-                ) : (
-                  <ClientSelector>
-                    <MdBusinessCenter size={18} color='#ffc928' />
-                    <Autocomplete
-                      options={clientOptions}
-                      value={selectedClient || null} // fallback to null to keep controlled
-                      onChange={handleClientChange}
-                      inputValue={inputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setInputValue(newInputValue);
-                        // Removed fetchData() here as requested
-                      }}
-                      onOpen={() => {
-                        fetchData(); // Refetch when dropdown opens
-                      }}
-                      getOptionLabel={(option) => option?.name || ''}
-                      isOptionEqualToValue={(option, value) => option?.clientId === value?.clientId}
-                      renderInput={(params) => (
-                        <StyledTextField
-                          {...params}
-                          variant='standard'
-                          placeholder='Select client'
+                          }}
                         />
-                      )}
-                      sx={{ width: 300 }}
-                    />
-                  </ClientSelector>
-                )}
+                      </ClientSelector>
+                    )
+                  : userRole === 'admin' && (
+                      <ClientSelector>
+                        <MdBusinessCenter size={18} color='#ffc928' />
+                        <Autocomplete
+                          options={clientOptions}
+                          value={selectedClient || null} // fallback to null to keep controlled
+                          onChange={handleClientChange}
+                          inputValue={inputValue}
+                          onInputChange={(event, newInputValue) => {
+                            setInputValue(newInputValue);
+                            // Removed fetchData() here as requested
+                          }}
+                          onOpen={() => {
+                            fetchData(); // Refetch when dropdown opens
+                          }}
+                          getOptionLabel={(option) => option?.name || ''}
+                          isOptionEqualToValue={(option, value) =>
+                            option?.clientId === value?.clientId
+                          }
+                          renderInput={(params) => (
+                            <StyledTextField
+                              {...params}
+                              variant='standard'
+                              placeholder='Select client'
+                            />
+                          )}
+                          sx={{ width: 300 }}
+                        />
+                      </ClientSelector>
+                    )}
 
                 {/* Language Selector */}
                 <LanguageSelect variant='standard'>
@@ -368,7 +360,7 @@ const Header = () => {
                       <FaRegUser size={14} />
                     </Avatar>
                   }
-                  label={`${displayName.split('@')[0]} | ${userRole}`}
+                  label={`${displayName.split('@')[0]} | ${userRole || 'user'}`}
                   component={Link}
                   to='/login'
                   clickable
@@ -421,12 +413,13 @@ const Header = () => {
                       <FaRegUser size={14} />
                     </Avatar>
                   }
-                  label={`${displayName.split('@')[0]} | ${userRole}`}
+                  label={`${displayName.split('@')[0]} | ${userRole || 'user'}`}
                   sx={{ width: '100%', justifyContent: 'flex-start', py: 1 }}
                 />
               </Box>
 
               <List>
+                userRole === 'admin' && (
                 <ListItem>
                   <ListItemText
                     primary='Client'
@@ -437,7 +430,6 @@ const Header = () => {
                     }}
                   />
                 </ListItem>
-
                 <ListItem sx={{ pt: 0 }}>
                   <Autocomplete
                     options={clientOptions}
@@ -459,9 +451,7 @@ const Header = () => {
                     sx={{ width: 300 }}
                   />
                 </ListItem>
-
-                <Divider sx={{ my: 2, bgcolor: alpha('#ffc928', 0.2) }} />
-
+                <Divider sx={{ my: 2, bgcolor: alpha('#ffc928', 0.2) }} />)
                 <ListItem>
                   <ListItemText
                     primary='Language'

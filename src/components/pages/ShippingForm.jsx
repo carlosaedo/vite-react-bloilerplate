@@ -800,7 +800,7 @@ function ShippingForm({ handleChangeFormType }) {
           )}
         </Grid>
       </Grid>
-      <Button onClick={resetForm} variant='contained' color='primary'>
+      <Button onClick={resetForm} variant='outlined' color='primary'>
         Reset Form
       </Button>
     </Paper>
