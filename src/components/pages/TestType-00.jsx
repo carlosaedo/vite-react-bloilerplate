@@ -57,7 +57,7 @@ const TestType = () => {
   };
 
   const autoTableHeight = window.visualViewport.height - (isMobile ? 540 : 290);
-  console.log('Nani: ', autoTableHeight);
+
   const [tableHeight, setTableHeight] = useState(() => {
     const savedState = localStorage.getItem('tableHeight');
     return savedState ? parseInt(savedState, 10) : 400;

@@ -80,7 +80,19 @@ function ReviewDetails({ formData }) {
                       {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
                     </Typography>
                     <Typography variant='body1' sx={{ fontWeight: 500 }}>
-                      {value || '-'}
+                      {key === 'packageLength' || key === 'packageWidth' || key === 'packageHeight'
+                        ? value
+                          ? value + ' cm'
+                          : '- cm'
+                        : key === 'packageWeight'
+                        ? value
+                          ? value + ' kg'
+                          : '- kg'
+                        : key === 'packageValue'
+                        ? value
+                          ? value + ' €'
+                          : '- €'
+                        : value || '-'}
                     </Typography>
                   </Grid>
                 ))}

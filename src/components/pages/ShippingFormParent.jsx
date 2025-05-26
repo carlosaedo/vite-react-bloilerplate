@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ShippingForm from './ShippingForm';
 import ShippingFormSinglePage from './ShippingFormSinglePage'; // Fixed incorrect import
 import { CircularProgress } from '@mui/material';
+import { ShippingFormProvider } from '../context/ShippingFormContext';
 
 function ShippingFormParent() {
   const [loading, setLoading] = useState(true);
@@ -27,11 +28,13 @@ function ShippingFormParent() {
 
   return (
     <>
-      {shippingFormTypeSinglePage ? (
-        <ShippingFormSinglePage handleChangeFormType={handleChangeFormType} />
-      ) : (
-        <ShippingForm handleChangeFormType={handleChangeFormType} />
-      )}
+      <ShippingFormProvider>
+        {shippingFormTypeSinglePage ? (
+          <ShippingFormSinglePage handleChangeFormType={handleChangeFormType} />
+        ) : (
+          <ShippingForm handleChangeFormType={handleChangeFormType} />
+        )}
+      </ShippingFormProvider>
     </>
   );
 }

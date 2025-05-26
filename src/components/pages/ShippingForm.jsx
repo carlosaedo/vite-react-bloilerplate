@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import api from '../api/api';
+import { useShippingFormContext } from '../context/ShippingFormContext';
 
 import {
   Box,
@@ -35,84 +37,43 @@ const shippingPaymentTo = [
 ];
 
 function ShippingForm({ handleChangeFormType }) {
+  const { shippingFormData, setShippingFormData, resetShippingFormData } = useShippingFormContext();
+
   const [step, setStep] = useState(0);
 
-  const [formData, setFormData] = useState(() => {
-    const storedData = localStorage.getItem('formData');
-    return storedData
-      ? JSON.parse(storedData)
-      : {
-          recipientTaxId: '',
-          shippingPayment: 'pronto',
-          shippingPaymentTo: 'expeditor',
-          year: '',
-          waybillNumber: '',
-          hour: '',
-          date: '',
-          extNumber: '',
-          deliveryDate: '',
-          extNumber2: '',
-          senderName: '',
-          senderEmail: '',
-          senderPhone: '',
-          senderStreet: '',
-          senderCity: '',
-          senderState: '',
-          senderZip: '',
-          senderCountry: '',
-          recipientName: '',
-          recipientEmail: '',
-          recipientPhone: '',
-          recipientStreet: '',
-          recipientCity: '',
-          recipientState: '',
-          recipientZip: '',
-          recipientCountry: '',
-          packages: [
-            {
-              packageWeight: '',
-              packageLength: '',
-              packageWidth: '',
-              packageHeight: '',
-              packageDescription: '',
-              packageValue: '',
-              shippingService: 'standard',
-            },
-          ],
-        };
-  });
+  const [message, setMessage] = useState(null);
 
-  console.log(formData);
+  console.log(shippingFormData);
 
   const handleStepChange = (event, newValue) => {
     setStep(newValue);
   };
 
   const handleChange = (event) => {
-    setFormData({
-      ...formData,
+    setShippingFormData({
+      ...shippingFormData,
       [event.target.name]: event.target.value,
     });
     localStorage.setItem(
-      'formData',
-      JSON.stringify({ ...formData, [event.target.name]: event.target.value }),
+      'shippingFormData',
+      JSON.stringify({ ...shippingFormData, [event.target.name]: event.target.value }),
     );
   };
 
   const handlePackageChange = (index, field, value) => {
-    const updatedPackages = [...formData.packages];
+    const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
       ...updatedPackages[index],
       [field]: value,
     };
 
     const updatedFormData = {
-      ...formData,
+      ...shippingFormData,
       packages: updatedPackages,
     };
 
-    setFormData(updatedFormData);
-    localStorage.setItem('formData', JSON.stringify(updatedFormData));
+    setShippingFormData(updatedFormData);
+    localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
   };
 
   const addPackage = () => {
@@ -127,65 +88,29 @@ function ShippingForm({ handleChangeFormType }) {
     };
 
     const updatedFormData = {
-      ...formData,
-      packages: [...formData.packages, newPackage],
+      ...shippingFormData,
+      packages: [...shippingFormData.packages, newPackage],
     };
 
-    setFormData(updatedFormData);
-    localStorage.setItem('formData', JSON.stringify(updatedFormData));
+    setShippingFormData(updatedFormData);
+    localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
   };
 
   const removePackage = (index) => {
-    if (formData.packages.length > 1) {
-      const updatedPackages = formData.packages.filter((_, i) => i !== index);
+    if (shippingFormData.packages.length > 1) {
+      const updatedPackages = shippingFormData.packages.filter((_, i) => i !== index);
       const updatedFormData = {
-        ...formData,
+        ...shippingFormData,
         packages: updatedPackages,
       };
 
-      setFormData(updatedFormData);
-      localStorage.setItem('formData', JSON.stringify(updatedFormData));
+      setShippingFormData(updatedFormData);
+      localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
     }
   };
 
   const resetForm = () => {
-    setFormData({
-      ...formData,
-      recipientTaxId: '',
-      shippingPayment: 'pronto',
-      shippingPaymentTo: 'expeditor',
-      extNumber: '',
-      deliveryDate: '',
-      extNumber2: '',
-      senderName: '',
-      senderEmail: '',
-      senderPhone: '',
-      senderStreet: '',
-      senderCity: '',
-      senderState: '',
-      senderZip: '',
-      senderCountry: '',
-      recipientName: '',
-      recipientEmail: '',
-      recipientPhone: '',
-      recipientStreet: '',
-      recipientCity: '',
-      recipientState: '',
-      recipientZip: '',
-      recipientCountry: '',
-      packages: [
-        {
-          packageWeight: '',
-          packageLength: '',
-          packageWidth: '',
-          packageHeight: '',
-          packageDescription: '',
-          packageValue: '',
-          shippingService: 'standard',
-        },
-      ],
-    });
-    localStorage.removeItem('formData');
+    resetShippingFormData();
   };
 
   useEffect(() => {
@@ -198,7 +123,7 @@ function ShippingForm({ handleChangeFormType }) {
       .padStart(6, '0');
 
     const updatedData = {
-      ...formData,
+      ...shippingFormData,
       deliveryTime: time,
       date: today,
       year: year,
@@ -206,8 +131,8 @@ function ShippingForm({ handleChangeFormType }) {
       hour: time,
     };
 
-    setFormData(updatedData);
-    localStorage.setItem('formData', JSON.stringify(updatedData));
+    setShippingFormData(updatedData);
+    localStorage.setItem('shippingFormData', JSON.stringify(updatedData));
   }, []);
 
   const handleChangeFormTypeToParent = () => {
@@ -218,36 +143,41 @@ function ShippingForm({ handleChangeFormType }) {
     switch (step) {
       case 0:
         return (
-          formData.senderName &&
-          formData.senderEmail &&
-          formData.senderPhone &&
-          formData.senderStreet &&
-          formData.senderCity &&
-          formData.senderState &&
-          formData.senderZip &&
-          formData.senderCountry
+          shippingFormData.senderName &&
+          shippingFormData.senderEmail &&
+          shippingFormData.senderPhone &&
+          shippingFormData.senderStreet &&
+          shippingFormData.senderCity &&
+          shippingFormData.senderState &&
+          shippingFormData.senderZip &&
+          shippingFormData.senderCountry
         );
       case 1:
         return (
-          formData.recipientName &&
-          formData.recipientEmail &&
-          formData.recipientPhone &&
-          formData.recipientStreet &&
-          formData.recipientCity &&
-          formData.recipientState &&
-          formData.recipientZip &&
-          formData.recipientCountry
+          shippingFormData.recipientName &&
+          shippingFormData.recipientEmail &&
+          shippingFormData.recipientPhone &&
+          shippingFormData.recipientStreet &&
+          shippingFormData.recipientCity &&
+          shippingFormData.recipientState &&
+          shippingFormData.recipientZip &&
+          shippingFormData.recipientCountry
         );
       case 2:
-        return (
-          formData.packageWeight &&
-          formData.packageLength &&
-          formData.packageWidth &&
-          formData.packageHeight &&
-          formData.packageDescription &&
-          formData.packageValue &&
-          formData.shippingService
-        );
+        for (const pkg of shippingFormData.packages) {
+          if (
+            !pkg.packageWeight ||
+            !pkg.packageLength ||
+            !pkg.packageWidth ||
+            !pkg.packageHeight ||
+            !pkg.packageDescription ||
+            !pkg.packageValue ||
+            !pkg.shippingService
+          ) {
+            return false;
+          }
+        }
+        return true;
       default:
         return true;
     }
@@ -258,7 +188,19 @@ function ShippingForm({ handleChangeFormType }) {
       ? setStep((prev) => Math.min(prev + 1, 3))
       : alert('Please fill all required fields on this step.');
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 0));
-  const handleSubmit = () => alert('Submitted data:\n' + JSON.stringify(formData, null, 2));
+  const handleSubmit = async () => {
+    try {
+      const response = await api.post(`/shipping-form`, { formData: shippingFormData });
+      console.log('Form submitted successfully:', response.data);
+      if (response?.status === 200) {
+        setMessage('Form submitted successfully!');
+        resetForm();
+        console.log(response);
+      }
+    } catch (error) {
+      console.error('Error :', error);
+    }
+  };
 
   return (
     <Paper sx={{ p: 3, maxWidth: 900, margin: 'auto', mt: 5 }}>
@@ -290,7 +232,7 @@ function ShippingForm({ handleChangeFormType }) {
             <TextField
               label='Year'
               name='year'
-              value={formData.year}
+              value={shippingFormData.year}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -303,7 +245,7 @@ function ShippingForm({ handleChangeFormType }) {
               label='Waybill Number'
               name='waybillNumber'
               type='text'
-              value={formData.waybillNumber}
+              value={shippingFormData.waybillNumber}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -316,7 +258,7 @@ function ShippingForm({ handleChangeFormType }) {
               label='Hour'
               name='hour'
               type='time'
-              value={formData.hour || ''} // default to HH:MM
+              value={shippingFormData.hour || ''} // default to HH:MM
               onChange={handleChange}
               fullWidth
               size='small'
@@ -330,7 +272,7 @@ function ShippingForm({ handleChangeFormType }) {
               label='Date'
               name='date'
               type='date'
-              value={formData.date}
+              value={shippingFormData.date}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -344,7 +286,7 @@ function ShippingForm({ handleChangeFormType }) {
               label='Ext. Number'
               name='extNumber'
               type='text'
-              value={formData.extNumber}
+              value={shippingFormData.extNumber}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -357,7 +299,7 @@ function ShippingForm({ handleChangeFormType }) {
               label='Delivery Date'
               name='deliveryDate'
               type='date'
-              value={formData.deliveryDate}
+              value={shippingFormData.deliveryDate}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -369,9 +311,9 @@ function ShippingForm({ handleChangeFormType }) {
           <Grid size={{ xs: 6, sm: 3 }}>
             <TextField
               label='Ext. Number 2'
-              name='extNumber'
+              name='extNumber2'
               type='text'
-              value={formData.extNumber2}
+              value={shippingFormData.extNumber2}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -405,7 +347,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='Sender Name'
                 name='senderName'
-                value={formData.senderName}
+                value={shippingFormData.senderName}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -416,7 +358,7 @@ function ShippingForm({ handleChangeFormType }) {
                 label='Sender Email'
                 name='senderEmail'
                 type='email'
-                value={formData.senderEmail}
+                value={shippingFormData.senderEmail}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -427,7 +369,7 @@ function ShippingForm({ handleChangeFormType }) {
                 label='Sender Phone'
                 name='senderPhone'
                 type='tel'
-                value={formData.senderPhone}
+                value={shippingFormData.senderPhone}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -437,7 +379,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='Street Address'
                 name='senderStreet'
-                value={formData.senderStreet}
+                value={shippingFormData.senderStreet}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -447,7 +389,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='City'
                 name='senderCity'
-                value={formData.senderCity}
+                value={shippingFormData.senderCity}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -457,7 +399,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='State/Province'
                 name='senderState'
-                value={formData.senderState}
+                value={shippingFormData.senderState}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -467,7 +409,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='ZIP/Postal Code'
                 name='senderZip'
-                value={formData.senderZip}
+                value={shippingFormData.senderZip}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -477,7 +419,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='Country'
                 name='senderCountry'
-                value={formData.senderCountry}
+                value={shippingFormData.senderCountry}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -492,7 +434,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='Recipient Name'
                 name='recipientName'
-                value={formData.recipientName}
+                value={shippingFormData.recipientName}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -503,7 +445,7 @@ function ShippingForm({ handleChangeFormType }) {
                 label='Recipient Email'
                 name='recipientEmail'
                 type='email'
-                value={formData.recipientEmail}
+                value={shippingFormData.recipientEmail}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -514,7 +456,7 @@ function ShippingForm({ handleChangeFormType }) {
                 label='Recipient Phone'
                 name='recipientPhone'
                 type='tel'
-                value={formData.recipientPhone}
+                value={shippingFormData.recipientPhone}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -524,7 +466,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='Street Address'
                 name='recipientStreet'
-                value={formData.recipientStreet}
+                value={shippingFormData.recipientStreet}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -534,7 +476,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='City'
                 name='recipientCity'
-                value={formData.recipientCity}
+                value={shippingFormData.recipientCity}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -544,7 +486,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='State/Province'
                 name='recipientState'
-                value={formData.recipientState}
+                value={shippingFormData.recipientState}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -554,7 +496,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='ZIP/Postal Code'
                 name='recipientZip'
-                value={formData.recipientZip}
+                value={shippingFormData.recipientZip}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -564,7 +506,7 @@ function ShippingForm({ handleChangeFormType }) {
               <TextField
                 label='Country'
                 name='recipientCountry'
-                value={formData.recipientCountry}
+                value={shippingFormData.recipientCountry}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -595,7 +537,7 @@ function ShippingForm({ handleChangeFormType }) {
                 </Button>
               </Box>
 
-              {formData.packages.map((pkg, index) => (
+              {shippingFormData.packages.map((pkg, index) => (
                 <Box key={index} sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
                   <Box
                     sx={{
@@ -606,7 +548,7 @@ function ShippingForm({ handleChangeFormType }) {
                     }}
                   >
                     <Typography variant='subtitle1'>Package {index + 1}</Typography>
-                    {formData.packages.length > 1 && (
+                    {shippingFormData.packages.length > 1 && (
                       <IconButton onClick={() => removePackage(index)} color='error' size='small'>
                         <DeleteIcon />
                       </IconButton>
@@ -720,7 +662,7 @@ function ShippingForm({ handleChangeFormType }) {
           </>
         )}
 
-        {step === 3 && <ShippingFormReviewDetails formData={formData} />}
+        {step === 3 && <ShippingFormReviewDetails formData={shippingFormData} />}
       </Grid>
 
       {/* Additional Info */}
@@ -733,7 +675,7 @@ function ShippingForm({ handleChangeFormType }) {
               select
               label='Shipping Payment'
               name='shippingPayment'
-              value={formData.shippingPayment}
+              value={shippingFormData.shippingPayment}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -752,7 +694,7 @@ function ShippingForm({ handleChangeFormType }) {
               select
               label='Payment'
               name='shippingPaymentTo'
-              value={formData.shippingPaymentTo}
+              value={shippingFormData.shippingPaymentTo}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -771,7 +713,7 @@ function ShippingForm({ handleChangeFormType }) {
               label='NIF Destinatário'
               name='recipientTaxId'
               type='text'
-              value={formData.recipientTaxId}
+              value={shippingFormData.recipientTaxId}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -788,6 +730,11 @@ function ShippingForm({ handleChangeFormType }) {
             Back
           </Button>
         </Grid>
+        {message && (
+          <Typography variant='h5' gutterBottom>
+            {message}
+          </Typography>
+        )}
         <Grid>
           {step < 3 ? (
             <Button onClick={handleNext} variant='contained' color='primary'>
