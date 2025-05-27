@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Drawer,
@@ -34,6 +34,8 @@ import './Sidebar.css';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = ({ onToggle }) => {
+  const scrollRef = useRef();
+  const [hasScroll, setHasScroll] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     const savedState = localStorage.getItem('sidebarCollapsed');
     return savedState === 'true';
@@ -43,7 +45,7 @@ const Sidebar = ({ onToggle }) => {
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
-    onToggle(collapsed ? 55 : 250);
+    onToggle(collapsed ? (hasScroll ? 60 : 55) : 250);
 
     // Force collapse on mobile
     const handleResize = () => {
@@ -58,6 +60,35 @@ const Sidebar = ({ onToggle }) => {
     // Listen for resize events
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, [collapsed, onToggle]);
+
+  useEffect(() => {
+    const checkScroll = () => {
+      const element = scrollRef.current;
+      if (!element) return; // Defensive check
+      const hasScroll = element.scrollHeight > element.clientHeight;
+      setHasScroll(hasScroll);
+    };
+
+    checkScroll();
+  }, [collapsed, onToggle, loadingAuth]);
+
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        const hasScroll = scrollRef.current.scrollHeight > scrollRef.current.clientHeight;
+        setHasScroll(hasScroll);
+        onToggle(collapsed ? (hasScroll ? 65 : 50) : 250);
+      }
+    };
+
+    const timeout = setTimeout(checkScroll, 0); // delay after DOM paint
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', checkScroll);
+    };
   }, [collapsed, onToggle]);
 
   const toggleSidebar = () => {
@@ -217,10 +248,10 @@ const Sidebar = ({ onToggle }) => {
       open={true}
       className={collapsed ? 'sidebar-collapsed' : ''}
       sx={{
-        width: collapsed ? 55 : 250,
+        width: collapsed ? (hasScroll ? 60 : 55) : 250,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: collapsed ? 55 : 250,
+          width: collapsed ? (hasScroll ? 60 : 55) : 250,
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'fixed',
           top: 0,
@@ -232,11 +263,11 @@ const Sidebar = ({ onToggle }) => {
       }}
     >
       <Box
+        ref={scrollRef}
         sx={{
           height: '100%',
           overflowY: 'auto',
           overflowX: 'hidden',
-          pr: 1, // add slight padding to avoid scrollbar overlay
         }}
       >
         <div className='sidebar-header'>
