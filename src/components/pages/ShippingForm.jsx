@@ -16,14 +16,29 @@ import {
   IconButton,
 } from '@mui/material';
 import { RiPagesLine } from 'react-icons/ri';
+import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
+
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
 import ShippingFormReviewDetails from './ShippingFormReviewDetails';
+
+function generateMockSSCC() {
+  let randomDigits = '';
+  for (let i = 0; i < 16; i++) {
+    randomDigits += Math.floor(Math.random() * 10);
+  }
+  return '00' + randomDigits;
+}
 
 const shippingServices = [
   { value: 'standard', label: 'Standard' },
   { value: 'express', label: 'Express' },
   { value: 'overnight', label: 'Overnight' },
+];
+
+const packageType = [
+  { value: 'volume', label: 'Volume' },
+  { value: 'palete', label: 'Palete' },
 ];
 
 const shippingPayment = [
@@ -40,6 +55,10 @@ function ShippingForm({ handleChangeFormType }) {
   const { shippingFormData, setShippingFormData, resetShippingFormData } = useShippingFormContext();
 
   const [step, setStep] = useState(0);
+
+  const [showSSCC, setShowSSCC] = useState(false);
+
+  const [showPackageDetails, setShowPackageDetails] = useState(true);
 
   const [message, setMessage] = useState(null);
 
@@ -84,7 +103,8 @@ function ShippingForm({ handleChangeFormType }) {
       packageHeight: '',
       packageDescription: '',
       packageValue: '',
-      shippingService: 'standard',
+      packageType: '',
+      sscc: generateMockSSCC(), // Generate a new SSCC for the new package
     };
 
     const updatedFormData = {
@@ -164,6 +184,7 @@ function ShippingForm({ handleChangeFormType }) {
           shippingFormData.recipientCountry
         );
       case 2:
+        if (!shippingFormData.shippingService) return false; // Ensure shipping service is selected
         for (const pkg of shippingFormData.packages) {
           if (
             !pkg.packageWeight ||
@@ -171,8 +192,7 @@ function ShippingForm({ handleChangeFormType }) {
             !pkg.packageWidth ||
             !pkg.packageHeight ||
             !pkg.packageDescription ||
-            !pkg.packageValue ||
-            !pkg.shippingService
+            !pkg.packageValue
           ) {
             return false;
           }
@@ -518,7 +538,7 @@ function ShippingForm({ handleChangeFormType }) {
         {step === 2 && (
           <>
             {/* Package Info - Multiple Packages */}
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 4, width: '100%' }}>
               <Box
                 sx={{
                   display: 'flex',
@@ -527,6 +547,30 @@ function ShippingForm({ handleChangeFormType }) {
                   mb: 2,
                 }}
               >
+                <Button
+                  sx={{ marginRight: 1 }}
+                  variant='outlined'
+                  startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
+                  onClick={
+                    showPackageDetails
+                      ? () => setShowPackageDetails(false)
+                      : () => setShowPackageDetails(true)
+                  }
+                  size='small'
+                >
+                  {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
+                </Button>
+
+                <Button
+                  sx={{ marginRight: 1 }}
+                  variant='outlined'
+                  startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
+                  onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
+                  size='small'
+                >
+                  {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
+                </Button>
+
                 <Button
                   variant='outlined'
                   startIcon={<AddIcon />}
@@ -544,10 +588,42 @@ function ShippingForm({ handleChangeFormType }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      mb: 2,
                     }}
                   >
-                    <Typography variant='subtitle1'>Package {index + 1}</Typography>
+                    <Typography variant='subtitle1'>
+                      Package {index + 1}
+                      {!showPackageDetails && (
+                        <>
+                          {pkg.packageType && (
+                            <>
+                              {' | '}
+                              {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                            </>
+                          )}
+                          {pkg.packageWeight && (
+                            <>
+                              {' | '}
+                              {pkg.packageWeight} kg
+                            </>
+                          )}
+                          {pkg.packageDescription && (
+                            <>
+                              {' | '}
+                              {pkg.packageDescription.length > 70
+                                ? pkg.packageDescription.slice(0, 70) + '...'
+                                : pkg.packageDescription}
+                            </>
+                          )}
+                          {pkg.packageValue && (
+                            <>
+                              {' | '}
+                              {pkg.packageValue} EUR
+                            </>
+                          )}
+                        </>
+                      )}
+                    </Typography>
+
                     {shippingFormData.packages.length > 1 && (
                       <IconButton onClick={() => removePackage(index)} color='error' size='small'>
                         <DeleteIcon />
@@ -555,109 +631,187 @@ function ShippingForm({ handleChangeFormType }) {
                     )}
                   </Box>
 
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 12 }}>
-                      <TextField
-                        label='Package Weight (kg)'
-                        name={`packageWeight_${index}`}
-                        type='number'
-                        value={pkg.packageWeight}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'packageWeight', e.target.value)
-                        }
-                        fullWidth
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
+                  {showPackageDetails && (
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 6 }}>
+                        <TextField
+                          label='Package Weight (kg)'
+                          name={`packageWeight_${index}`}
+                          type='number'
+                          value={pkg.packageWeight}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageWeight', e.target.value)
+                          }
+                          fullWidth
+                          required
+                          slotProps={{ htmlInput: { min: 0 } }}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 6 }}>
+                        <TextField
+                          select
+                          label='Package Type'
+                          name={'packageType'}
+                          value={pkg.packageType}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageType', e.target.value)
+                          }
+                          fullWidth
+                          required
+                        >
+                          {packageType.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <TextField
+                          label='Length (cm)'
+                          name={`packageLength_${index}`}
+                          type='number'
+                          value={pkg.packageLength}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageLength', e.target.value)
+                          }
+                          fullWidth
+                          required
+                          slotProps={{ htmlInput: { min: 0 } }}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <TextField
+                          label='Width (cm)'
+                          name={`packageWidth_${index}`}
+                          type='number'
+                          value={pkg.packageWidth}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageWidth', e.target.value)
+                          }
+                          fullWidth
+                          required
+                          slotProps={{ htmlInput: { min: 0 } }}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <TextField
+                          label='Height (cm)'
+                          name={`packageHeight_${index}`}
+                          type='number'
+                          value={pkg.packageHeight}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageHeight', e.target.value)
+                          }
+                          fullWidth
+                          required
+                          slotProps={{ htmlInput: { min: 0 } }}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label='Package Description'
+                          name={`packageDescription_${index}`}
+                          value={pkg.packageDescription}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageDescription', e.target.value)
+                          }
+                          fullWidth
+                          required
+                          multiline
+                          rows={3}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label='Package Value (EUR)'
+                          name={`packageValue_${index}`}
+                          type='number'
+                          value={pkg.packageValue}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageValue', e.target.value)
+                          }
+                          fullWidth
+                          required
+                          slotProps={{ htmlInput: { min: 0 } }}
+                        />
+                      </Grid>
+
+                      {showSSCC && (
+                        <Grid size={{ xs: 12 }}>
+                          <TextField
+                            label='SSCC'
+                            name='sscc'
+                            type='text'
+                            value={pkg.sscc}
+                            fullWidth
+                            size='small'
+                            margin='dense'
+                            disabled={true}
+                          />
+                        </Grid>
+                      )}
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                      <TextField
-                        label='Length (cm)'
-                        name={`packageLength_${index}`}
-                        type='number'
-                        value={pkg.packageLength}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'packageLength', e.target.value)
-                        }
-                        fullWidth
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                      <TextField
-                        label='Width (cm)'
-                        name={`packageWidth_${index}`}
-                        type='number'
-                        value={pkg.packageWidth}
-                        onChange={(e) => handlePackageChange(index, 'packageWidth', e.target.value)}
-                        fullWidth
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 4 }}>
-                      <TextField
-                        label='Height (cm)'
-                        name={`packageHeight_${index}`}
-                        type='number'
-                        value={pkg.packageHeight}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'packageHeight', e.target.value)
-                        }
-                        fullWidth
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12 }}>
-                      <TextField
-                        label='Package Description'
-                        name={`packageDescription_${index}`}
-                        value={pkg.packageDescription}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'packageDescription', e.target.value)
-                        }
-                        fullWidth
-                        required
-                        multiline
-                        rows={3}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12 }}>
-                      <TextField
-                        label='Package Value (EUR)'
-                        name={`packageValue_${index}`}
-                        type='number'
-                        value={pkg.packageValue}
-                        onChange={(e) => handlePackageChange(index, 'packageValue', e.target.value)}
-                        fullWidth
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12 }}>
-                      <TextField
-                        select
-                        label='Shipping Service'
-                        name={`shippingService_${index}`}
-                        value={pkg.shippingService}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'shippingService', e.target.value)
-                        }
-                        fullWidth
-                        required
-                      >
-                        {shippingServices.map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                  </Grid>
+                  )}
                 </Box>
               ))}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'right',
+                  mb: 2,
+                }}
+              >
+                <Button
+                  sx={{ marginRight: 1 }}
+                  variant='outlined'
+                  startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
+                  onClick={
+                    showPackageDetails
+                      ? () => setShowPackageDetails(false)
+                      : () => setShowPackageDetails(true)
+                  }
+                  size='small'
+                >
+                  {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
+                </Button>
+                <Button
+                  sx={{ marginRight: 1 }}
+                  variant='outlined'
+                  startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
+                  onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
+                  size='small'
+                >
+                  {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
+                </Button>
+
+                <Button
+                  variant='outlined'
+                  startIcon={<AddIcon />}
+                  onClick={addPackage}
+                  size='small'
+                >
+                  Add Package
+                </Button>
+              </Box>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  select
+                  label='Shipping Service'
+                  name={'shippingService'}
+                  value={shippingFormData.shippingService}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                >
+                  {shippingServices.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
             </Box>
           </>
         )}

@@ -3,6 +3,14 @@ import { createContext, useContext, useState } from 'react';
 // Create context
 const ShippingFormContext = createContext(null);
 
+function generateMockSSCC() {
+  let randomDigits = '';
+  for (let i = 0; i < 16; i++) {
+    randomDigits += Math.floor(Math.random() * 10);
+  }
+  return '00' + randomDigits;
+}
+
 // Provider Component
 export const ShippingFormProvider = ({ children }) => {
   const [formData, setFormData] = useState(() => {
@@ -44,9 +52,12 @@ export const ShippingFormProvider = ({ children }) => {
               packageHeight: '',
               packageDescription: '',
               packageValue: '',
-              shippingService: 'standard',
+              packageType: '',
+              sscc: generateMockSSCC(),
             },
           ],
+          shippingService: 'standard',
+          trackingNumber: '',
         };
   });
 
@@ -83,9 +94,12 @@ export const ShippingFormProvider = ({ children }) => {
           packageHeight: '',
           packageDescription: '',
           packageValue: '',
-          shippingService: 'standard',
+          packageType: '',
+          sscc: '',
         },
       ],
+      shippingService: 'standard',
+      trackingNumber: '',
     });
     localStorage.removeItem('formData');
   };

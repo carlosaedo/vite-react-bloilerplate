@@ -5,7 +5,7 @@ const Footer = () => {
     <>
       <div>
         <p className='systemVersionInfo'>
-          Torrestir Shipping Portal v1.0.0 build 26.05.2025.18.24.50
+          Torrestir Shipping Portal v1.0.0 build 27.05.2025.11.05.12
         </p>
       </div>
     </>
