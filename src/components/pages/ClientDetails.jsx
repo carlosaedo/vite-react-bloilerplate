@@ -205,7 +205,7 @@ const ClientDetails = () => {
         padding: 2,
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 500 }}>
+      <Box sx={{ width: '600px', margin: '0 auto' }}>
         <Typography variant='h5' gutterBottom>
           Client Details
         </Typography>
@@ -223,7 +223,7 @@ const ClientDetails = () => {
           </Stack>
         )}
 
-        <Box display='flex' flexDirection='column' gap={2} maxWidth={400}>
+        <Box display='flex' flexDirection='column' gap={2} width={'100%'}>
           <TextField
             label='Name'
             name='name'

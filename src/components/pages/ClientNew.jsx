@@ -75,12 +75,12 @@ const ClientNew = () => {
         padding: 2,
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 400 }}>
+      <Box sx={{ width: '600px', margin: '0 auto' }}>
         <Typography variant='h5' gutterBottom>
           Create new client
         </Typography>
 
-        <Box display='flex' flexDirection='column' gap={2} maxWidth={400}>
+        <Box display='flex' flexDirection='column' gap={2} width={'100%'}>
           <TextField label='Name' name='name' value={formData.name} onChange={handleChange} />
           <TextField label='VAT' name='vat' value={formData.vat} onChange={handleChange} />
           <TextField
