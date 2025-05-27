@@ -610,45 +610,45 @@ function ShippingForm({ handleChangeFormType }) {
                     Jump to package
                   </MenuItem>
                   {shippingFormData.packages.map((pkg, index) => (
-                    <Tooltip
-                      title={
-                        <Box sx={{ p: 1 }}>
-                          <Typography variant='body2'>
-                            <strong>Weight:</strong> {pkg.packageWeight} kg
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Type:</strong>{' '}
-                            {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Length:</strong> {pkg.packageLength} cm
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Width:</strong> {pkg.packageWidth} cm
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Height:</strong> {pkg.packageHeight} cm
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Description:</strong> {pkg.packageDescription}
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Value:</strong> {pkg.packageValue} EUR
-                          </Typography>
-                          {showSSCC && (
+                    <MenuItem key={index} value={index}>
+                      <Tooltip
+                        title={
+                          <Box sx={{ p: 1 }}>
                             <Typography variant='body2'>
-                              <strong>SSCC:</strong> {pkg.sscc}
+                              <strong>Weight:</strong> {pkg.packageWeight} kg
                             </Typography>
-                          )}
-                        </Box>
-                      }
-                      arrow
-                      placement='top-start'
-                    >
-                      <MenuItem key={index} value={index}>
-                        Package {index + 1}
-                      </MenuItem>
-                    </Tooltip>
+                            <Typography variant='body2'>
+                              <strong>Type:</strong>{' '}
+                              {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Length:</strong> {pkg.packageLength} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Width:</strong> {pkg.packageWidth} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Height:</strong> {pkg.packageHeight} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Description:</strong> {pkg.packageDescription}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Value:</strong> {pkg.packageValue} EUR
+                            </Typography>
+                            {showSSCC && (
+                              <Typography variant='body2'>
+                                <strong>SSCC:</strong> {pkg.sscc}
+                              </Typography>
+                            )}
+                          </Box>
+                        }
+                        arrow
+                        placement='top-start'
+                      >
+                        <span>Package {index + 1}</span>
+                      </Tooltip>
+                    </MenuItem>
                   ))}
                 </Select>
               </Box>
@@ -946,45 +946,45 @@ function ShippingForm({ handleChangeFormType }) {
                     Jump to package
                   </MenuItem>
                   {shippingFormData.packages.map((pkg, index) => (
-                    <Tooltip
-                      title={
-                        <Box sx={{ p: 1 }}>
-                          <Typography variant='body2'>
-                            <strong>Weight:</strong> {pkg.packageWeight} kg
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Type:</strong>{' '}
-                            {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Length:</strong> {pkg.packageLength} cm
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Width:</strong> {pkg.packageWidth} cm
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Height:</strong> {pkg.packageHeight} cm
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Description:</strong> {pkg.packageDescription}
-                          </Typography>
-                          <Typography variant='body2'>
-                            <strong>Value:</strong> {pkg.packageValue} EUR
-                          </Typography>
-                          {showSSCC && (
+                    <MenuItem key={index} value={index}>
+                      <Tooltip
+                        title={
+                          <Box sx={{ p: 1 }}>
                             <Typography variant='body2'>
-                              <strong>SSCC:</strong> {pkg.sscc}
+                              <strong>Weight:</strong> {pkg.packageWeight} kg
                             </Typography>
-                          )}
-                        </Box>
-                      }
-                      arrow
-                      placement='top-start'
-                    >
-                      <MenuItem key={index} value={index}>
-                        Package {index + 1}
-                      </MenuItem>
-                    </Tooltip>
+                            <Typography variant='body2'>
+                              <strong>Type:</strong>{' '}
+                              {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Length:</strong> {pkg.packageLength} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Width:</strong> {pkg.packageWidth} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Height:</strong> {pkg.packageHeight} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Description:</strong> {pkg.packageDescription}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Value:</strong> {pkg.packageValue} EUR
+                            </Typography>
+                            {showSSCC && (
+                              <Typography variant='body2'>
+                                <strong>SSCC:</strong> {pkg.sscc}
+                              </Typography>
+                            )}
+                          </Box>
+                        }
+                        arrow
+                        placement='top-start'
+                      >
+                        <span>Package {index + 1}</span>
+                      </Tooltip>
+                    </MenuItem>
                   ))}
                 </Select>
               </Box>
