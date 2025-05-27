@@ -278,12 +278,12 @@ const Header = () => {
                               {...params}
                               variant='standard'
                               placeholder='Select client'
-                              sx={{ width: 100 }} // ✅ Input width
+                              sx={{ width: 100 }} // Input width
                             />
                           )}
                           sx={{ width: 'auto' }}
                           slots={{
-                            popper: Popper, // ✅ Default Popper can still be used
+                            popper: Popper, // Default Popper can still be used
                           }}
                           slotProps={{
                             popper: {
@@ -294,7 +294,7 @@ const Header = () => {
                                   phase: 'beforeWrite',
                                   requires: ['computeStyles'],
                                   fn: ({ state }) => {
-                                    state.styles.popper.width = '300px'; // ✅ Dropdown width
+                                    state.styles.popper.width = '300px'; // Dropdown width
                                   },
                                 },
                               ],
@@ -308,12 +308,11 @@ const Header = () => {
                         <MdBusinessCenter size={18} color='#ffc928' />
                         <Autocomplete
                           options={clientOptions}
-                          value={selectedClient || null} // fallback to null to keep controlled
+                          value={selectedClient || null}
                           onChange={handleClientChange}
                           inputValue={inputValue}
                           onInputChange={(event, newInputValue) => {
                             setInputValue(newInputValue);
-                            // Removed fetchData() here as requested
                           }}
                           onOpen={() => {
                             fetchData(); // Refetch when dropdown opens
@@ -433,39 +432,47 @@ const Header = () => {
               </Box>
 
               <List>
-                userRole === 'admin' && (
-                <ListItem>
-                  <ListItemText
-                    primary='Client'
-                    slotProps={{
-                      typography: {
-                        sx: { color: alpha('#ffc928', 0.7), fontSize: '0.8rem' },
-                      },
-                    }}
-                  />
-                </ListItem>
-                <ListItem sx={{ pt: 0 }}>
-                  <Autocomplete
-                    options={clientOptions}
-                    value={selectedClient || null} // fallback to null to keep controlled
-                    onChange={handleClientChange}
-                    inputValue={inputValue}
-                    onInputChange={(event, newInputValue) => {
-                      setInputValue(newInputValue);
-                      // Removed fetchData() here as requested
-                    }}
-                    onOpen={() => {
-                      fetchData(); // Refetch when dropdown opens
-                    }}
-                    getOptionLabel={(option) => option?.name || ''}
-                    isOptionEqualToValue={(option, value) => option?.clientId === value?.clientId}
-                    renderInput={(params) => (
-                      <StyledTextField {...params} variant='standard' placeholder='Select client' />
-                    )}
-                    sx={{ width: 300 }}
-                  />
-                </ListItem>
-                <Divider sx={{ my: 2, bgcolor: alpha('#ffc928', 0.2) }} />)
+                {userRole === 'admin' && (
+                  <>
+                    <ListItem>
+                      <ListItemText
+                        primary='Client'
+                        slotProps={{
+                          typography: {
+                            sx: { color: alpha('#ffc928', 0.7), fontSize: '0.8rem' },
+                          },
+                        }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ pt: 0 }}>
+                      <Autocomplete
+                        options={clientOptions}
+                        value={selectedClient || null}
+                        onChange={handleClientChange}
+                        inputValue={inputValue}
+                        onInputChange={(event, newInputValue) => {
+                          setInputValue(newInputValue);
+                        }}
+                        onOpen={() => {
+                          fetchData();
+                        }}
+                        getOptionLabel={(option) => option?.name || ''}
+                        isOptionEqualToValue={(option, value) =>
+                          option?.clientId === value?.clientId
+                        }
+                        renderInput={(params) => (
+                          <StyledTextField
+                            {...params}
+                            variant='standard'
+                            placeholder='Select client'
+                          />
+                        )}
+                        sx={{ width: 300 }}
+                      />
+                    </ListItem>
+                    <Divider sx={{ my: 2, bgcolor: alpha('#ffc928', 0.2) }} />
+                  </>
+                )}
                 <ListItem>
                   <ListItemText
                     primary='Language'
