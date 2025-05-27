@@ -140,7 +140,7 @@ const LanguageSelect = styled(FormControl)(({ theme }) => ({
 }));
 
 const Header = () => {
-  const { user, userRole } = useAuth();
+  const { user, userRole, checkLoginStatusAuth, loadingAuth } = useAuth();
   const navigateTo = useNavigate();
   const token = localStorage.getItem('token');
   const isTokenPresent = !!token;
@@ -148,7 +148,6 @@ const Header = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
-  const [userInfo, setUserInfo] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [clientOptions, setClientOptions] = useState([]);
@@ -203,6 +202,19 @@ const Header = () => {
   }
 
   useEffect(() => {
+    async function checkLoginStatus() {
+      try {
+        const loginStatus = await checkLoginStatusAuth();
+
+        if (!loginStatus) {
+          navigateTo('/login');
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        navigateTo('/login');
+      }
+    }
+    checkLoginStatus();
     fetchData(); // Call once on mount
   }, []);
 
@@ -224,6 +236,8 @@ const Header = () => {
   };
 
   const displayName = user?.email || localStorage.getItem('userEmail') || 'user';
+
+  if (loadingAuth) return <></>;
 
   return (
     <StyledAppBar position='sticky'>

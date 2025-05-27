@@ -198,7 +198,17 @@ const Sidebar = ({ onToggle }) => {
       return renderMenuItem(item);
     });
 
-  if (loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
+  if (loadingAuth) {
+    return (
+      <CircularProgress
+        sx={{
+          position: 'fixed',
+          top: 15,
+          left: 2,
+        }}
+      />
+    );
+  }
 
   return (
     <Drawer
