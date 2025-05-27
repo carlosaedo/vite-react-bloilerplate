@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
+
+import { useAuth } from '../../context/AuthContext';
 import {
   Box,
   Typography,
@@ -15,8 +16,8 @@ import torrestirApi from '../api/torrestirApi';
 
 const ClientNew = () => {
   const navigateTo = useNavigate();
+  const { checkLoginStatusAuth, loadingAuth } = useAuth();
 
-  const navigate = useNavigate();
   const [client, setClient] = useState(null);
 
   const [error, setError] = useState(null);
@@ -27,13 +28,17 @@ const ClientNew = () => {
   useEffect(() => {
     // Run on mount: check login and set startup date
     async function checkLoginStatus() {
-      const loginStatus = await authCheckLoginStatus();
+      try {
+        const loginStatus = await checkLoginStatusAuth();
 
-      if (!loginStatus) {
+        if (!loginStatus) {
+          navigateTo('/login');
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
         navigateTo('/login');
       }
     }
-
     checkLoginStatus();
   }, [navigateTo]); // Only on initial mount
 
@@ -58,6 +63,8 @@ const ClientNew = () => {
   };
 
   if (error) return <Alert severity='error'>{error}</Alert>;
+
+  if (loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   return (
     <Box

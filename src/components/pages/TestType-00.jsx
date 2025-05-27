@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
+
+import { useAuth } from '../context/AuthContext';
 import Modal from '../TestType00-Modal/Modal';
 import ModalDeleteRow from '../TestType00-Modal/ModalDeleteRow';
 import { useTheme } from '@mui/material/styles';
@@ -25,6 +26,7 @@ import {
   InputLabel,
   FormControl,
   useMediaQuery,
+  CircularProgress,
 } from '@mui/material';
 
 import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
@@ -38,6 +40,7 @@ import { MdOutlineTextIncrease, MdOutlineTextDecrease } from 'react-icons/md';
 import api from '../api/api';
 
 const TestType = () => {
+  const { checkLoginStatusAuth, loadingAuth } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigateTo = useNavigate();
@@ -97,7 +100,24 @@ const TestType = () => {
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
-  const [authLoading, setAuthLoading] = useState(true);
+  useEffect(() => {
+    async function checkLoginStatus() {
+      try {
+        const loginStatus = await checkLoginStatusAuth();
+
+        if (!loginStatus) {
+          navigateTo('/login');
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        navigateTo('/login');
+      }
+    }
+    checkLoginStatus();
+    if (autoTableHeightFlag) {
+      handleTableHeightChange(autoTableHeight, true);
+    }
+  }, [navigateTo]);
 
   const handleContextMenu = (event, row) => {
     event.preventDefault();
@@ -169,26 +189,6 @@ const TestType = () => {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    async function checkLoginStatus() {
-      try {
-        const loginStatus = await authCheckLoginStatus();
-        if (!loginStatus) {
-          navigateTo('/login');
-        } else {
-          setAuthLoading(false);
-        }
-      } catch (err) {
-        console.error('Auth check failed:', err);
-        navigateTo('/login');
-      }
-    }
-    checkLoginStatus();
-    if (autoTableHeightFlag) {
-      handleTableHeightChange(autoTableHeight, true);
-    }
-  }, [navigateTo]);
 
   useEffect(() => {
     if (startupDateFirstTime) {
@@ -322,16 +322,10 @@ const TestType = () => {
     handlePageChange(pageNumber);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading || loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   if (error) {
     return <div>{error}</div>;
-  }
-
-  if (authLoading) {
-    return <div>Checking login status...</div>;
   }
 
   const headers = data.length ? Object.keys(data[0]) : [];

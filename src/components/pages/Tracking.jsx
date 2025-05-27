@@ -5,6 +5,7 @@ import TrackingMap from '../trackingMap/TrackingMap';
 import api from '../api/api';
 import './Tracking.css';
 import { motion } from 'framer-motion';
+import { CircularProgress } from '@mui/material';
 import { GiWeight, GiWoodenCrate } from 'react-icons/gi';
 import { IoIosArrowBack, IoMdMore, IoMdArrowDropdown } from 'react-icons/io'; // For icons
 import {
@@ -128,7 +129,7 @@ const Tracking = () => {
     }
   }, [trackingNumber]);
 
-  if (!data) return <div className='loading'>Loading...</div>;
+  if (!data) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   const {
     currentStage,

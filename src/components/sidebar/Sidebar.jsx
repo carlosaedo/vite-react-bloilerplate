@@ -38,7 +38,7 @@ const Sidebar = ({ onToggle }) => {
     return savedState === 'true';
   });
 
-  const { isLoggedIn, loading, userRole } = useAuth();
+  const { isLoggedIn, loadingAuth, userRole } = useAuth();
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
@@ -198,9 +198,7 @@ const Sidebar = ({ onToggle }) => {
       return renderMenuItem(item);
     });
 
-  if (loading) {
-    return <CircularProgress />;
-  }
+  if (loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   return (
     <Drawer

@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import ShippingForm from './ShippingForm';
 import ShippingFormSinglePage from './ShippingFormSinglePage'; // Fixed incorrect import
 import { CircularProgress } from '@mui/material';
 import { ShippingFormProvider } from '../context/ShippingFormContext';
+import { useAuth } from '../context/AuthContext';
 
 function ShippingFormParent() {
+  const navigateTo = useNavigate();
+  const { checkLoginStatusAuth, loadingAuth } = useAuth();
   const [loading, setLoading] = useState(true);
   const [shippingFormTypeSinglePage, setShippingFormTypeSinglePage] = useState(null);
 
   useEffect(() => {
+    async function checkLoginStatus() {
+      try {
+        const loginStatus = await checkLoginStatusAuth();
+
+        if (!loginStatus) {
+          navigateTo('/login');
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        navigateTo('/login');
+      }
+    }
+    checkLoginStatus();
     const storedData = localStorage.getItem('formTypeSinglePage');
     setShippingFormTypeSinglePage(storedData === 'true'); // Ensure boolean
     setLoading(false);
@@ -24,7 +41,7 @@ function ShippingFormParent() {
     }
   };
 
-  if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
+  if (loading || loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   return (
     <>

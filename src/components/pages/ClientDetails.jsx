@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
+import { useAuth } from '../../context/AuthContext';
 import {
   Box,
   Typography,
@@ -16,6 +16,8 @@ import torrestirApi from '../api/torrestirApi';
 
 const ClientDetails = () => {
   const navigateTo = useNavigate();
+
+  const { checkLoginStatusAuth, loadingAuth } = useAuth();
 
   const { clientId: paramClientId } = useParams();
   const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
@@ -42,8 +44,14 @@ const ClientDetails = () => {
 
   useEffect(() => {
     async function checkLoginStatus() {
-      const loginStatus = await authCheckLoginStatus();
-      if (!loginStatus) {
+      try {
+        const loginStatus = await checkLoginStatusAuth();
+
+        if (!loginStatus) {
+          navigateTo('/login');
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
         navigateTo('/login');
       }
     }
@@ -185,7 +193,7 @@ const ClientDetails = () => {
       setError('Failed to restore client');
     }
   };
-  if (loading) return <CircularProgress />;
+  if (loading || loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
   if (error) return <Alert severity='error'>{error}</Alert>;
 
   return (
