@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
 
@@ -14,6 +14,7 @@ import {
   MenuItem,
   Tooltip,
   IconButton,
+  Select,
 } from '@mui/material';
 import { RiPagesLine } from 'react-icons/ri';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -52,6 +53,23 @@ const shippingPaymentTo = [
 ];
 
 function ShippingForm({ handleChangeFormType }) {
+  const packageRefs = useRef([]);
+  const [selectedIndex, setSelectedIndex] = useState('');
+
+  /*const handleJumpToPackage = (index) => {
+      packageRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };*/
+
+  const handleJumpToPackage = (index) => {
+    const el = packageRefs.current[index];
+    if (el) {
+      const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+    // Reset dropdown after scroll
+    setSelectedIndex('');
+  };
+
   const { shippingFormData, setShippingFormData, resetShippingFormData } = useShippingFormContext();
 
   const [step, setStep] = useState(0);
@@ -577,10 +595,70 @@ function ShippingForm({ handleChangeFormType }) {
                 >
                   Add Package
                 </Button>
+                <Typography sx={{ ml: 2 }}>
+                  {shippingFormData.packages.length}{' '}
+                  {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
+                </Typography>
+                <Select
+                  size='small'
+                  displayEmpty
+                  value={selectedIndex}
+                  onChange={(e) => handleJumpToPackage(e.target.value)}
+                  sx={{ ml: 2 }}
+                >
+                  <MenuItem value='' disabled>
+                    Jump to package
+                  </MenuItem>
+                  {shippingFormData.packages.map((pkg, index) => (
+                    <Tooltip
+                      title={
+                        <Box sx={{ p: 1 }}>
+                          <Typography variant='body2'>
+                            <strong>Weight:</strong> {pkg.packageWeight} kg
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Type:</strong>{' '}
+                            {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Length:</strong> {pkg.packageLength} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Width:</strong> {pkg.packageWidth} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Height:</strong> {pkg.packageHeight} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Description:</strong> {pkg.packageDescription}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Value:</strong> {pkg.packageValue} EUR
+                          </Typography>
+                          {showSSCC && (
+                            <Typography variant='body2'>
+                              <strong>SSCC:</strong> {pkg.sscc}
+                            </Typography>
+                          )}
+                        </Box>
+                      }
+                      arrow
+                      placement='top-start'
+                    >
+                      <MenuItem key={index} value={index}>
+                        Package {index + 1}
+                      </MenuItem>
+                    </Tooltip>
+                  ))}
+                </Select>
               </Box>
 
               {shippingFormData.packages.map((pkg, index) => (
-                <Box key={index} sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                <Box
+                  key={index}
+                  ref={(el) => (packageRefs.current[index] = el)}
+                  sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
+                >
                   <Tooltip
                     title={
                       <Box sx={{ p: 1 }}>
@@ -623,13 +701,33 @@ function ShippingForm({ handleChangeFormType }) {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <Typography variant='subtitle1'>
-                        Package {index + 1}
+                      <Typography
+                        variant='subtitle1'
+                        sx={{ display: 'flex', alignItems: 'center' }}
+                      >
+                        <Box
+                          component='span'
+                          sx={{
+                            display: 'inline-block',
+                            backgroundColor: 'primary.main',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            borderRadius: '18px',
+                            px: 1.5,
+                            py: 0.5,
+                            fontSize: '0.75rem',
+                            mr: 1.5, // margin-right between badge and text
+                            minWidth: 24,
+                            textAlign: 'center',
+                            mb: 1.5, // margin-bottom to align with text
+                          }}
+                        >
+                          Package {index + 1}
+                        </Box>
                         {!showPackageDetails && (
                           <>
                             {pkg.packageType && (
                               <>
-                                {' | '}
                                 {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
                               </>
                             )}
@@ -827,6 +925,62 @@ function ShippingForm({ handleChangeFormType }) {
                 >
                   Add Package
                 </Button>
+                <Typography sx={{ ml: 2 }}>
+                  {shippingFormData.packages.length}{' '}
+                  {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
+                </Typography>
+                <Select
+                  size='small'
+                  displayEmpty
+                  value={selectedIndex}
+                  onChange={(e) => handleJumpToPackage(e.target.value)}
+                  sx={{ ml: 2 }}
+                >
+                  <MenuItem value='' disabled>
+                    Jump to package
+                  </MenuItem>
+                  {shippingFormData.packages.map((pkg, index) => (
+                    <Tooltip
+                      title={
+                        <Box sx={{ p: 1 }}>
+                          <Typography variant='body2'>
+                            <strong>Weight:</strong> {pkg.packageWeight} kg
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Type:</strong>{' '}
+                            {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Length:</strong> {pkg.packageLength} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Width:</strong> {pkg.packageWidth} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Height:</strong> {pkg.packageHeight} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Description:</strong> {pkg.packageDescription}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Value:</strong> {pkg.packageValue} EUR
+                          </Typography>
+                          {showSSCC && (
+                            <Typography variant='body2'>
+                              <strong>SSCC:</strong> {pkg.sscc}
+                            </Typography>
+                          )}
+                        </Box>
+                      }
+                      arrow
+                      placement='top-start'
+                    >
+                      <MenuItem key={index} value={index}>
+                        Package {index + 1}
+                      </MenuItem>
+                    </Tooltip>
+                  ))}
+                </Select>
               </Box>
               <Grid size={{ xs: 12 }}>
                 <TextField
