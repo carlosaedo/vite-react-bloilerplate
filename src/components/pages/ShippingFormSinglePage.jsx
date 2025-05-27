@@ -593,52 +593,80 @@ function ShippingForm({ handleChangeFormType }) {
 
           {shippingFormData.packages.map((pkg, index) => (
             <Box key={index} sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
+              <Tooltip
+                title={
+                  <Box sx={{ p: 1 }}>
+                    <Typography variant='body2'>
+                      <strong>Weight:</strong> {pkg.packageWeight} kg
+                    </Typography>
+                    <Typography variant='body2'>
+                      <strong>Type:</strong>{' '}
+                      {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                    </Typography>
+                    <Typography variant='body2'>
+                      <strong>Length:</strong> {pkg.packageLength} cm
+                    </Typography>
+                    <Typography variant='body2'>
+                      <strong>Width:</strong> {pkg.packageWidth} cm
+                    </Typography>
+                    <Typography variant='body2'>
+                      <strong>Height:</strong> {pkg.packageHeight} cm
+                    </Typography>
+                    <Typography variant='body2'>
+                      <strong>Description:</strong> {pkg.packageDescription}
+                    </Typography>
+                    <Typography variant='body2'>
+                      <strong>Value:</strong> {pkg.packageValue} EUR
+                    </Typography>
+                    {showSSCC && (
+                      <Typography variant='body2'>
+                        <strong>SSCC:</strong> {pkg.sscc}
+                      </Typography>
+                    )}
+                  </Box>
+                }
+                arrow
+                placement='top-start'
               >
-                <Typography variant='subtitle1'>
-                  Package {index + 1}
-                  {!showPackageDetails && (
-                    <>
-                      {pkg.packageType && (
-                        <>
-                          {' | '}
-                          {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
-                        </>
-                      )}
-                      {pkg.packageWeight && (
-                        <>
-                          {' | '}
-                          {pkg.packageWeight} kg
-                        </>
-                      )}
-                      {pkg.packageDescription && (
-                        <>
-                          {' | '}
-                          {pkg.packageDescription.length > 70
-                            ? pkg.packageDescription.slice(0, 70) + '...'
-                            : pkg.packageDescription}
-                        </>
-                      )}
-                      {pkg.packageValue && (
-                        <>
-                          {' | '}
-                          {pkg.packageValue} EUR
-                        </>
-                      )}
-                    </>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Typography variant='subtitle1'>
+                    Package {index + 1}
+                    {!showPackageDetails && (
+                      <>
+                        {pkg.packageType && (
+                          <>
+                            {' | '}
+                            {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                          </>
+                        )}
+                        {pkg.packageWeight && <> | {pkg.packageWeight} kg</>}
+                        {pkg.packageDescription && (
+                          <>
+                            {' | '}
+                            {pkg.packageDescription.length > 70
+                              ? pkg.packageDescription.slice(0, 70) + '...'
+                              : pkg.packageDescription}
+                          </>
+                        )}
+                        {pkg.packageValue && <> | {pkg.packageValue} EUR</>}
+                      </>
+                    )}
+                  </Typography>
+
+                  {shippingFormData.packages.length > 1 && (
+                    <IconButton onClick={() => removePackage(index)} color='error' size='small'>
+                      <DeleteIcon />
+                    </IconButton>
                   )}
-                </Typography>
-                {shippingFormData.packages.length > 1 && (
-                  <IconButton onClick={() => removePackage(index)} color='error' size='small'>
-                    <DeleteIcon />
-                  </IconButton>
-                )}
-              </Box>
+                </Box>
+              </Tooltip>
+
               {showPackageDetails && (
                 <>
                   <Grid container spacing={2}>

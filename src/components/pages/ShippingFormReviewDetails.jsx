@@ -1,4 +1,5 @@
 import { Grid, Typography, Divider, Paper, Box, Card, CardContent } from '@mui/material';
+import { transform } from 'framer-motion';
 
 function ReviewDetails({ formData }) {
   const renderSection = (title, data) => (
@@ -63,6 +64,8 @@ function ReviewDetails({ formData }) {
           year: formData.year,
           waybillNumber: formData.waybillNumber,
           deliveryDate: formData.deliveryDate,
+          shippingService: formData.shippingService,
+          trackingNumber: formData.trackingNumber,
         })}
 
         <Divider sx={{ my: 3 }} />
