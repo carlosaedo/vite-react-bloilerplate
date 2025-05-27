@@ -185,9 +185,46 @@ function ShippingForm({ handleChangeFormType }) {
     <>
       <Paper sx={{ p: 2, maxWidth: 900, margin: 'auto', mt: 5 }}>
         <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
-          <Typography variant='h5' gutterBottom>
+          <Typography
+            variant='h5'
+            gutterBottom
+            sx={{ fontWeight: 700, color: '#003e2d', display: 'flex', alignItems: 'center' }}
+          >
             Shipping Form
+            {shippingFormData.trackingRef ? (
+              <Box
+                component='span'
+                sx={{
+                  ml: 2,
+                  px: 1.5,
+                  py: 0.3,
+                  bgcolor: '#ffc928',
+                  color: '#003e2d',
+                  borderRadius: 1,
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                  userSelect: 'none',
+                }}
+              >
+                Tracking: {shippingFormData.trackingRef}
+              </Box>
+            ) : (
+              <Typography
+                component='span'
+                variant='subtitle1'
+                sx={{
+                  ml: 2,
+                  fontStyle: 'italic',
+                  color: 'text.secondary',
+                  fontWeight: 400,
+                }}
+              >
+                New Waybill
+              </Typography>
+            )}
           </Typography>
+
           <Tooltip title='Multi tab form' placement='top' arrow>
             <Button
               onClick={handleChangeFormTypeToParent}

@@ -11,6 +11,14 @@ function generateMockSSCC() {
   return '00' + randomDigits;
 }
 
+function generateMockTrackingREF() {
+  let randomDigits = '';
+  for (let i = 0; i < 20; i++) {
+    randomDigits += Math.floor(Math.random() * 10);
+  }
+  return 'TT' + randomDigits;
+}
+
 // Provider Component
 export const ShippingFormProvider = ({ children }) => {
   const [formData, setFormData] = useState(() => {
@@ -58,7 +66,7 @@ export const ShippingFormProvider = ({ children }) => {
             },
           ],
           shippingService: 'standard',
-          trackingNumber: '',
+          trackingRef: generateMockTrackingREF(),
         };
   });
 
@@ -96,11 +104,11 @@ export const ShippingFormProvider = ({ children }) => {
           packageDescription: '',
           packageValue: '',
           packageType: '',
-          sscc: '',
+          sscc: generateMockSSCC(),
         },
       ],
       shippingService: 'standard',
-      trackingNumber: '',
+      trackingRef: generateMockTrackingREF(),
     });
     localStorage.removeItem('formData');
   };
