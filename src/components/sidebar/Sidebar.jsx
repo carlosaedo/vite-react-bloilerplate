@@ -68,6 +68,7 @@ const Sidebar = ({ onToggle }) => {
       if (!element) return; // Defensive check
       const hasScroll = element.scrollHeight > element.clientHeight;
       setHasScroll(hasScroll);
+      hasScroll ? onToggle(collapsed ? 60 : 250) : onToggle(collapsed ? 55 : 250);
     };
 
     checkScroll();
@@ -78,7 +79,7 @@ const Sidebar = ({ onToggle }) => {
       if (scrollRef.current) {
         const hasScroll = scrollRef.current.scrollHeight > scrollRef.current.clientHeight;
         setHasScroll(hasScroll);
-        onToggle(collapsed ? (hasScroll ? 65 : 50) : 250);
+        hasScroll ? onToggle(collapsed ? 60 : 250) : onToggle(collapsed ? 55 : 250);
       }
     };
 
