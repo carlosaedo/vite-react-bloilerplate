@@ -720,7 +720,13 @@ function ShippingForm({ handleChangeFormType }) {
                             minWidth: 24,
                             textAlign: 'center',
                             mb: 1.5, // margin-bottom to align with text
+                            cursor: 'pointer',
                           }}
+                          onClick={
+                            showPackageDetails
+                              ? () => setShowPackageDetails(false)
+                              : () => setShowPackageDetails(true)
+                          }
                         >
                           Package {index + 1}
                         </Box>

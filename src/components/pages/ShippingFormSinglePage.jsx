@@ -729,7 +729,13 @@ function ShippingForm({ handleChangeFormType }) {
                         mr: 1.5, // margin-right between badge and text
                         minWidth: 24,
                         textAlign: 'center',
+                        cursor: 'pointer',
                       }}
+                      onClick={
+                        showPackageDetails
+                          ? () => setShowPackageDetails(false)
+                          : () => setShowPackageDetails(true)
+                      }
                     >
                       Package {index + 1}
                     </Box>
