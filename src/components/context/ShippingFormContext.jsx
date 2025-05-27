@@ -14,7 +14,8 @@ function generateMockSSCC() {
 // Provider Component
 export const ShippingFormProvider = ({ children }) => {
   const [formData, setFormData] = useState(() => {
-    const storedData = localStorage.getItem('formData');
+    const storedData = localStorage.getItem('shippingFormData');
+
     return storedData
       ? JSON.parse(storedData)
       : {

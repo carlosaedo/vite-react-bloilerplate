@@ -62,8 +62,6 @@ function ShippingForm({ handleChangeFormType }) {
 
   const [message, setMessage] = useState(null);
 
-  console.log(shippingFormData);
-
   const handleStepChange = (event, newValue) => {
     setStep(newValue);
   };
