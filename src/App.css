@@ -29,6 +29,27 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* Webkit-based browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #003d2c;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ffc928 #ffffff;
+}
+
 @media (max-width: 768px) {
   #root {
     margin: 0 auto;

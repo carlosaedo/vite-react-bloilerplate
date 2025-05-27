@@ -11,6 +11,7 @@ import {
   Tooltip,
   CircularProgress,
   Collapse,
+  Box,
 } from '@mui/material';
 import {
   FaBoxOpen,
@@ -42,7 +43,7 @@ const Sidebar = ({ onToggle }) => {
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed);
-    onToggle(collapsed ? 50 : 250);
+    onToggle(collapsed ? 55 : 250);
 
     // Force collapse on mobile
     const handleResize = () => {
@@ -216,129 +217,140 @@ const Sidebar = ({ onToggle }) => {
       open={true}
       className={collapsed ? 'sidebar-collapsed' : ''}
       sx={{
-        width: collapsed ? 50 : 250,
+        width: collapsed ? 55 : 250,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: collapsed ? 50 : 250,
+          width: collapsed ? 55 : 250,
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'fixed',
           top: 0,
           height: '100%',
           zIndex: 1200,
+          overflow: 'hidden', // Do not scroll the paper itself
+          boxSizing: 'border-box',
         },
       }}
     >
-      <div className='sidebar-header'>
-        <IconButton
-          onClick={toggleSidebar}
-          sx={{
-            height: '40px',
-            width: '40px',
-            cursor: 'pointer',
-            padding: '8px',
-            borderRadius: '50%',
-            margin: '8px',
-            color: '#003D2C',
-          }}
-        >
-          {collapsed ? <FaBars size={16} /> : <FaChevronRight size={16} />}
-        </IconButton>
-      </div>
+      <Box
+        sx={{
+          height: '100%',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          pr: 1, // add slight padding to avoid scrollbar overlay
+        }}
+      >
+        <div className='sidebar-header'>
+          <IconButton
+            onClick={toggleSidebar}
+            sx={{
+              height: '40px',
+              width: '40px',
+              cursor: 'pointer',
+              padding: '8px',
+              borderRadius: '50%',
+              margin: '8px',
+              color: '#003D2C',
+            }}
+          >
+            {collapsed ? <FaBars size={16} /> : <FaChevronRight size={16} />}
+          </IconButton>
+        </div>
 
-      <List>
-        {isLoggedIn ? (
-          <>
-            {renderMenu()}
+        <List>
+          {isLoggedIn ? (
+            <>
+              {renderMenu()}
 
-            <ListItem disablePadding sx={{ marginTop: 'auto' }}>
-              <Tooltip
-                title={collapsed ? (isLoggedIn ? 'Logout' : 'Login') : ''}
-                placement='right'
-                arrow
-              >
-                <ListItemButton
-                  component={NavLink}
-                  to='/login'
-                  onClick={toggleSidebarMenuItem}
-                  className={({ isActive }) => (isActive ? 'active' : '')}
-                  sx={{ marginTop: '12px' }}
+              <ListItem disablePadding sx={{ marginTop: 'auto' }}>
+                <Tooltip
+                  title={collapsed ? (isLoggedIn ? 'Logout' : 'Login') : ''}
+                  placement='right'
+                  arrow
                 >
-                  <ListItemIcon
-                    className={isLoggedIn ? 'logged-in' : ''}
-                    sx={{ minWidth: collapsed ? '24px' : '35px' }}
+                  <ListItemButton
+                    component={NavLink}
+                    to='/login'
+                    onClick={toggleSidebarMenuItem}
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                    sx={{ marginTop: '12px' }}
                   >
-                    <FaUserCircle />
-                  </ListItemIcon>
-                  <ListItemText
-                    sx={{
-                      '& .MuiListItemText-primary': {
-                        fontSize: '0.95rem',
-                        fontWeight: 400,
-                        transition: 'color 0.2s ease',
-                      },
-                    }}
-                    className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
-                    primary={isLoggedIn ? 'Logout' : 'Login'}
-                  />
-                </ListItemButton>
-              </Tooltip>
-            </ListItem>
-          </>
-        ) : (
-          <>
-            <ListItem disablePadding sx={{ marginTop: 'auto' }}>
-              <Tooltip title='Home' placement='right' arrow>
-                <ListItemButton
-                  component={NavLink}
-                  to='/'
-                  onClick={toggleSidebarMenuItem}
-                  className={({ isActive }) => (isActive ? 'active' : '')}
-                >
-                  <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>
-                    <FaHome />
-                  </ListItemIcon>
-                  <ListItemText
-                    sx={{
-                      '& .MuiListItemText-primary': {
-                        fontSize: '0.95rem',
-                        fontWeight: 400,
-                        transition: 'color 0.2s ease',
-                      },
-                    }}
-                    className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
-                    primary='Home'
-                  />
-                </ListItemButton>
-              </Tooltip>
-            </ListItem>
-            <ListItem disablePadding sx={{ marginTop: 'auto' }}>
-              <Tooltip title={collapsed ? 'Login' : ''} placement='right' arrow>
-                <ListItemButton
-                  component={NavLink}
-                  to='/login'
-                  onClick={toggleSidebarMenuItem}
-                  className={({ isActive }) => (isActive ? 'active' : '')}
-                >
-                  <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>
-                    <FaRegUserCircle />
-                  </ListItemIcon>
-                  <ListItemText
-                    sx={{
-                      '& .MuiListItemText-primary': {
-                        fontSize: '0.95rem',
-                        fontWeight: 400,
-                        transition: 'color 0.2s ease',
-                      },
-                    }}
-                    className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
-                    primary={isLoggedIn ? 'Logout' : 'Login'}
-                  />
-                </ListItemButton>
-              </Tooltip>
-            </ListItem>
-          </>
-        )}
-      </List>
+                    <ListItemIcon
+                      className={isLoggedIn ? 'logged-in' : ''}
+                      sx={{ minWidth: collapsed ? '24px' : '35px' }}
+                    >
+                      <FaUserCircle />
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          fontSize: '0.95rem',
+                          fontWeight: 400,
+                          transition: 'color 0.2s ease',
+                        },
+                      }}
+                      className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
+                      primary={isLoggedIn ? 'Logout' : 'Login'}
+                    />
+                  </ListItemButton>
+                </Tooltip>
+              </ListItem>
+            </>
+          ) : (
+            <>
+              <ListItem disablePadding sx={{ marginTop: 'auto' }}>
+                <Tooltip title='Home' placement='right' arrow>
+                  <ListItemButton
+                    component={NavLink}
+                    to='/'
+                    onClick={toggleSidebarMenuItem}
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>
+                      <FaHome />
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          fontSize: '0.95rem',
+                          fontWeight: 400,
+                          transition: 'color 0.2s ease',
+                        },
+                      }}
+                      className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
+                      primary='Home'
+                    />
+                  </ListItemButton>
+                </Tooltip>
+              </ListItem>
+              <ListItem disablePadding sx={{ marginTop: 'auto' }}>
+                <Tooltip title={collapsed ? 'Login' : ''} placement='right' arrow>
+                  <ListItemButton
+                    component={NavLink}
+                    to='/login'
+                    onClick={toggleSidebarMenuItem}
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>
+                      <FaRegUserCircle />
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          fontSize: '0.95rem',
+                          fontWeight: 400,
+                          transition: 'color 0.2s ease',
+                        },
+                      }}
+                      className={collapsed ? 'sidebar-collapsed-text' : 'sidebar-expanded-text'}
+                      primary={isLoggedIn ? 'Logout' : 'Login'}
+                    />
+                  </ListItemButton>
+                </Tooltip>
+              </ListItem>
+            </>
+          )}
+        </List>
+      </Box>
     </Drawer>
   );
 };
