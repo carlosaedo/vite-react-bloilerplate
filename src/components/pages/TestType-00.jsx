@@ -27,6 +27,7 @@ import {
   FormControl,
   useMediaQuery,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 
 import { dateFieldsArray } from '../../config/componentsSpecialConfigurations';
@@ -59,7 +60,10 @@ const TestType = () => {
     setOpen(false);
   };
 
-  const autoTableHeight = window.visualViewport.height - (isMobile ? 540 : 290);
+  const [autoTableHeight, setAutoTableHeight] = useState(() => {
+    const h = window.visualViewport?.height || window.innerHeight;
+    return h - (isMobile ? 540 : 290);
+  });
 
   const [tableHeight, setTableHeight] = useState(() => {
     const savedState = localStorage.getItem('tableHeight');
@@ -100,6 +104,28 @@ const TestType = () => {
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
+  async function fetchData() {
+    try {
+      const response = await api.get(`/test-type-00`, {
+        params: {
+          page: currentPage,
+          pageSize: pageSize,
+          selectedDate: selectedDate,
+        },
+      });
+
+      if (response && response.data && response.data.data) {
+        setData(response.data.data);
+        setTotalPages(response.data.pagination.totalPages);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Failed to load data.');
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     async function checkLoginStatus() {
       try {
@@ -117,13 +143,15 @@ const TestType = () => {
     if (autoTableHeightFlag) {
       handleTableHeightChange(autoTableHeight, true);
     }
-  }, [navigateTo]);
+  }, [autoTableHeight, autoTableHeightFlag, checkLoginStatusAuth, navigateTo]);
 
   const handleContextMenu = (event, row) => {
     event.preventDefault();
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
     setContextMenu({
-      x: event.pageX,
-      y: event.pageY,
+      x: event.clientX + scrollX,
+      y: event.clientY + scrollY,
       row,
     });
   };
@@ -132,7 +160,7 @@ const TestType = () => {
     setTableHeight(height);
     localStorage.setItem('tableHeight', height);
     if (autoFlag) {
-      localStorage.setItem('tableHeightAuto', true);
+      localStorage.setItem('tableHeightAuto', 'true');
       setAutoTableHeightFlag(true);
     } else {
       localStorage.removeItem('tableHeightAuto');
@@ -167,28 +195,6 @@ const TestType = () => {
   const handleClickOutside = () => {
     setContextMenu(null);
   };
-
-  async function fetchData() {
-    try {
-      const response = await api.get(`/test-type-00`, {
-        params: {
-          page: currentPage,
-          pageSize: pageSize,
-          selectedDate: selectedDate,
-        },
-      });
-
-      if (response && response.data && response.data.data) {
-        setData(response.data.data);
-        setTotalPages(response.data.pagination.totalPages);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('Failed to load data.');
-    } finally {
-      setLoading(false);
-    }
-  }
 
   useEffect(() => {
     if (startupDateFirstTime) {
@@ -286,20 +292,21 @@ const TestType = () => {
     let start = Math.max(1, currentPage - 2); // Start from 2 pages before current
     let end = Math.min(totalPages, currentPage + 2); // End at 2 pages after current
 
-    for (let i = start; i <= end; i++) {
-      pageNumbers.push(i);
-    }
-
-    // If there are pages before the start, add the ellipsis (but not as clickable)
+    // Add ellipsis before if needed
     if (start > 1) {
-      pageNumbers.unshift(
+      pageNumbers.push(
         <span key='ellipsis-start' className='pagination-ellipsis'>
           ...
         </span>,
       );
     }
 
-    // If there are pages after the end, add the ellipsis (but not as clickable)
+    // Add page numbers
+    for (let i = start; i <= end; i++) {
+      pageNumbers.push(i);
+    }
+
+    // Add ellipsis after if needed
     if (end < totalPages) {
       pageNumbers.push(
         <span key='ellipsis-end' className='pagination-ellipsis'>

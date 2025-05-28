@@ -3,10 +3,21 @@ import ReactDOM from 'react-dom/client';
 import './i18n.js'; // Import the i18n configuration
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
+import { appBuildVersion } from './appVersion.js';
 import { AuthProvider } from './components/context/AuthContext';
 import theme from './theme'; // import the theme file
 import App from './App.jsx';
 import './index.css';
+
+// Check app version before rendering
+const APP_BUILD_VERSION = appBuildVersion;
+const storedVersion = localStorage.getItem('appBuildVersion');
+
+if (storedVersion && storedVersion !== APP_BUILD_VERSION) {
+  console.warn('App version changed. Clearing localStorage...');
+  localStorage.clear();
+}
+localStorage.setItem('appBuildVersion', APP_BUILD_VERSION);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

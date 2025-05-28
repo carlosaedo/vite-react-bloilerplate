@@ -44,7 +44,7 @@ const Sidebar = ({ onToggle }) => {
   const { isLoggedIn, loadingAuth, userRole } = useAuth();
 
   useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', collapsed);
+    localStorage.setItem('sidebarCollapsed', collapsed.toString());
     onToggle(collapsed ? (hasScroll ? 60 : 55) : 250);
 
     // Force collapse on mobile

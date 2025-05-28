@@ -1,11 +1,12 @@
 import './Footer.css';
+import { appVersion, appBuildVersion } from '../../appVersion';
 
 const Footer = () => {
   return (
     <>
       <div>
         <p className='systemVersionInfo'>
-          Torrestir Shipping Portal v1.0.0 build 27.05.2025.11.05.12
+          Torrestir Shipping Portal v{appVersion} build {appBuildVersion}
         </p>
       </div>
     </>

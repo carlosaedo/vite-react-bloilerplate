@@ -1,5 +1,7 @@
 import torrestirApi from '../components/api/torrestirApi';
 
+import cleanLocalStorage from './cleanLocalStorage';
+
 async function logout() {
   try {
     const token = localStorage.getItem('token');
@@ -24,12 +26,14 @@ async function logout() {
     }*/
 
     localStorage.removeItem('token');
+    cleanLocalStorage();
     return true;
 
     //return false;
   } catch (error) {
     if (error.response?.status === 400) {
       localStorage.removeItem('token');
+      cleanLocalStorage();
       return true;
     } else if (error.response?.status === 500) {
       return false;

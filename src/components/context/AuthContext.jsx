@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import authLogout from '../../utils/authLogout';
 import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import { jwtDecode } from 'jwt-decode';
+import cleanLocalStorage from '../../utils/cleanLocalStorage';
 
 const AuthContext = createContext();
 
@@ -19,6 +20,7 @@ export function AuthProvider({ children }) {
     setIsLoggedIn(false);
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
+    cleanLocalStorage();
   };
 
   const login = (newToken) => {

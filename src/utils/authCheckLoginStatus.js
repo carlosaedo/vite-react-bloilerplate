@@ -1,4 +1,5 @@
 import torrestirApi from '../components/api/torrestirApi';
+import cleanLocalStorage from './cleanLocalStorage';
 
 async function checkLoginStatus() {
   try {
@@ -14,24 +15,30 @@ async function checkLoginStatus() {
 
     if (!response || !response.data || !response.data.isValid) {
       localStorage.removeItem('token');
+      cleanLocalStorage();
       return false;
     }
     if (response?.data?.isValid) {
       return true;
     } else {
       localStorage.removeItem('token');
+      cleanLocalStorage();
       return false;
     }
   } catch (error) {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
+      cleanLocalStorage();
       return false;
     } else if (error.response?.status === 500) {
       localStorage.removeItem('token');
+      cleanLocalStorage();
       return false;
     } else {
       localStorage.removeItem('token');
+      cleanLocalStorage();
       console.error(error);
+      return false;
     }
   }
 }

@@ -665,30 +665,30 @@ function ShippingForm({ handleChangeFormType }) {
                     title={
                       <Box sx={{ p: 1 }}>
                         <Typography variant='body2'>
-                          <strong>Weight:</strong> {pkg.packageWeight} kg
+                          <strong>Weight:</strong> {pkg?.packageWeight} kg
                         </Typography>
                         <Typography variant='body2'>
                           <strong>Type:</strong>{' '}
-                          {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                          {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Length:</strong> {pkg.packageLength} cm
+                          <strong>Length:</strong> {pkg?.packageLength} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Width:</strong> {pkg.packageWidth} cm
+                          <strong>Width:</strong> {pkg?.packageWidth} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Height:</strong> {pkg.packageHeight} cm
+                          <strong>Height:</strong> {pkg?.packageHeight} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Description:</strong> {pkg.packageDescription}
+                          <strong>Description:</strong> {pkg?.packageDescription}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Value:</strong> {pkg.packageValue} EUR
+                          <strong>Value:</strong> {pkg?.packageValue} EUR
                         </Typography>
                         {showSSCC && (
                           <Typography variant='body2'>
-                            <strong>SSCC:</strong> {pkg.sscc}
+                            <strong>SSCC:</strong> {pkg?.sscc}
                           </Typography>
                         )}
                       </Box>
@@ -714,30 +714,30 @@ function ShippingForm({ handleChangeFormType }) {
                 title={
                   <Box sx={{ p: 1 }}>
                     <Typography variant='body2'>
-                      <strong>Weight:</strong> {pkg.packageWeight} kg
+                      <strong>Weight:</strong> {pkg?.packageWeight} kg
                     </Typography>
                     <Typography variant='body2'>
                       <strong>Type:</strong>{' '}
-                      {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                      {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
                     </Typography>
                     <Typography variant='body2'>
-                      <strong>Length:</strong> {pkg.packageLength} cm
+                      <strong>Length:</strong> {pkg?.packageLength} cm
                     </Typography>
                     <Typography variant='body2'>
-                      <strong>Width:</strong> {pkg.packageWidth} cm
+                      <strong>Width:</strong> {pkg?.packageWidth} cm
                     </Typography>
                     <Typography variant='body2'>
-                      <strong>Height:</strong> {pkg.packageHeight} cm
+                      <strong>Height:</strong> {pkg?.packageHeight} cm
                     </Typography>
                     <Typography variant='body2'>
-                      <strong>Description:</strong> {pkg.packageDescription}
+                      <strong>Description:</strong> {pkg?.packageDescription}
                     </Typography>
                     <Typography variant='body2'>
-                      <strong>Value:</strong> {pkg.packageValue} EUR
+                      <strong>Value:</strong> {pkg?.packageValue} EUR
                     </Typography>
                     {showSSCC && (
                       <Typography variant='body2'>
-                        <strong>SSCC:</strong> {pkg.sscc}
+                        <strong>SSCC:</strong> {pkg?.sscc}
                       </Typography>
                     )}
                   </Box>
@@ -780,19 +780,21 @@ function ShippingForm({ handleChangeFormType }) {
 
                     {!showPackageDetails && (
                       <>
-                        {pkg.packageType && (
-                          <>{pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}</>
-                        )}
-                        {pkg.packageWeight && <> | {pkg.packageWeight} kg</>}
-                        {pkg.packageDescription && (
+                        {pkg?.packageType && (
                           <>
-                            {' | '}
-                            {pkg.packageDescription.length > 70
-                              ? pkg.packageDescription.slice(0, 70) + '...'
-                              : pkg.packageDescription}
+                            {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
                           </>
                         )}
-                        {pkg.packageValue && <> | {pkg.packageValue} EUR</>}
+                        {pkg?.packageWeight && <> | {pkg?.packageWeight} kg</>}
+                        {pkg?.packageDescription && (
+                          <>
+                            {' | '}
+                            {pkg?.packageDescription.length > 70
+                              ? pkg?.packageDescription.slice(0, 70) + '...'
+                              : pkg?.packageDescription}
+                          </>
+                        )}
+                        {pkg?.packageValue && <> | {pkg?.packageValue} EUR</>}
                       </>
                     )}
                   </Typography>
@@ -813,7 +815,7 @@ function ShippingForm({ handleChangeFormType }) {
                         label='Weight (kg)'
                         name={`packageWeight_${index}`}
                         type='number'
-                        value={pkg.packageWeight}
+                        value={pkg?.packageWeight}
                         onChange={(e) =>
                           handlePackageChange(index, 'packageWeight', e.target.value)
                         }
@@ -829,7 +831,7 @@ function ShippingForm({ handleChangeFormType }) {
                         select
                         label='Package Type'
                         name={`packageType_${index}`}
-                        value={pkg.packageType}
+                        value={pkg?.packageType}
                         onChange={(e) => handlePackageChange(index, 'packageType', e.target.value)}
                         fullWidth
                         size='small'
@@ -850,7 +852,7 @@ function ShippingForm({ handleChangeFormType }) {
                         label='Length (cm)'
                         name={`packageLength_${index}`}
                         type='number'
-                        value={pkg.packageLength}
+                        value={pkg?.packageLength}
                         onChange={(e) =>
                           handlePackageChange(index, 'packageLength', e.target.value)
                         }
@@ -866,7 +868,7 @@ function ShippingForm({ handleChangeFormType }) {
                         label='Width (cm)'
                         name={`packageWidth_${index}`}
                         type='number'
-                        value={pkg.packageWidth}
+                        value={pkg?.packageWidth}
                         onChange={(e) => handlePackageChange(index, 'packageWidth', e.target.value)}
                         fullWidth
                         size='small'
@@ -880,7 +882,7 @@ function ShippingForm({ handleChangeFormType }) {
                         label='Height (cm)'
                         name={`packageHeight_${index}`}
                         type='number'
-                        value={pkg.packageHeight}
+                        value={pkg?.packageHeight}
                         onChange={(e) =>
                           handlePackageChange(index, 'packageHeight', e.target.value)
                         }
@@ -895,7 +897,7 @@ function ShippingForm({ handleChangeFormType }) {
                   <TextField
                     label='Description'
                     name={`packageDescription_${index}`}
-                    value={pkg.packageDescription}
+                    value={pkg?.packageDescription}
                     onChange={(e) =>
                       handlePackageChange(index, 'packageDescription', e.target.value)
                     }
@@ -910,7 +912,7 @@ function ShippingForm({ handleChangeFormType }) {
                     label='Package Value (EUR)'
                     name={`packageValue_${index}`}
                     type='number'
-                    value={pkg.packageValue}
+                    value={pkg?.packageValue}
                     onChange={(e) => handlePackageChange(index, 'packageValue', e.target.value)}
                     fullWidth
                     size='small'
@@ -923,7 +925,7 @@ function ShippingForm({ handleChangeFormType }) {
                       label='SSCC'
                       name='sscc'
                       type='text'
-                      value={pkg.sscc}
+                      value={pkg?.sscc}
                       fullWidth
                       size='small'
                       margin='dense'
@@ -987,30 +989,30 @@ function ShippingForm({ handleChangeFormType }) {
                     title={
                       <Box sx={{ p: 1 }}>
                         <Typography variant='body2'>
-                          <strong>Weight:</strong> {pkg.packageWeight} kg
+                          <strong>Weight:</strong> {pkg?.packageWeight} kg
                         </Typography>
                         <Typography variant='body2'>
                           <strong>Type:</strong>{' '}
-                          {pkg.packageType.charAt(0).toUpperCase() + pkg.packageType.slice(1)}
+                          {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Length:</strong> {pkg.packageLength} cm
+                          <strong>Length:</strong> {pkg?.packageLength} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Width:</strong> {pkg.packageWidth} cm
+                          <strong>Width:</strong> {pkg?.packageWidth} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Height:</strong> {pkg.packageHeight} cm
+                          <strong>Height:</strong> {pkg?.packageHeight} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Description:</strong> {pkg.packageDescription}
+                          <strong>Description:</strong> {pkg?.packageDescription}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Value:</strong> {pkg.packageValue} EUR
+                          <strong>Value:</strong> {pkg?.packageValue} EUR
                         </Typography>
                         {showSSCC && (
                           <Typography variant='body2'>
-                            <strong>SSCC:</strong> {pkg.sscc}
+                            <strong>SSCC:</strong> {pkg?.sscc}
                           </Typography>
                         )}
                       </Box>
