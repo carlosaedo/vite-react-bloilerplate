@@ -68,10 +68,9 @@ const ClientNew = () => {
   return (
     <Box
       sx={{
-        height: '100vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'top',
+        alignItems: 'center',
         padding: 2,
       }}
     >

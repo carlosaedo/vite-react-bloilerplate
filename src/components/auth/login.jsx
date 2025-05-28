@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import torrestirApi from '../api/torrestirApi';
+import ChangePassword from './changePassword';
+import EditProfile from './editProfile';
 import './login.css';
 import {
   Stack,
@@ -40,6 +42,10 @@ const Login = () => {
   const [showFlork, setShowFlork] = useState(false);
   const [showCryingFlork, setShowCryingFlork] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [showChangingPassword, setShowChangingPassword] = useState(false);
+
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   const [userInfo] = useState(() => {
     let userInfo;
@@ -113,11 +119,56 @@ const Login = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  const handleShowEditProfile = () => {
+    setShowEditProfile(!showEditProfile);
+    setShowChangingPassword(false);
+  };
+
+  const handleShowChangingPassword = () => {
+    setShowChangingPassword(!showChangingPassword);
+    setShowEditProfile(false);
+  };
+
   return (
     <>
       {isTokenPresent ? (
         <div>
-          <Logout userInfoData={userInfo} />
+          {!showChangingPassword && !showEditProfile && <Logout userInfoData={userInfo} />}
+
+          <Button
+            type='submit'
+            variant='contained'
+            color='primary'
+            sx={{ marginTop: 2, marginRight: 2 }}
+            onClick={handleShowEditProfile}
+          >
+            Edit Profile
+          </Button>
+          <Button
+            type='submit'
+            variant='contained'
+            color='primary'
+            sx={{ marginTop: 2 }}
+            onClick={handleShowChangingPassword}
+          >
+            Change Password
+          </Button>
+          {showChangingPassword && <ChangePassword />}
+          {showEditProfile && <EditProfile />}
+          {(showChangingPassword || showEditProfile) && (
+            <Button
+              type='submit'
+              variant='contained'
+              color='primary'
+              sx={{ marginTop: 2 }}
+              onClick={() => {
+                setShowChangingPassword(false);
+                setShowEditProfile(false);
+              }}
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       ) : (
         <Box
