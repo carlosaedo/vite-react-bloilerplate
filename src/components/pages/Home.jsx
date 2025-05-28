@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   Box,
   Paper,
@@ -160,8 +161,9 @@ const statColors = {
 };
 
 const Home = () => {
+  const { getToken } = useAuth();
   const navigateTo = useNavigate();
-  const token = localStorage.getItem('token');
+  const token = getToken();
   const isTokenPresent = !!token;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

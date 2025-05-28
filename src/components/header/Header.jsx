@@ -140,9 +140,9 @@ const LanguageSelect = styled(FormControl)(({ theme }) => ({
 }));
 
 const Header = () => {
-  const { user, userRole, checkLoginStatusAuth, loadingAuth } = useAuth();
+  const { user, userRole, checkLoginStatusAuth, loadingAuth, getToken } = useAuth();
   const navigateTo = useNavigate();
-  const token = localStorage.getItem('token');
+  const token = getToken();
   const isTokenPresent = !!token;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -180,24 +180,21 @@ const Header = () => {
   });
 
   async function fetchData() {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await torrestirApi.get(`/api/clients`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    try {
+      const response = await torrestirApi.get(`/api/clients`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (response?.data) {
-          setClientOptions(response.data);
-        } else {
-          console.error('No data found in response:', response);
-          setClientOptions([]);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      if (response?.data) {
+        setClientOptions(response.data);
+      } else {
+        console.error('No data found in response:', response);
+        setClientOptions([]);
       }
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
   }
 

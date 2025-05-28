@@ -17,7 +17,7 @@ import torrestirApi from '../api/torrestirApi';
 const ClientDetails = () => {
   const navigateTo = useNavigate();
 
-  const { checkLoginStatusAuth, loadingAuth } = useAuth();
+  const { checkLoginStatusAuth, loadingAuth, getToken } = useAuth();
 
   const { clientId: paramClientId } = useParams();
   const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
@@ -40,7 +40,7 @@ const ClientDetails = () => {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: '', vat: '', country: '' });
 
-  const token = localStorage.getItem('token');
+  const token = getToken();
 
   useEffect(() => {
     async function checkLoginStatus() {

@@ -15,14 +15,14 @@ import torrestirApi from '../api/torrestirApi';
 
 const ClientNew = () => {
   const navigateTo = useNavigate();
-  const { checkLoginStatusAuth, loadingAuth } = useAuth();
+  const { checkLoginStatusAuth, loadingAuth, getToken } = useAuth();
 
   const [client, setClient] = useState(null);
 
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({ name: '', vat: '', country: '' });
 
-  const token = localStorage.getItem('token');
+  const token = getToken();
 
   useEffect(() => {
     // Run on mount: check login and set startup date

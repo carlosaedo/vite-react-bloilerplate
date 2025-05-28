@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import torrestirApi from '../api/torrestirApi';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -21,10 +22,12 @@ import FlorkYay from '../../assets/yay-flork.png';
 const ChangePassword = () => {
   const navigateTo = useNavigate();
 
+  const { getToken } = useAuth();
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: '',
+    confirmNewPassword: '',
   });
   const [message, setMessage] = useState(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -33,7 +36,13 @@ const ChangePassword = () => {
 
   async function handleRequestResetPassword() {
     try {
-      const response = await torrestirApi.post('/auth/confirm-password-reset', formData);
+      const token = getToken();
+
+      const response = await torrestirApi.post('/Account/change-password', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log(response);
       if (
         response?.status === 200 &&
@@ -158,8 +167,8 @@ const ChangePassword = () => {
             <InputLabel>Confirm New Password</InputLabel>
             <OutlinedInput
               type={showConfirmNewPassword ? 'text' : 'password'}
-              name='confirmPassword'
-              value={formData.confirmPassword}
+              name='confirmNewPassword'
+              value={formData.confirmNewPassword}
               onChange={handleChange}
               endAdornment={
                 <InputAdornment position='end'>

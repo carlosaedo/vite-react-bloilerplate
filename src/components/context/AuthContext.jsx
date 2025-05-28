@@ -61,6 +61,10 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const getToken = () => {
+    return token;
+  };
+
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -105,6 +109,7 @@ export function AuthProvider({ children }) {
         user,
         userRole,
         loadingAuth,
+        getToken,
       }}
     >
       {children}

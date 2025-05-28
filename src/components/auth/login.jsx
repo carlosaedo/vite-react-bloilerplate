@@ -29,10 +29,10 @@ import { useAuth } from '../context/AuthContext';
 import Logout from '../auth/logout';
 
 const Login = () => {
-  const token = localStorage.getItem('token');
-  const isTokenPresent = !!localStorage.getItem('token'); // convert to boolean
+  const { login, getToken } = useAuth();
+  const token = getToken();
+  const isTokenPresent = !!getToken(); // convert to boolean
 
-  const { login } = useAuth();
   const navigateTo = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
