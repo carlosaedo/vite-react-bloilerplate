@@ -772,6 +772,15 @@ function ShippingForm({ handleChangeFormType }) {
                         <Typography variant='body2'>
                           <strong>Value:</strong> {pkg?.packageValue} EUR
                         </Typography>
+                        <Typography variant='body2'>
+                          <strong>CBM:</strong> {pkg?.CBM}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>LDM:</strong> {pkg?.LDM}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                        </Typography>
                         {showSSCC && (
                           <Typography variant='body2'>
                             <strong>SSCC:</strong> {pkg?.sscc}
@@ -855,6 +864,15 @@ function ShippingForm({ handleChangeFormType }) {
                             </Typography>
                             <Typography variant='body2'>
                               <strong>Value:</strong> {pkg?.packageValue} EUR
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>CBM:</strong> {pkg?.CBM}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>LDM:</strong> {pkg?.LDM}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
                             </Typography>
                             {showSSCC && (
                               <Typography variant='body2'>
@@ -1011,6 +1029,15 @@ function ShippingForm({ handleChangeFormType }) {
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Value:</strong> {selectedPackage?.pkgData?.packageValue} EUR
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>CBM:</strong> {selectedPackage?.pkgData?.CBM}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>LDM:</strong> {selectedPackage?.pkgData?.LDM}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Taxable Weight:</strong> {selectedPackage?.pkgData?.TaxableWeight}
                   </Typography>
                   {showSSCC && (
                     <Typography variant='body2'>
@@ -1272,6 +1299,15 @@ function ShippingForm({ handleChangeFormType }) {
                         </Typography>
                         <Typography variant='body2'>
                           <strong>Value:</strong> {pkg?.packageValue} EUR
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>CBM:</strong> {pkg?.CBM}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>LDM:</strong> {pkg?.LDM}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
                         </Typography>
                         {showSSCC && (
                           <Typography variant='body2'>

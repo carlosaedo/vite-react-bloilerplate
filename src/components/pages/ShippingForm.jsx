@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
+import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
 
 import {
   Box,
@@ -105,10 +106,20 @@ function ShippingForm({ handleChangeFormType }) {
   const handlePackageChange = (index, field, value) => {
     setMessage(null);
     setErrorMessage(null);
+
+    const newCalculationsForPackage = calculateShippingFormSizeValues(
+      shippingFormData?.packages[index]?.packageWeight,
+      shippingFormData?.packages[index]?.packageLength,
+      shippingFormData?.packages[index]?.packageWidth,
+      shippingFormData?.packages[index]?.packageHeight,
+      5000,
+    );
+
     const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
       ...updatedPackages[index],
       [field]: value,
+      ...newCalculationsForPackage,
     };
 
     const updatedFormData = {
@@ -740,6 +751,15 @@ function ShippingForm({ handleChangeFormType }) {
                             <Typography variant='body2'>
                               <strong>Value:</strong> {pkg?.packageValue} EUR
                             </Typography>
+                            <Typography variant='body2'>
+                              <strong>CBM:</strong> {pkg?.CBM}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>LDM:</strong> {pkg?.LDM}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                            </Typography>
                             {showSSCC && (
                               <Typography variant='body2'>
                                 <strong>SSCC:</strong> {pkg?.sscc}
@@ -787,6 +807,15 @@ function ShippingForm({ handleChangeFormType }) {
                         </Typography>
                         <Typography variant='body2'>
                           <strong>Value:</strong> {pkg?.packageValue} EUR
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>CBM:</strong> {pkg?.CBM}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>LDM:</strong> {pkg?.LDM}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
                         </Typography>
                         {showSSCC && (
                           <Typography variant='body2'>
@@ -1077,6 +1106,15 @@ function ShippingForm({ handleChangeFormType }) {
                             </Typography>
                             <Typography variant='body2'>
                               <strong>Value:</strong> {pkg?.packageValue} EUR
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>CBM:</strong> {pkg?.CBM}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>LDM:</strong> {pkg?.LDM}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
                             </Typography>
                             {showSSCC && (
                               <Typography variant='body2'>
