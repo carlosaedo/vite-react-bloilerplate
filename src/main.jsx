@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { appBuildVersion } from './appVersion.js';
 import { AuthProvider } from './components/context/AuthContext';
+import cleanLocalStorage from './utils/cleanLocalStorage.js';
 import theme from './theme'; // import the theme file
 import App from './App.jsx';
 import './index.css';
@@ -15,9 +16,25 @@ const storedVersion = localStorage.getItem('appBuildVersion');
 
 if (storedVersion && storedVersion !== APP_BUILD_VERSION) {
   console.warn('App version changed. Clearing localStorage...');
-  localStorage.clear();
+  cleanLocalStorage();
 }
+
+if (!storedVersion) {
+  console.warn('App version not found. Clearing localStorage...');
+  cleanLocalStorage();
+}
+
 localStorage.setItem('appBuildVersion', APP_BUILD_VERSION);
+
+window.addEventListener('storage', (event) => {
+  if (event.key === 'appBuildVersion') {
+    if (event.newValue !== appBuildVersion) {
+      localStorage.clear();
+      localStorage.setItem('appBuildVersion', appBuildVersion);
+      window.location.reload();
+    }
+  }
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

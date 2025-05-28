@@ -1,11 +1,11 @@
 const cleanLocalStorage = () => {
   const keepKeys = ['appBuildVersion', 'appLanguage'];
 
-  Object.keys(localStorage).forEach((key) => {
+  for (const key of Object.keys(localStorage)) {
     if (!keepKeys.includes(key)) {
       localStorage.removeItem(key);
     }
-  });
+  }
 };
 
 export default cleanLocalStorage;
