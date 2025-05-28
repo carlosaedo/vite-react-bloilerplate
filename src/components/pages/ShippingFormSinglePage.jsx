@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
+
+import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
 
 import {
   Grid,
@@ -15,6 +17,12 @@ import {
   Tooltip,
   IconButton,
   Select,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  TablePagination,
 } from '@mui/material';
 
 import { LiaWpforms } from 'react-icons/lia';
@@ -51,24 +59,10 @@ const shippingPaymentTo = [
 ];
 
 function ShippingForm({ handleChangeFormType }) {
-  const packageRefs = useRef([]);
-  const [selectedIndex, setSelectedIndex] = useState('');
-
-  /*const handleJumpToPackage = (index) => {
-    packageRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };*/
-
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
     setMessage(null);
-    const el = packageRefs.current[index];
-    if (el) {
-      const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-    console.log('Jumping to package:', index, el);
-    // Reset dropdown after scroll
-    setSelectedIndex('');
+    setSelectedPackage({ pkgData: shippingFormData.packages[index], pkgIndex: index });
   };
 
   const { shippingFormData, setShippingFormData, resetShippingFormData } = useShippingFormContext();
@@ -76,9 +70,20 @@ function ShippingForm({ handleChangeFormType }) {
   const [message, setMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 10;
+
+  const packagesToShow = shippingFormData.packages.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage,
+  );
+
   const [showSSCC, setShowSSCC] = useState(false);
 
-  const [showPackageDetails, setShowPackageDetails] = useState(true);
+  const [selectedPackage, setSelectedPackage] = useState({
+    pkgData: shippingFormData.packages[0],
+    pkgIndex: 0,
+  });
 
   const handleChange = (event) => {
     setMessage(null);
@@ -96,10 +101,20 @@ function ShippingForm({ handleChangeFormType }) {
   const handlePackageChange = (index, field, value) => {
     setErrorMessage(null);
     setMessage(null);
+
+    const newCalculationsForPackage = calculateShippingFormSizeValues(
+      shippingFormData?.packages[index]?.packageWeight,
+      shippingFormData?.packages[index]?.packageLength,
+      shippingFormData?.packages[index]?.packageWidth,
+      shippingFormData?.packages[index]?.packageHeight,
+      5000,
+    );
+
     const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
       ...updatedPackages[index],
       [field]: value,
+      ...newCalculationsForPackage,
     };
 
     const updatedFormData = {
@@ -273,7 +288,7 @@ function ShippingForm({ handleChangeFormType }) {
                   fontWeight: 400,
                 }}
               >
-                New Waybill
+                New Booking Information
               </Typography>
             )}
           </Typography>
@@ -295,7 +310,7 @@ function ShippingForm({ handleChangeFormType }) {
 
         {/* Guia*/}
         <Box sx={{ mb: 4 }}>
-          <Typography variant='h6'>Waybill Information</Typography>
+          <Typography variant='h6'>Booking Information</Typography>
           <Divider sx={{ mb: 2 }} />
 
           <Grid container spacing={2}>
@@ -308,33 +323,6 @@ function ShippingForm({ handleChangeFormType }) {
                 fullWidth
                 size='small'
                 margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='Waybill Number'
-                name='waybillNumber'
-                type='text'
-                value={shippingFormData.waybillNumber}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='Hour'
-                name='hour'
-                type='time'
-                value={shippingFormData.hour || ''} // default to HH:MM
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
                 required
               />
             </Grid>
@@ -354,19 +342,6 @@ function ShippingForm({ handleChangeFormType }) {
             </Grid>
             <Grid size={{ xs: 6, sm: 3 }}>
               <TextField
-                label='Ext. Number'
-                name='extNumber'
-                type='text'
-                value={shippingFormData.extNumber}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
                 label='Delivery Date'
                 name='deliveryDate'
                 type='date'
@@ -380,6 +355,76 @@ function ShippingForm({ handleChangeFormType }) {
               />
             </Grid>
             <Grid size={{ xs: 6, sm: 3 }}>
+              <TextField
+                label='Hour'
+                name='hour'
+                type='time'
+                value={shippingFormData.hour || ''} // default to HH:MM
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
+                required
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label='Shipper Reference'
+                name='shipperRef'
+                type='text'
+                value={shippingFormData.shipperRef}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label='Consignee Reference'
+                name='consigneeRef'
+                type='text'
+                value={shippingFormData.consigneeRef}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                label='Waybill Reference'
+                name='trackingRef'
+                type='text'
+                value={shippingFormData.trackingRef}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                label='Ext. Number'
+                name='extNumber'
+                type='text'
+                value={shippingFormData.extNumber}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 label='Ext. Number 2'
                 name='extNumber2'
@@ -676,19 +721,6 @@ function ShippingForm({ handleChangeFormType }) {
             <Button
               sx={{ marginRight: 1 }}
               variant='outlined'
-              startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
-              onClick={
-                showPackageDetails
-                  ? () => setShowPackageDetails(false)
-                  : () => setShowPackageDetails(true)
-              }
-              size='small'
-            >
-              {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
-            </Button>
-            <Button
-              sx={{ marginRight: 1 }}
-              variant='outlined'
               startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
               onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
               size='small'
@@ -705,13 +737,14 @@ function ShippingForm({ handleChangeFormType }) {
             <Select
               size='small'
               displayEmpty
-              value={selectedIndex}
+              value={selectedPackage?.pkgIndex}
               onChange={(e) => handleJumpToPackage(e.target.value)}
               sx={{ ml: 2 }}
             >
               <MenuItem value='' disabled>
-                Jump to package
+                Select Package
               </MenuItem>
+
               {shippingFormData.packages.map((pkg, index) => (
                 <MenuItem key={index} value={index}>
                   <Tooltip
@@ -756,239 +789,429 @@ function ShippingForm({ handleChangeFormType }) {
             </Select>
           </Box>
           <Divider sx={{ mb: 2 }} />
+          <Paper elevation={2} sx={{ mt: 2, p: 2, mb: 2 }}>
+            <Typography variant='h6' gutterBottom>
+              Package Table
+            </Typography>
 
-          {shippingFormData.packages.map((pkg, index) => (
-            <Box
-              key={index}
-              ref={(el) => (packageRefs.current[index] = el)}
-              sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
-            >
-              <Tooltip
-                title={
-                  <Box sx={{ p: 1 }}>
-                    <Typography variant='body2'>
-                      <strong>Weight:</strong> {pkg?.packageWeight} kg
-                    </Typography>
-                    <Typography variant='body2'>
-                      <strong>Type:</strong>{' '}
-                      {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
-                    </Typography>
-                    <Typography variant='body2'>
-                      <strong>Length:</strong> {pkg?.packageLength} cm
-                    </Typography>
-                    <Typography variant='body2'>
-                      <strong>Width:</strong> {pkg?.packageWidth} cm
-                    </Typography>
-                    <Typography variant='body2'>
-                      <strong>Height:</strong> {pkg?.packageHeight} cm
-                    </Typography>
-                    <Typography variant='body2'>
-                      <strong>Description:</strong> {pkg?.packageDescription}
-                    </Typography>
-                    <Typography variant='body2'>
-                      <strong>Value:</strong> {pkg?.packageValue} EUR
-                    </Typography>
-                    {showSSCC && (
-                      <Typography variant='body2'>
-                        <strong>SSCC:</strong> {pkg?.sscc}
-                      </Typography>
-                    )}
-                  </Box>
-                }
-                arrow
-                placement='top-start'
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Typography variant='subtitle1' sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box
-                      component='span'
-                      sx={{
-                        display: 'inline-block',
-                        backgroundColor: 'primary.main',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        borderRadius: '18px',
-                        px: 1.5,
-                        py: 0.5,
-                        fontSize: '0.75rem',
-                        mr: 1.5, // margin-right between badge and text
-                        minWidth: 24,
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                      }}
-                      onClick={
-                        showPackageDetails
-                          ? () => setShowPackageDetails(false)
-                          : () => setShowPackageDetails(true)
-                      }
-                    >
-                      Package {index + 1}
-                    </Box>
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <strong>#</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Weight (kg)</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Type</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>CBM</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>LDM</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Taxable Weight</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Description</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Value (€)</strong>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-                    {!showPackageDetails && (
-                      <>
-                        {pkg?.packageType && (
-                          <>
-                            {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
-                          </>
-                        )}
-                        {pkg?.packageWeight && <> | {pkg?.packageWeight} kg</>}
-                        {pkg?.packageDescription && (
-                          <>
-                            {' | '}
-                            {pkg?.packageDescription.length > 70
-                              ? pkg?.packageDescription.slice(0, 70) + '...'
-                              : pkg?.packageDescription}
-                          </>
-                        )}
-                        {pkg?.packageValue && <> | {pkg?.packageValue} EUR</>}
-                      </>
-                    )}
+              <TableBody>
+                {packagesToShow.map((pkg, index) => {
+                  const globalIndex = page * rowsPerPage + index;
+
+                  return (
+                    <React.Fragment key={globalIndex}>
+                      <Tooltip
+                        title={
+                          <Box sx={{ p: 1 }}>
+                            <Typography variant='body2'>
+                              <strong>Weight:</strong> {pkg?.packageWeight} kg
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Type:</strong>{' '}
+                              {pkg?.packageType?.charAt(0).toUpperCase() +
+                                pkg?.packageType.slice(1)}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Length:</strong> {pkg?.packageLength} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Width:</strong> {pkg?.packageWidth} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Height:</strong> {pkg?.packageHeight} cm
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Description:</strong> {pkg?.packageDescription}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Value:</strong> {pkg?.packageValue} EUR
+                            </Typography>
+                            {showSSCC && (
+                              <Typography variant='body2'>
+                                <strong>SSCC:</strong> {pkg?.sscc}
+                              </Typography>
+                            )}
+                          </Box>
+                        }
+                        arrow
+                        placement='top-start'
+                      >
+                        <TableRow
+                          onClick={() => handleJumpToPackage(globalIndex)}
+                          sx={{
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            <Typography
+                              variant='subtitle1'
+                              sx={{ display: 'flex', alignItems: 'center' }}
+                            >
+                              <Box
+                                component='span'
+                                sx={{
+                                  display: 'inline-block',
+                                  backgroundColor: 'primary.main',
+                                  color: 'white',
+                                  fontWeight: 'bold',
+                                  borderRadius: '18px',
+                                  px: 1.5,
+                                  py: 0.5,
+                                  fontSize: '0.75rem',
+                                  mr: 1.5,
+                                  minWidth: 24,
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {globalIndex + 1}
+                              </Box>
+                            </Typography>
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            {pkg?.packageWeight || '-'}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            {pkg?.packageType?.charAt(0).toUpperCase() +
+                              pkg?.packageType?.slice(1) || '-'}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            {pkg?.CBM || '-'}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            {pkg?.LDM || '-'}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            {pkg?.TaxableWeight || '-'}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            {pkg?.packageDescription || '-'}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: showSSCC ? 'none !important' : undefined,
+                            }}
+                          >
+                            {pkg?.packageValue || '-'}
+                          </TableCell>
+                        </TableRow>
+                      </Tooltip>
+                      {showSSCC && (
+                        <TableRow>
+                          <TableCell colSpan={8}>
+                            <Typography
+                              variant='body2'
+                              sx={{
+                                pl: 5,
+                                color: 'text.secondary',
+                                fontSize: '0.75rem',
+                              }}
+                              style={{ fontStyle: 'italic !important' }} // inline style with !important
+                            >
+                              <strong>SSCC:</strong> {pkg?.sscc}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            <TablePagination
+              component='div'
+              count={shippingFormData.packages.length}
+              page={page}
+              onPageChange={(event, newPage) => setPage(newPage)}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[10]}
+              // hide rowsPerPage selector by providing only one option
+            />
+          </Paper>
+          <Box sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+            <Tooltip
+              title={
+                <Box sx={{ p: 1 }}>
+                  <Typography variant='body2'>
+                    <strong>Weight:</strong> {selectedPackage?.pkgData?.packageWeight} kg
                   </Typography>
-
-                  {shippingFormData.packages.length > 1 && (
-                    <IconButton onClick={() => removePackage(index)} color='error' size='small'>
-                      <DeleteIcon />
-                    </IconButton>
+                  <Typography variant='body2'>
+                    <strong>Type:</strong>{' '}
+                    {selectedPackage?.pkgData?.packageType?.charAt(0).toUpperCase() +
+                      selectedPackage?.pkgData?.packageType.slice(1)}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Length:</strong> {selectedPackage?.pkgData?.packageLength} cm
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Width:</strong> {selectedPackage?.pkgData?.packageWidth} cm
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Height:</strong> {selectedPackage?.pkgData?.packageHeight} cm
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Description:</strong> {selectedPackage?.pkgData?.packageDescription}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Value:</strong> {selectedPackage?.pkgData?.packageValue} EUR
+                  </Typography>
+                  {showSSCC && (
+                    <Typography variant='body2'>
+                      <strong>SSCC:</strong> {selectedPackage?.pkgData?.sscc}
+                    </Typography>
                   )}
                 </Box>
-              </Tooltip>
+              }
+              arrow
+              placement='top-start'
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Typography variant='subtitle1' sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box
+                    component='span'
+                    sx={{
+                      display: 'inline-block',
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      borderRadius: '18px',
+                      px: 1.5,
+                      py: 0.5,
+                      fontSize: '0.75rem',
+                      mr: 1.5, // margin-right between badge and text
+                      minWidth: 24,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    # {selectedPackage?.pkgIndex + 1}
+                  </Box>
+                </Typography>
 
-              {showPackageDetails && (
-                <>
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 6 }}>
-                      <TextField
-                        label='Weight (kg)'
-                        name={`packageWeight_${index}`}
-                        type='number'
-                        value={pkg?.packageWeight}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'packageWeight', e.target.value)
-                        }
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 6 }}>
-                      <TextField
-                        select
-                        label='Package Type'
-                        name={`packageType_${index}`}
-                        value={pkg?.packageType}
-                        onChange={(e) => handlePackageChange(index, 'packageType', e.target.value)}
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        required
-                      >
-                        {packageType.map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 4 }}>
-                      <TextField
-                        label='Length (cm)'
-                        name={`packageLength_${index}`}
-                        type='number'
-                        value={pkg?.packageLength}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'packageLength', e.target.value)
-                        }
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 4 }}>
-                      <TextField
-                        label='Width (cm)'
-                        name={`packageWidth_${index}`}
-                        type='number'
-                        value={pkg?.packageWidth}
-                        onChange={(e) => handlePackageChange(index, 'packageWidth', e.target.value)}
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 4 }}>
-                      <TextField
-                        label='Height (cm)'
-                        name={`packageHeight_${index}`}
-                        type='number'
-                        value={pkg?.packageHeight}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'packageHeight', e.target.value)
-                        }
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        required
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                    </Grid>
-                  </Grid>
-                  <TextField
-                    label='Description'
-                    name={`packageDescription_${index}`}
-                    value={pkg?.packageDescription}
-                    onChange={(e) =>
-                      handlePackageChange(index, 'packageDescription', e.target.value)
-                    }
-                    fullWidth
+                {shippingFormData.packages.length > 1 && (
+                  <IconButton
+                    onClick={() => removePackage(selectedPackage?.pkgIndex)}
+                    color='error'
                     size='small'
-                    margin='dense'
-                    required
-                    multiline
-                    rows={2}
-                  />
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                )}
+              </Box>
+            </Tooltip>
+
+            <>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 6 }}>
                   <TextField
-                    label='Package Value (EUR)'
-                    name={`packageValue_${index}`}
+                    label='Weight (kg)'
+                    name={`packageWeight_${selectedPackage?.pkgIndex}`}
                     type='number'
-                    value={pkg?.packageValue}
-                    onChange={(e) => handlePackageChange(index, 'packageValue', e.target.value)}
+                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageWeight}
+                    onChange={(e) =>
+                      handlePackageChange(
+                        selectedPackage?.pkgIndex,
+                        'packageWeight',
+                        e.target.value,
+                      )
+                    }
                     fullWidth
                     size='small'
                     margin='dense'
                     required
                     slotProps={{ htmlInput: { min: 0 } }}
                   />
-                  {showSSCC && (
-                    <TextField
-                      label='SSCC'
-                      name='sscc'
-                      type='text'
-                      value={pkg?.sscc}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      disabled={true}
-                    />
-                  )}
-                </>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <TextField
+                    select
+                    label='Package Type'
+                    name={`packageType_${selectedPackage?.pkgIndex}`}
+                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageType}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackage?.pkgIndex, 'packageType', e.target.value)
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                  >
+                    {packageType.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    label='Length (cm)'
+                    name={`packageLength_${selectedPackage?.pkgIndex}`}
+                    type='number'
+                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageLength}
+                    onChange={(e) =>
+                      handlePackageChange(
+                        selectedPackage?.pkgIndex,
+                        'packageLength',
+                        e.target.value,
+                      )
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                    slotProps={{ htmlInput: { min: 0 } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    label='Width (cm)'
+                    name={`packageWidth_${selectedPackage?.pkgIndex}`}
+                    type='number'
+                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageWidth}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackage?.pkgIndex, 'packageWidth', e.target.value)
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                    slotProps={{ htmlInput: { min: 0 } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    label='Height (cm)'
+                    name={`packageHeight_${selectedPackage?.pkgIndex}`}
+                    type='number'
+                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageHeight}
+                    onChange={(e) =>
+                      handlePackageChange(
+                        selectedPackage?.pkgIndex,
+                        'packageHeight',
+                        e.target.value,
+                      )
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                    slotProps={{ htmlInput: { min: 0 } }}
+                  />
+                </Grid>
+              </Grid>
+              <TextField
+                label='Description'
+                name={`packageDescription_${selectedPackage?.pkgIndex}`}
+                value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageDescription}
+                onChange={(e) =>
+                  handlePackageChange(
+                    selectedPackage?.pkgIndex,
+                    'packageDescription',
+                    e.target.value,
+                  )
+                }
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+                multiline
+                rows={2}
+              />
+              <TextField
+                label='Package Value (EUR)'
+                name={`packageValue_${selectedPackage?.pkgIndex}`}
+                type='number'
+                value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageValue}
+                onChange={(e) =>
+                  handlePackageChange(selectedPackage?.pkgIndex, 'packageValue', e.target.value)
+                }
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+                slotProps={{ htmlInput: { min: 0 } }}
+              />
+              {showSSCC && (
+                <TextField
+                  label='SSCC'
+                  name='sscc'
+                  type='text'
+                  value={shippingFormData.packages[selectedPackage?.pkgIndex]?.sscc}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  disabled={true}
+                />
               )}
-            </Box>
-          ))}
+            </>
+          </Box>
+
           <Box
             sx={{
               display: 'flex',
@@ -997,19 +1220,6 @@ function ShippingForm({ handleChangeFormType }) {
               mb: 2,
             }}
           >
-            <Button
-              sx={{ marginRight: 1 }}
-              variant='outlined'
-              startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
-              onClick={
-                showPackageDetails
-                  ? () => setShowPackageDetails(false)
-                  : () => setShowPackageDetails(true)
-              }
-              size='small'
-            >
-              {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
-            </Button>
             <Button
               sx={{ marginRight: 1 }}
               variant='outlined'
@@ -1029,12 +1239,12 @@ function ShippingForm({ handleChangeFormType }) {
             <Select
               size='small'
               displayEmpty
-              value={selectedIndex}
+              value={selectedPackage?.pkgIndex}
               onChange={(e) => handleJumpToPackage(e.target.value)}
               sx={{ ml: 2 }}
             >
               <MenuItem value='' disabled>
-                Jump to package
+                Select Package
               </MenuItem>
               {shippingFormData.packages.map((pkg, index) => (
                 <MenuItem key={index} value={index}>

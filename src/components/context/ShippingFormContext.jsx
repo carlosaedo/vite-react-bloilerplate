@@ -63,10 +63,15 @@ export const ShippingFormProvider = ({ children }) => {
               packageValue: '',
               packageType: '',
               sscc: generateMockSSCC(),
+              CBM: '',
+              LDM: '',
+              TaxableWeight: '',
             },
           ],
           shippingService: 'standard',
           trackingRef: generateMockTrackingREF(),
+          shipperRef: '',
+          consigneeRef: '',
         };
   });
 
@@ -105,10 +110,15 @@ export const ShippingFormProvider = ({ children }) => {
           packageValue: '',
           packageType: '',
           sscc: generateMockSSCC(),
+          CBM: '',
+          LDM: '',
+          TaxableWeight: '',
         },
       ],
       shippingService: 'standard',
       trackingRef: generateMockTrackingREF(),
+      shipperRef: '',
+      consigneeRef: '',
     });
     localStorage.removeItem('formData');
   };

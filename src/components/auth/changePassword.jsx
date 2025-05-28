@@ -54,14 +54,23 @@ const ChangePassword = () => {
         setErrorMessage('Algo correu mal.');
       }
     } catch (error) {
-      if (error.response && error.response.status === 404) {
-        setErrorMessage('Este email não está registado');
+      if (
+        error?.response?.status === 403 &&
+        error?.response?.data === 'A password atual está incorreta.'
+      ) {
+        setErrorMessage('A password atual está incorreta.');
       } else if (
         error.response?.status === 400 &&
-        error.response?.data?.error === 'Código inválido ou expirado.'
+        error.response?.data === 'A nova password e a confirmação não coincidem.'
       ) {
-        setErrorMessage('Código inválido ou expirado.');
+        setErrorMessage('A nova password e a confirmação não coincidem.');
+      } else if (
+        error.response?.status === 422 &&
+        error.response?.data === 'A nova password não cumpre os critérios mínimos de segurança.'
+      ) {
+        setErrorMessage('A nova password não cumpre os critérios mínimos de segurança.');
       } else {
+        setErrorMessage('Algo correu mal.');
         console.error(error);
       }
     }
