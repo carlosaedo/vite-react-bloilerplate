@@ -11,6 +11,7 @@ const ResetPassword = () => {
     email: '',
   });
   const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   async function handleRequestResetPassword() {
     try {
@@ -25,20 +26,20 @@ const ResetPassword = () => {
           navigateTo('/login');
         }, 1000);
       } else {
-        setMessage('Erro a pedir o código de verificação.');
+        setErrorMessage('Erro a pedir o código de verificação.');
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        setMessage('Este email não está registado');
+        setErrorMessage('Este email não está registado');
       } else if (
         error.response?.status === 400 &&
         error.response?.data === 'Limite diário de pedidos de reset atingido.'
       ) {
-        setMessage('Limite diário de pedidos de reset atingido.');
+        setErrorMessage('Limite diário de pedidos de reset atingido.');
       } else if (error.response?.status === 500) {
-        setMessage('Erro a pedir o reset da password.');
+        setErrorMessage('Erro a pedir o reset da password.');
       } else {
-        setMessage('Erro a pedir o reset da password.');
+        setErrorMessage('Erro a pedir o reset da password.');
         console.error(error);
       }
     }
@@ -51,6 +52,7 @@ const ResetPassword = () => {
 
   const handleChange = (event) => {
     setMessage(null);
+    setErrorMessage(null);
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
@@ -77,11 +79,13 @@ const ResetPassword = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          {message && (
+          {errorMessage && (
             <Typography color='error' variant='body2'>
-              {message}
+              {errorMessage}
             </Typography>
           )}
+
+          {message && <Typography variant='body2'>{message}</Typography>}
 
           <TextField
             label='Email'

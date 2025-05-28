@@ -59,6 +59,8 @@ function ShippingForm({ handleChangeFormType }) {
   };*/
 
   const handleJumpToPackage = (index) => {
+    setErrorMessage(null);
+    setMessage(null);
     const el = packageRefs.current[index];
     if (el) {
       const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
@@ -72,11 +74,15 @@ function ShippingForm({ handleChangeFormType }) {
   const { shippingFormData, setShippingFormData, resetShippingFormData } = useShippingFormContext();
 
   const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+
   const [showSSCC, setShowSSCC] = useState(false);
 
   const [showPackageDetails, setShowPackageDetails] = useState(true);
 
   const handleChange = (event) => {
+    setMessage(null);
+    setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
       [event.target.name]: event.target.value,
@@ -88,6 +94,8 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const handlePackageChange = (index, field, value) => {
+    setErrorMessage(null);
+    setMessage(null);
     const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
       ...updatedPackages[index],
@@ -125,6 +133,8 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const removePackage = (index) => {
+    setErrorMessage(null);
+    setMessage(null);
     if (shippingFormData.packages.length > 1) {
       const updatedPackages = shippingFormData.packages.filter((_, i) => i !== index);
       const updatedFormData = {
@@ -138,10 +148,53 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const resetForm = () => {
+    setErrorMessage(null);
+    setMessage(null);
     resetShippingFormData();
   };
 
+  const validateFromBeforeSubmit = () => {
+    if (
+      !shippingFormData.senderName &&
+      !shippingFormData.senderEmail &&
+      !shippingFormData.senderPhone &&
+      !shippingFormData.senderStreet &&
+      !shippingFormData.senderCity &&
+      !shippingFormData.senderState &&
+      !shippingFormData.senderZip &&
+      !shippingFormData.senderCountry &&
+      !shippingFormData.recipientName &&
+      !shippingFormData.recipientEmail &&
+      !shippingFormData.recipientPhone &&
+      !shippingFormData.recipientStreet &&
+      !shippingFormData.recipientCity &&
+      !shippingFormData.recipientState &&
+      !shippingFormData.recipientZip &&
+      !shippingFormData.recipientCountry
+    )
+      return false;
+
+    if (!shippingFormData.shippingService) return false; // Ensure shipping service is selected
+    for (const pkg of shippingFormData.packages) {
+      if (
+        !pkg?.packageWeight ||
+        !pkg?.packageLength ||
+        !pkg?.packageWidth ||
+        !pkg?.packageHeight ||
+        !pkg?.packageDescription ||
+        !pkg?.packageValue
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
+    if (!validateFromBeforeSubmit()) {
+      setErrorMessage('Please fill in all required fields.');
+      return;
+    }
     try {
       const response = await api.post(`/shipping-form`, { formData: shippingFormData });
       console.log('Form submitted successfully:', response.data);
@@ -1047,6 +1100,11 @@ function ShippingForm({ handleChangeFormType }) {
 
         {/* Submit */}
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+          {errorMessage && (
+            <Typography color='error' variant='h5' gutterBottom>
+              {errorMessage}
+            </Typography>
+          )}
           {message && (
             <Typography variant='h5' gutterBottom>
               {message}

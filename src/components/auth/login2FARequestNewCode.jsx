@@ -11,6 +11,7 @@ const Login2FARequestNewCode = () => {
     userEmail: userEmail,
   });
   const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   async function handleRequestResetPassword() {
     try {
@@ -22,16 +23,16 @@ const Login2FARequestNewCode = () => {
           navigateTo(`/login-2fa/${userEmail}`);
         }, 1000);
       } else {
-        setMessage('Erro a pedir o código de verificação.');
+        setErrorMessage('Erro a pedir o código de verificação.');
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        setMessage('Este email não está registado');
+        setErrorMessage('Este email não está registado');
       } else if (
         error.response?.status === 401 &&
         error.response?.data === 'Utilizador inválido.'
       ) {
-        setMessage('Utilizador inválido.');
+        setErrorMessage('Utilizador inválido.');
       } else {
         console.error(error);
       }
@@ -63,11 +64,13 @@ const Login2FARequestNewCode = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          {message && (
+          {errorMessage && (
             <Typography color='error' variant='body2'>
-              {message}
+              {errorMessage}
             </Typography>
           )}
+
+          {message && <Typography variant='body2'>{message}</Typography>}
 
           <Button type='submit' variant='contained' color='primary'>
             Request new code

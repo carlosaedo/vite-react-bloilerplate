@@ -29,6 +29,7 @@ const ChangePassword = () => {
     newPassword: '',
     confirmNewPassword: '',
   });
+  const [errorMessage, setErrorMessage] = useState(null);
   const [message, setMessage] = useState(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -44,25 +45,22 @@ const ChangePassword = () => {
         },
       });
       console.log(response);
-      if (
-        response?.status === 200 &&
-        response?.data?.message === 'Password atualizada com sucesso.'
-      ) {
+      if (response?.status === 200 && response?.data === 'Password alterada com sucesso.') {
         setMessage('Password atualizada com sucesso.');
         setTimeout(() => {
           navigateTo('/login');
         }, 1000);
       } else {
-        setMessage('Algo correu mal.');
+        setErrorMessage('Algo correu mal.');
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setMessage('Este email não está registado');
+        setErrorMessage('Este email não está registado');
       } else if (
         error.response?.status === 400 &&
         error.response?.data?.error === 'Código inválido ou expirado.'
       ) {
-        setMessage('Código inválido ou expirado.');
+        setErrorMessage('Código inválido ou expirado.');
       } else {
         console.error(error);
       }
@@ -76,6 +74,7 @@ const ChangePassword = () => {
 
   const handleChange = (event) => {
     setMessage(null);
+    setErrorMessage(null);
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
@@ -113,13 +112,15 @@ const ChangePassword = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          {message && (
+          {errorMessage && (
             <Typography color='error' variant='body2'>
-              {message}
+              {errorMessage}
             </Typography>
           )}
 
-          <FormControl fullWidth margin='normal' variant='outlined'>
+          {message && <Typography variant='body2'>{message}</Typography>}
+
+          <FormControl fullWidth margin='normal' variant='outlined' required>
             <InputLabel>Current Password</InputLabel>
             <OutlinedInput
               type={showCurrentPassword ? 'text' : 'password'}
@@ -141,7 +142,7 @@ const ChangePassword = () => {
             />
           </FormControl>
 
-          <FormControl fullWidth margin='normal' variant='outlined'>
+          <FormControl fullWidth margin='normal' variant='outlined' required>
             <InputLabel>New Password</InputLabel>
             <OutlinedInput
               type={showNewPassword ? 'text' : 'password'}
@@ -163,7 +164,7 @@ const ChangePassword = () => {
             />
           </FormControl>
 
-          <FormControl fullWidth margin='normal' variant='outlined'>
+          <FormControl fullWidth margin='normal' variant='outlined' required>
             <InputLabel>Confirm New Password</InputLabel>
             <OutlinedInput
               type={showConfirmNewPassword ? 'text' : 'password'}

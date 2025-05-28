@@ -61,6 +61,8 @@ function ShippingForm({ handleChangeFormType }) {
     };*/
 
   const handleJumpToPackage = (index) => {
+    setMessage(null);
+    setErrorMessage(null);
     const el = packageRefs.current[index];
     if (el) {
       const y = el.getBoundingClientRect().top + window.pageYOffset - 80;
@@ -79,12 +81,17 @@ function ShippingForm({ handleChangeFormType }) {
   const [showPackageDetails, setShowPackageDetails] = useState(true);
 
   const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleStepChange = (event, newValue) => {
+    setMessage(null);
+    setErrorMessage(null);
     setStep(newValue);
   };
 
   const handleChange = (event) => {
+    setMessage(null);
+    setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
       [event.target.name]: event.target.value,
@@ -96,6 +103,8 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const handlePackageChange = (index, field, value) => {
+    setMessage(null);
+    setErrorMessage(null);
     const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
       ...updatedPackages[index],
@@ -112,6 +121,8 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const addPackage = () => {
+    setMessage(null);
+    setErrorMessage(null);
     const newPackage = {
       packageWeight: '',
       packageLength: '',
@@ -133,6 +144,8 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const removePackage = (index) => {
+    setMessage(null);
+    setErrorMessage(null);
     if (shippingFormData.packages.length > 1) {
       const updatedPackages = shippingFormData.packages.filter((_, i) => i !== index);
       const updatedFormData = {
@@ -146,6 +159,8 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const resetForm = () => {
+    setMessage(null);
+    setErrorMessage(null);
     resetShippingFormData();
   };
 
@@ -219,21 +234,72 @@ function ShippingForm({ handleChangeFormType }) {
     }
   };
 
-  const handleNext = () =>
+  const validateFromBeforeSubmit = () => {
+    if (
+      !shippingFormData.senderName &&
+      !shippingFormData.senderEmail &&
+      !shippingFormData.senderPhone &&
+      !shippingFormData.senderStreet &&
+      !shippingFormData.senderCity &&
+      !shippingFormData.senderState &&
+      !shippingFormData.senderZip &&
+      !shippingFormData.senderCountry &&
+      !shippingFormData.recipientName &&
+      !shippingFormData.recipientEmail &&
+      !shippingFormData.recipientPhone &&
+      !shippingFormData.recipientStreet &&
+      !shippingFormData.recipientCity &&
+      !shippingFormData.recipientState &&
+      !shippingFormData.recipientZip &&
+      !shippingFormData.recipientCountry
+    )
+      return false;
+
+    if (!shippingFormData.shippingService) return false; // Ensure shipping service is selected
+    for (const pkg of shippingFormData.packages) {
+      if (
+        !pkg?.packageWeight ||
+        !pkg?.packageLength ||
+        !pkg?.packageWidth ||
+        !pkg?.packageHeight ||
+        !pkg?.packageDescription ||
+        !pkg?.packageValue
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    setMessage(null);
+    setErrorMessage(null);
     validateStep()
       ? setStep((prev) => Math.min(prev + 1, 3))
-      : alert('Please fill all required fields on this step.');
-  const handleBack = () => setStep((prev) => Math.max(prev - 1, 0));
+      : setErrorMessage('Please fill all the required fields on this step.');
+  };
+
+  const handleBack = () => {
+    setMessage(null);
+    setErrorMessage(null);
+    setStep((prev) => Math.max(prev - 1, 0));
+  };
+
   const handleSubmit = async () => {
+    if (!validateFromBeforeSubmit()) {
+      setErrorMessage('Please fill in all required fields.');
+      return;
+    }
     try {
       const response = await api.post(`/shipping-form`, { formData: shippingFormData });
-      console.log('Form submitted successfully:', response.data);
       if (response?.status === 200) {
+        console.log('Form submitted successfully:', response.data);
         setMessage('Form submitted successfully!');
         resetForm();
         console.log(response);
       }
     } catch (error) {
+      setErrorMessage('Error submitting form');
       console.error('Error :', error);
     }
   };
@@ -1117,6 +1183,11 @@ function ShippingForm({ handleChangeFormType }) {
             Back
           </Button>
         </Grid>
+        {errorMessage && (
+          <Typography color='error' variant='h5' gutterBottom>
+            {errorMessage}
+          </Typography>
+        )}
         {message && (
           <Typography variant='h5' gutterBottom>
             {message}

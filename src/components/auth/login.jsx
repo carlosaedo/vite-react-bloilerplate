@@ -59,8 +59,6 @@ const Login = () => {
     return userInfo;
   });
 
-  console.log(userInfo);
-
   const toggleShowFlork = () => {
     setShowFlork(!showFlork);
   };
@@ -72,7 +70,6 @@ const Login = () => {
   async function handleLogin() {
     try {
       const response = await torrestirApi.post('/Auth/login', formData, {});
-      console.log('response: ', response.data);
       const { token, requires2FA } = response.data;
       if (token === '' && requires2FA) {
         navigateTo(`/login-2fa/${formData?.email?.trim()}`);
@@ -166,7 +163,7 @@ const Login = () => {
                 setShowEditProfile(false);
               }}
             >
-              Cancel
+              Close
             </Button>
           )}
         </div>

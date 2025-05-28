@@ -29,6 +29,7 @@ const CreateAccount = () => {
   });
 
   const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleRequestResetPassword() {
@@ -41,16 +42,16 @@ const CreateAccount = () => {
           navigateTo('/validate-created-account');
         }, 1000);
       } else {
-        setMessage('Algo correu mal.');
+        setErrorMessage('Algo correu mal.');
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setMessage('Este email não está registado');
+        setErrorMessage('Este email não está registado');
       } else if (
         error.response?.status === 400 &&
         error.response?.data?.error === 'Esse email já se encontra registado.'
       ) {
-        setMessage('Esse email já se encontra registado.');
+        setErrorMessage('Esse email já se encontra registado.');
       } else {
         console.error(error);
       }
@@ -64,6 +65,7 @@ const CreateAccount = () => {
 
   const handleChange = (event) => {
     setMessage(null);
+    setErrorMessage(null);
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
@@ -94,11 +96,13 @@ const CreateAccount = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          {message && (
+          {errorMessage && (
             <Typography color='error' variant='body2'>
-              {message}
+              {errorMessage}
             </Typography>
           )}
+
+          {message && <Typography variant='body2'>{message}</Typography>}
 
           <TextField
             label='Display Name'

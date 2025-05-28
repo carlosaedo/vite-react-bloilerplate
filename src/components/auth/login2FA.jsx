@@ -10,36 +10,36 @@ const Login2FA = () => {
   const navigateTo = useNavigate();
   const { userEmail } = useParams();
   const { login } = useAuth();
-  console.log('params: ', userEmail);
 
   const [formData, setFormData] = useState({
     userEmail: userEmail,
     code: '',
   });
   const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   async function handleRequestResetPassword() {
     try {
       const response = await torrestirApi.post('/Auth/verify-2fa', formData);
-      console.log(response.data);
       if (response?.data?.token) {
         login(response?.data?.token);
-        //setTimeout(() => {
-        navigateTo('/');
-        //}, 1000);
+        setTimeout(() => {
+          setMessage('Código 2FA aceite. A redirecionar...');
+          navigateTo('/');
+        }, 1000);
       } else {
-        setMessage('Erro a pedir o código de verificação.');
+        setErrorMessage('Erro a pedir o código de verificação.');
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        setMessage('Código inválido ou expirado.');
+        setErrorMessage('Código inválido ou expirado.');
       } else if (error.response?.status === 400) {
-        setMessage('Código inválido ou expirado.');
+        setErrorMessage('Código inválido ou expirado.');
       } else if (
         error.response?.status === 401 &&
         error.response?.data === 'Código inválido ou expirado.'
       ) {
-        setMessage('Código inválido ou expirado.');
+        setErrorMessage('Código inválido ou expirado.');
       } else {
         console.error(error);
       }
@@ -53,6 +53,7 @@ const Login2FA = () => {
 
   const handleChange = (event) => {
     setMessage(null);
+    setErrorMessage(null);
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
@@ -79,11 +80,13 @@ const Login2FA = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          {message && (
+          {errorMessage && (
             <Typography color='error' variant='body2'>
-              {message}
+              {errorMessage}
             </Typography>
           )}
+
+          {message && <Typography variant='body2'>{message}</Typography>}
 
           <TextField
             label='2FA Code'

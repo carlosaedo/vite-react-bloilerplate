@@ -22,6 +22,7 @@ const EditProfile = () => {
     email: '',
   });
   const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   async function handleRequestResetPassword() {
     try {
@@ -36,16 +37,16 @@ const EditProfile = () => {
           navigateTo('/login');
         }, 1000);
       } else {
-        setMessage('Algo correu mal.');
+        setErrorMessage('Algo correu mal.');
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setMessage('Este email não está registado');
+        setErrorMessage('Este email não está registado');
       } else if (
         error.response?.status === 400 &&
         error.response?.data?.error === 'Código inválido ou expirado.'
       ) {
-        setMessage('Código inválido ou expirado.');
+        setErrorMessage('Código inválido ou expirado.');
       } else {
         console.error(error);
       }
@@ -59,6 +60,7 @@ const EditProfile = () => {
 
   const handleChange = (event) => {
     setMessage(null);
+    setErrorMessage(null);
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
@@ -84,11 +86,13 @@ const EditProfile = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          {message && (
+          {errorMessage && (
             <Typography color='error' variant='body2'>
-              {message}
+              {errorMessage}
             </Typography>
           )}
+
+          {message && <Typography variant='body2'>{message}</Typography>}
 
           <TextField
             label='Email'
