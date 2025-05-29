@@ -16,6 +16,8 @@ import {
   Tooltip,
   IconButton,
   Select,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { RiPagesLine } from 'react-icons/ri';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -139,13 +141,17 @@ function ShippingForm({ handleChangeFormType }) {
       packageLength: '',
       packageWidth: '',
       packageHeight: '',
-      packageDescription: '',
-      packageValue: '',
+      packageNote: '',
+      valueOfGoods: '',
       packageType: '',
       sscc: generateMockSSCC(), // Generate a new SSCC for the new package
       CBM: '',
       LDM: '',
       TaxableWeight: '',
+      stackable: false,
+      dangerousGoods: false,
+      customs: false,
+      marksAndNumbers: '',
     };
 
     const updatedFormData = {
@@ -236,8 +242,8 @@ function ShippingForm({ handleChangeFormType }) {
             !pkg?.packageLength ||
             !pkg?.packageWidth ||
             !pkg?.packageHeight ||
-            !pkg?.packageDescription ||
-            !pkg?.packageValue
+            !pkg?.packageNote ||
+            !pkg?.valueOfGoods
           ) {
             return false;
           }
@@ -276,8 +282,8 @@ function ShippingForm({ handleChangeFormType }) {
         !pkg?.packageLength ||
         !pkg?.packageWidth ||
         !pkg?.packageHeight ||
-        !pkg?.packageDescription ||
-        !pkg?.packageValue
+        !pkg?.packageNote ||
+        !pkg?.valueOfGoods
       ) {
         return false;
       }
@@ -378,7 +384,7 @@ function ShippingForm({ handleChangeFormType }) {
       </Box>
       {/* Guia*/}
       <Box sx={{ mb: 4 }}>
-        <Typography variant='h6'>Waybill Information</Typography>
+        <Typography variant='h6'>Booking Information</Typography>
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 6, sm: 3 }}>
@@ -390,33 +396,6 @@ function ShippingForm({ handleChangeFormType }) {
               fullWidth
               size='small'
               margin='dense'
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <TextField
-              label='Waybill Number'
-              name='waybillNumber'
-              type='text'
-              value={shippingFormData.waybillNumber}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <TextField
-              label='Hour'
-              name='hour'
-              type='time'
-              value={shippingFormData.hour || ''} // default to HH:MM
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
               required
             />
           </Grid>
@@ -436,19 +415,6 @@ function ShippingForm({ handleChangeFormType }) {
           </Grid>
           <Grid size={{ xs: 6, sm: 3 }}>
             <TextField
-              label='Ext. Number'
-              name='extNumber'
-              type='text'
-              value={shippingFormData.extNumber}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <TextField
               label='Delivery Date'
               name='deliveryDate'
               type='date'
@@ -462,6 +428,76 @@ function ShippingForm({ handleChangeFormType }) {
             />
           </Grid>
           <Grid size={{ xs: 6, sm: 3 }}>
+            <TextField
+              label='Hour'
+              name='hour'
+              type='time'
+              value={shippingFormData.hour || ''} // default to HH:MM
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
+              required
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              label='Shipper Reference'
+              name='shipperRef'
+              type='text'
+              value={shippingFormData.shipperRef}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              label='Consignee Reference'
+              name='consigneeRef'
+              type='text'
+              value={shippingFormData.consigneeRef}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+          </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              label='Waybill Reference'
+              name='trackingRef'
+              type='text'
+              value={shippingFormData.trackingRef}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              label='Ext. Number'
+              name='extNumber'
+              type='text'
+              value={shippingFormData.extNumber}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <TextField
               label='Ext. Number 2'
               name='extNumber2'
@@ -749,10 +785,10 @@ function ShippingForm({ handleChangeFormType }) {
                               <strong>Height:</strong> {pkg?.packageHeight} cm
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Description:</strong> {pkg?.packageDescription}
+                              <strong>Note:</strong> {pkg?.packageNote}
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Value:</strong> {pkg?.packageValue} EUR
+                              <strong>Value:</strong> {pkg?.valueOfGoods} EUR
                             </Typography>
                             <Typography variant='body2'>
                               <strong>CBM:</strong> {pkg?.CBM}
@@ -806,10 +842,10 @@ function ShippingForm({ handleChangeFormType }) {
                           <strong>Height:</strong> {pkg?.packageHeight} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Description:</strong> {pkg?.packageDescription}
+                          <strong>Note:</strong> {pkg?.packageNote}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Value:</strong> {pkg?.packageValue} EUR
+                          <strong>Value:</strong> {pkg?.valueOfGoods} EUR
                         </Typography>
                         <Typography variant='body2'>
                           <strong>CBM:</strong> {pkg?.CBM}
@@ -900,13 +936,13 @@ function ShippingForm({ handleChangeFormType }) {
                                 <strong>Taxable:</strong> {pkg?.TaxableWeight || '-'}
                               </Typography>
                               <Typography variant='body2' className='smallText'>
-                                <strong>Description:</strong>{' '}
-                                {pkg?.packageDescription?.length > 70
-                                  ? pkg.packageDescription.slice(0, 70) + '...'
-                                  : pkg?.packageDescription || '-'}
+                                <strong>Note:</strong>{' '}
+                                {pkg?.packageNote?.length > 70
+                                  ? pkg.packageNote.slice(0, 70) + '...'
+                                  : pkg?.packageNote || '-'}
                               </Typography>
                               <Typography variant='body2' className='smallText'>
-                                <strong>Value:</strong> {pkg?.packageValue || '-'} €
+                                <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                               </Typography>
                             </Box>
                           </>
@@ -922,6 +958,28 @@ function ShippingForm({ handleChangeFormType }) {
                   </Tooltip>
                   {showPackageDetails && (
                     <Grid container spacing={2}>
+                      {/* Top-right CBM section */}
+                      <Grid
+                        size={{ xs: 12 }}
+                        sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}
+                      >
+                        <Grid>
+                          <Typography variant='body2' component='h6'>
+                            <strong>CBM:</strong> {pkg?.CBM || '-'}
+                          </Typography>
+                        </Grid>
+                        <Grid>
+                          <Typography variant='body2' component='h6'>
+                            <strong>LDM:</strong> {pkg?.LDM || '-'}
+                          </Typography>
+                        </Grid>
+                        <Grid>
+                          <Typography variant='body2' component='h6'>
+                            <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+
                       <Grid size={{ xs: 6 }}>
                         <TextField
                           label='Package Weight (kg)'
@@ -932,6 +990,7 @@ function ShippingForm({ handleChangeFormType }) {
                             handlePackageChange(index, 'packageWeight', e.target.value)
                           }
                           fullWidth
+                          size='small'
                           required
                           slotProps={{ htmlInput: { min: 0 } }}
                         />
@@ -946,6 +1005,7 @@ function ShippingForm({ handleChangeFormType }) {
                             handlePackageChange(index, 'packageType', e.target.value)
                           }
                           fullWidth
+                          size='small'
                           required
                         >
                           {packageType.map((option) => (
@@ -966,6 +1026,7 @@ function ShippingForm({ handleChangeFormType }) {
                           }
                           fullWidth
                           required
+                          size='small'
                           slotProps={{ htmlInput: { min: 0 } }}
                         />
                       </Grid>
@@ -980,6 +1041,7 @@ function ShippingForm({ handleChangeFormType }) {
                           }
                           fullWidth
                           required
+                          size='small'
                           slotProps={{ htmlInput: { min: 0 } }}
                         />
                       </Grid>
@@ -994,37 +1056,94 @@ function ShippingForm({ handleChangeFormType }) {
                           }
                           fullWidth
                           required
+                          size='small'
                           slotProps={{ htmlInput: { min: 0 } }}
                         />
                       </Grid>
                       <Grid size={{ xs: 12 }}>
                         <TextField
-                          label='Package Description'
-                          name={`packageDescription_${index}`}
-                          value={pkg?.packageDescription}
+                          label='Note'
+                          name={`packageNote_${index}`}
+                          value={pkg?.packageNote}
                           onChange={(e) =>
-                            handlePackageChange(index, 'packageDescription', e.target.value)
+                            handlePackageChange(index, 'packageNote', e.target.value)
                           }
                           fullWidth
                           required
                           multiline
+                          size='small'
                           rows={3}
                         />
                       </Grid>
-                      <Grid size={{ xs: 12 }}>
+                      <TextField
+                        label='Marks and Numbers'
+                        name={`marksAndNumbers_${index}`}
+                        type='text'
+                        value={shippingFormData.packages[index]?.marksAndNumbers}
+                        onChange={(e) =>
+                          handlePackageChange(index, 'marksAndNumbers', e.target.value)
+                        }
+                        fullWidth
+                        size='small'
+                        required
+                      />
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1, mb: 1 }}>
                         <TextField
                           label='Package Value (EUR)'
                           name={`packageValue_${index}`}
                           type='number'
-                          value={pkg?.packageValue}
+                          value={pkg?.valueOfGoods}
                           onChange={(e) =>
-                            handlePackageChange(index, 'packageValue', e.target.value)
+                            handlePackageChange(index, 'valueOfGoods', e.target.value)
                           }
-                          fullWidth
+                          size='small'
                           required
+                          sx={{ minWidth: 180 }}
                           slotProps={{ htmlInput: { min: 0 } }}
                         />
-                      </Grid>
+
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pkg?.stackable || false}
+                              onChange={(e) =>
+                                handlePackageChange(index, 'stackable', e.target.checked)
+                              }
+                              name={`stackable_${index}`}
+                              color='primary'
+                            />
+                          }
+                          label='Stackable'
+                        />
+
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pkg?.dangerousGoods || false}
+                              onChange={(e) =>
+                                handlePackageChange(index, 'dangerousGoods', e.target.checked)
+                              }
+                              name={`dangerousGoods_${index}`}
+                              color='primary'
+                            />
+                          }
+                          label='Dangerous Goods'
+                        />
+
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={pkg?.customs || false}
+                              onChange={(e) =>
+                                handlePackageChange(index, 'customs', e.target.checked)
+                              }
+                              name={`customs_${index}`}
+                              color='primary'
+                            />
+                          }
+                          label='Customs'
+                        />
+                      </Box>
 
                       {showSSCC && (
                         <Grid size={{ xs: 12 }}>
@@ -1120,10 +1239,10 @@ function ShippingForm({ handleChangeFormType }) {
                               <strong>Height:</strong> {pkg?.packageHeight} cm
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Description:</strong> {pkg?.packageDescription}
+                              <strong>Note:</strong> {pkg?.packageNote}
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Value:</strong> {pkg?.packageValue} EUR
+                              <strong>Value:</strong> {pkg?.valueOfGoods} EUR
                             </Typography>
                             <Typography variant='body2'>
                               <strong>CBM:</strong> {pkg?.CBM}
@@ -1158,6 +1277,7 @@ function ShippingForm({ handleChangeFormType }) {
                   value={shippingFormData.shippingService}
                   onChange={handleChange}
                   fullWidth
+                  size='small'
                   required
                 >
                   {shippingServices.map((option) => (
