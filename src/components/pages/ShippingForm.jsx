@@ -18,6 +18,7 @@ import {
   Select,
   FormControlLabel,
   Checkbox,
+  Alert,
 } from '@mui/material';
 import { RiPagesLine } from 'react-icons/ri';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -75,11 +76,23 @@ function ShippingForm({ handleChangeFormType }) {
     setSelectedIndex('');
   };
 
-  const { shippingFormData, setShippingFormData, resetShippingFormData } = useShippingFormContext();
+  const {
+    shippingFormData,
+    setShippingFormData,
+    resetShippingFormData,
+    trackingNumberShippingForm,
+    retryFetchTrackingNumber,
+  } = useShippingFormContext();
 
   const [step, setStep] = useState(0);
 
   const [showSSCC, setShowSSCC] = useState(false);
+
+  const [showCBM, setShowCBM] = useState(true);
+  const [hideLDM, setShowLDM] = useState(true);
+  const [activeCBM, setActiveCBM] = useState(false);
+  const [activeLDM, setActiveLDM] = useState(false);
+  const [showDimensions, setShowDimensions] = useState(true);
 
   const [showPackageDetails, setShowPackageDetails] = useState(true);
 
@@ -99,29 +112,34 @@ function ShippingForm({ handleChangeFormType }) {
       ...shippingFormData,
       [event.target.name]: event.target.value,
     });
-    localStorage.setItem(
-      'shippingFormData',
-      JSON.stringify({ ...shippingFormData, [event.target.name]: event.target.value }),
-    );
   };
 
   const handlePackageChange = (index, field, value) => {
     setMessage(null);
     setErrorMessage(null);
 
-    const newCalculationsForPackage = calculateShippingFormSizeValues(
-      shippingFormData?.packages[index]?.packageWeight,
-      shippingFormData?.packages[index]?.packageLength,
-      shippingFormData?.packages[index]?.packageWidth,
-      shippingFormData?.packages[index]?.packageHeight,
-      5000,
-    );
+    let newCalculationsForPackage = null;
+
+    if (
+      shippingFormData?.packages[index]?.packageWeight &&
+      shippingFormData?.packages[index]?.packageLength &&
+      shippingFormData?.packages[index]?.packageWidth &&
+      shippingFormData?.packages[index]?.packageHeight
+    ) {
+      newCalculationsForPackage = calculateShippingFormSizeValues(
+        shippingFormData?.packages[index]?.packageWeight,
+        shippingFormData?.packages[index]?.packageLength,
+        shippingFormData?.packages[index]?.packageWidth,
+        shippingFormData?.packages[index]?.packageHeight,
+        333,
+      );
+    }
 
     const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
       ...updatedPackages[index],
       [field]: value,
-      ...newCalculationsForPackage,
+      ...(newCalculationsForPackage || {}),
     };
 
     const updatedFormData = {
@@ -130,13 +148,33 @@ function ShippingForm({ handleChangeFormType }) {
     };
 
     setShippingFormData(updatedFormData);
-    localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
+  };
+
+  const handlePackageClearDimensions = (index) => {
+    setErrorMessage(null);
+    setMessage(null);
+
+    const updatedPackages = [...shippingFormData.packages];
+    updatedPackages[index] = {
+      ...updatedPackages[index],
+      ['packageHeight']: '',
+      ['packageLength']: '',
+      ['packageWidth']: '',
+    };
+
+    const updatedFormData = {
+      ...shippingFormData,
+      packages: updatedPackages,
+    };
+
+    setShippingFormData(updatedFormData);
   };
 
   const addPackage = () => {
     setMessage(null);
     setErrorMessage(null);
     const newPackage = {
+      packageQuantity: '',
       packageWeight: '',
       packageLength: '',
       packageWidth: '',
@@ -152,6 +190,7 @@ function ShippingForm({ handleChangeFormType }) {
       dangerousGoods: false,
       customs: false,
       marksAndNumbers: '',
+      typeOfGoods: '',
     };
 
     const updatedFormData = {
@@ -160,7 +199,6 @@ function ShippingForm({ handleChangeFormType }) {
     };
 
     setShippingFormData(updatedFormData);
-    localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
   };
 
   const removePackage = (index) => {
@@ -174,7 +212,6 @@ function ShippingForm({ handleChangeFormType }) {
       };
 
       setShippingFormData(updatedFormData);
-      localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
     }
   };
 
@@ -203,7 +240,6 @@ function ShippingForm({ handleChangeFormType }) {
     };
 
     setShippingFormData(updatedData);
-    localStorage.setItem('shippingFormData', JSON.stringify(updatedData));
   }, []);
 
   const handleChangeFormTypeToParent = () => {
@@ -325,1066 +361,1084 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   return (
-    <Paper sx={{ p: 3, maxWidth: 900, margin: 'auto', mt: 5 }}>
-      <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
-        <Typography
-          variant='h5'
-          gutterBottom
-          sx={{ fontWeight: 700, color: '#003e2d', display: 'flex', alignItems: 'center' }}
+    <>
+      {(shippingFormData.trackingRef === null || trackingNumberShippingForm === null) && (
+        <Alert
+          severity='error'
+          action={
+            <Button color='inherit' size='small' onClick={retryFetchTrackingNumber}>
+              Retry Now
+            </Button>
+          }
         >
-          Shipping Form
-          {shippingFormData.trackingRef ? (
-            <Box
-              component='span'
-              sx={{
-                ml: 2,
-                px: 1.5,
-                py: 0.3,
-                bgcolor: '#ffc928',
-                color: '#003e2d',
-                borderRadius: 1,
-                fontWeight: 600,
-                fontSize: '0.875rem',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                userSelect: 'none',
-              }}
-            >
-              Tracking: {shippingFormData.trackingRef}
-            </Box>
-          ) : (
-            <Typography
-              component='span'
-              variant='subtitle1'
-              sx={{
-                ml: 2,
-                fontStyle: 'italic',
-                color: 'text.secondary',
-                fontWeight: 400,
-              }}
-            >
-              New Waybill
-            </Typography>
-          )}
-        </Typography>
-
-        <Tooltip title='Single page form' placement='top' arrow>
-          <Button
-            onClick={handleChangeFormTypeToParent}
-            variant='contained'
-            color='primary'
-            sx={{
-              marginLeft: 'auto',
-              fontSize: '25px',
-              fontWeight: '900',
-            }}
+          Cannot get tracking number from the server. Retrying automatically every 10 seconds...
+        </Alert>
+      )}
+      <Paper sx={{ p: 3, maxWidth: 900, margin: 'auto', mt: 5 }}>
+        <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
+          <Typography
+            variant='h5'
+            gutterBottom
+            sx={{ fontWeight: 700, color: '#003e2d', display: 'flex', alignItems: 'center' }}
           >
-            <RiPagesLine />
-          </Button>
-        </Tooltip>
-      </Box>
-      {/* Guia*/}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant='h6'>Booking Information</Typography>
+            Shipping Form
+            {shippingFormData.trackingRef ? (
+              <Box
+                component='span'
+                sx={{
+                  ml: 2,
+                  px: 1.5,
+                  py: 0.3,
+                  bgcolor: '#ffc928',
+                  color: '#003e2d',
+                  borderRadius: 1,
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                  userSelect: 'none',
+                }}
+              >
+                Tracking: {shippingFormData.trackingRef}
+              </Box>
+            ) : (
+              <Typography
+                component='span'
+                variant='subtitle1'
+                sx={{
+                  ml: 2,
+                  fontStyle: 'italic',
+                  color: 'text.secondary',
+                  fontWeight: 400,
+                }}
+              >
+                New Waybill
+              </Typography>
+            )}
+          </Typography>
 
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <TextField
-              label='Year'
-              name='year'
-              value={shippingFormData.year}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <TextField
-              label='Date'
-              name='date'
-              type='date'
-              value={shippingFormData.date}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <TextField
-              label='Delivery Date'
-              name='deliveryDate'
-              type='date'
-              value={shippingFormData.deliveryDate}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-              slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label overlapping issue
-            />
-          </Grid>
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <TextField
-              label='Hour'
-              name='hour'
-              type='time'
-              value={shippingFormData.hour || ''} // default to HH:MM
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
-              required
-            />
-          </Grid>
-        </Grid>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label='Shipper Reference'
-              name='shipperRef'
-              type='text'
-              value={shippingFormData.shipperRef}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label='Consignee Reference'
-              name='consigneeRef'
-              type='text'
-              value={shippingFormData.consigneeRef}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-        </Grid>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              label='Waybill Reference'
-              name='trackingRef'
-              type='text'
-              value={shippingFormData.trackingRef}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              label='Ext. Number'
-              name='extNumber'
-              type='text'
-              value={shippingFormData.extNumber}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              label='Ext. Number 2'
-              name='extNumber2'
-              type='text'
-              value={shippingFormData.extNumber2}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-        </Grid>
-      </Box>
-      <Tabs value={step} onChange={handleStepChange} variant='fullWidth'>
-        {['Sender Info', 'Recipient Info', 'Package Details', 'Review & Submit'].map(
-          (label, index) => (
-            <Tab
-              key={index}
-              label={label}
+          <Tooltip title='Single page form' placement='top' arrow>
+            <Button
+              onClick={handleChangeFormTypeToParent}
+              variant='contained'
+              color='primary'
               sx={{
-                color: '#003D2C',
-                '&.Mui-selected': { color: '#003D2C' },
-                '&.Mui-selected:hover': { color: 'white' },
-                '&:hover': { color: step ? 'white' : 'white' },
+                marginLeft: 'auto',
+                fontSize: '25px',
+                fontWeight: '900',
               }}
-            />
-          ),
-        )}
-      </Tabs>
+            >
+              <RiPagesLine />
+            </Button>
+          </Tooltip>
+        </Box>
+        {/* Guia*/}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant='h6'>Booking Information</Typography>
 
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        {step === 0 && (
-          <>
-            <Grid size={{ xs: 12 }}>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 6, sm: 3 }}>
               <TextField
-                label='Sender Name'
-                name='senderName'
-                value={shippingFormData.senderName}
+                label='Year'
+                name='year'
+                value={shippingFormData.year}
                 onChange={handleChange}
                 fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <TextField
+                label='Date'
+                name='date'
+                type='date'
+                value={shippingFormData.date}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
+                required
+              />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <TextField
+                label='Delivery Date'
+                name='deliveryDate'
+                type='date'
+                value={shippingFormData.deliveryDate}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+                slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label overlapping issue
+              />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3 }}>
+              <TextField
+                label='Hour'
+                name='hour'
+                type='time'
+                value={shippingFormData.hour || ''} // default to HH:MM
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label
+                required
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label='Shipper Reference'
+                name='shipperRef'
+                type='text'
+                value={shippingFormData.shipperRef}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
                 required
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
-                label='Sender Email'
-                name='senderEmail'
-                type='email'
-                value={shippingFormData.senderEmail}
+                label='Consignee Reference'
+                name='consigneeRef'
+                type='text'
+                value={shippingFormData.consigneeRef}
                 onChange={handleChange}
                 fullWidth
+                size='small'
+                margin='dense'
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
-                label='Sender Phone'
-                name='senderPhone'
-                type='tel'
-                value={shippingFormData.senderPhone}
+                label='Waybill Reference'
+                name='trackingRef'
+                type='text'
+                value={shippingFormData.trackingRef}
                 onChange={handleChange}
                 fullWidth
+                size='small'
+                margin='dense'
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
-                label='Street Address'
-                name='senderStreet'
-                value={shippingFormData.senderStreet}
+                label='Ext. Number'
+                name='extNumber'
+                type='text'
+                value={shippingFormData.extNumber}
                 onChange={handleChange}
                 fullWidth
+                size='small'
+                margin='dense'
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
-                label='City'
-                name='senderCity'
-                value={shippingFormData.senderCity}
+                label='Ext. Number 2'
+                name='extNumber2'
+                type='text'
+                value={shippingFormData.extNumber2}
                 onChange={handleChange}
                 fullWidth
+                size='small'
+                margin='dense'
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField
-                label='State/Province'
-                name='senderState'
-                value={shippingFormData.senderState}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField
-                label='ZIP/Postal Code'
-                name='senderZip'
-                value={shippingFormData.senderZip}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField
-                label='Country'
-                name='senderCountry'
-                value={shippingFormData.senderCountry}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-          </>
-        )}
-
-        {step === 1 && (
-          <>
-            <Grid size={{ xs: 12 }}>
-              <TextField
-                label='Recipient Name'
-                name='recipientName'
-                value={shippingFormData.recipientName}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label='Recipient Email'
-                name='recipientEmail'
-                type='email'
-                value={shippingFormData.recipientEmail}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label='Recipient Phone'
-                name='recipientPhone'
-                type='tel'
-                value={shippingFormData.recipientPhone}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12 }}>
-              <TextField
-                label='Street Address'
-                name='recipientStreet'
-                value={shippingFormData.recipientStreet}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField
-                label='City'
-                name='recipientCity'
-                value={shippingFormData.recipientCity}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField
-                label='State/Province'
-                name='recipientState'
-                value={shippingFormData.recipientState}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField
-                label='ZIP/Postal Code'
-                name='recipientZip'
-                value={shippingFormData.recipientZip}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField
-                label='Country'
-                name='recipientCountry'
-                value={shippingFormData.recipientCountry}
-                onChange={handleChange}
-                fullWidth
-                required
-              />
-            </Grid>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            {/* Package Info - Multiple Packages */}
-            <Box sx={{ mb: 4, width: '100%' }}>
-              <Box
+          </Grid>
+        </Box>
+        <Tabs value={step} onChange={handleStepChange} variant='fullWidth'>
+          {['Sender Info', 'Recipient Info', 'Package Details', 'Review & Submit'].map(
+            (label, index) => (
+              <Tab
+                key={index}
+                label={label}
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'right',
-                  mb: 2,
+                  color: '#003D2C',
+                  '&.Mui-selected': { color: '#003D2C' },
+                  '&.Mui-selected:hover': { color: 'white' },
+                  '&:hover': { color: step ? 'white' : 'white' },
                 }}
-              >
-                <Button
-                  sx={{ marginRight: 1 }}
-                  variant='outlined'
-                  startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
-                  onClick={
-                    showPackageDetails
-                      ? () => setShowPackageDetails(false)
-                      : () => setShowPackageDetails(true)
-                  }
-                  size='small'
-                >
-                  {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
-                </Button>
+              />
+            ),
+          )}
+        </Tabs>
 
-                <Button
-                  sx={{ marginRight: 1 }}
-                  variant='outlined'
-                  startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
-                  onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
-                  size='small'
-                >
-                  {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
-                </Button>
-
-                <Button
-                  variant='outlined'
-                  startIcon={<AddIcon />}
-                  onClick={addPackage}
-                  size='small'
-                >
-                  Add Package
-                </Button>
-                <Typography sx={{ ml: 2 }}>
-                  {shippingFormData.packages.length}{' '}
-                  {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
-                </Typography>
-                <Select
-                  size='small'
-                  displayEmpty
-                  value={selectedIndex}
-                  onChange={(e) => handleJumpToPackage(e.target.value)}
-                  sx={{ ml: 2 }}
-                >
-                  <MenuItem value='' disabled>
-                    Jump to package
-                  </MenuItem>
-                  {shippingFormData.packages.map((pkg, index) => (
-                    <MenuItem key={index} value={index}>
-                      <Tooltip
-                        title={
-                          <Box sx={{ p: 1 }}>
-                            <Typography variant='body2'>
-                              <strong>Weight:</strong> {pkg?.packageWeight} kg
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Type:</strong>{' '}
-                              {pkg?.packageType?.charAt(0).toUpperCase() +
-                                pkg?.packageType.slice(1)}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Length:</strong> {pkg?.packageLength} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Width:</strong> {pkg?.packageWidth} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Height:</strong> {pkg?.packageHeight} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Note:</strong> {pkg?.packageNote}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Value:</strong> {pkg?.valueOfGoods} EUR
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>CBM:</strong> {pkg?.CBM}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>LDM:</strong> {pkg?.LDM}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
-                            </Typography>
-                            {showSSCC && (
-                              <Typography variant='body2'>
-                                <strong>SSCC:</strong> {pkg?.sscc}
-                              </Typography>
-                            )}
-                          </Box>
-                        }
-                        arrow
-                        placement='top-start'
-                      >
-                        <span>Package {index + 1}</span>
-                      </Tooltip>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box>
-
-              {shippingFormData.packages.map((pkg, index) => (
-                <Box
-                  key={index}
-                  ref={(el) => (packageRefs.current[index] = el)}
-                  sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
-                >
-                  <Tooltip
-                    title={
-                      <Box sx={{ p: 1 }}>
-                        <Typography variant='body2'>
-                          <strong>Weight:</strong> {pkg?.packageWeight} kg
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Type:</strong>{' '}
-                          {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Length:</strong> {pkg?.packageLength} cm
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Width:</strong> {pkg?.packageWidth} cm
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Height:</strong> {pkg?.packageHeight} cm
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Note:</strong> {pkg?.packageNote}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Value:</strong> {pkg?.valueOfGoods} EUR
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>CBM:</strong> {pkg?.CBM}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>LDM:</strong> {pkg?.LDM}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
-                        </Typography>
-                        {showSSCC && (
-                          <Typography variant='body2'>
-                            <strong>SSCC:</strong> {pkg?.sscc}
-                          </Typography>
-                        )}
-                      </Box>
-                    }
-                    arrow
-                    placement='top-start'
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <Typography
-                        variant='subtitle1'
-                        sx={{ display: 'flex', alignItems: 'center' }}
-                      >
-                        <Box
-                          component='span'
-                          sx={{
-                            display: 'inline-block',
-                            backgroundColor: 'primary.main',
-                            color: 'white',
-                            fontWeight: 'bold',
-                            borderRadius: '18px',
-                            px: 1.5,
-                            py: 0.5,
-                            fontSize: '0.75rem',
-                            mr: 1.5, // margin-right between badge and text
-                            minWidth: 24,
-                            textAlign: 'center',
-                            mb: 1.5, // margin-bottom to align with text
-                            cursor: 'pointer',
-                          }}
-                          onClick={
-                            showPackageDetails
-                              ? () => setShowPackageDetails(false)
-                              : () => setShowPackageDetails(true)
-                          }
-                        >
-                          # {index + 1}
-                        </Box>
-                        {!showPackageDetails && (
-                          <>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                flexWrap: 'wrap',
-                                gap: 2,
-                                px: 1,
-                                py: 1,
-                                '& .smallText': {
-                                  fontSize: '0.85rem', // Smaller font size
-                                },
-                              }}
-                            >
-                              <Typography variant='body2' className='smallText'>
-                                <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
-                              </Typography>
-                              <Typography variant='body2' className='smallText'>
-                                <strong>Type:</strong>{' '}
-                                {pkg?.packageType
-                                  ? pkg.packageType.charAt(0).toUpperCase() +
-                                    pkg.packageType.slice(1)
-                                  : '-'}
-                              </Typography>
-                              <Typography variant='body2' className='smallText'>
-                                <strong>CBM:</strong> {pkg?.CBM || '-'}
-                              </Typography>
-                              <Typography variant='body2' className='smallText'>
-                                <strong>LDM:</strong> {pkg?.LDM || '-'}
-                              </Typography>
-                              <Typography variant='body2' className='smallText'>
-                                <strong>Taxable:</strong> {pkg?.TaxableWeight || '-'}
-                              </Typography>
-                              <Typography variant='body2' className='smallText'>
-                                <strong>Note:</strong>{' '}
-                                {pkg?.packageNote?.length > 70
-                                  ? pkg.packageNote.slice(0, 70) + '...'
-                                  : pkg?.packageNote || '-'}
-                              </Typography>
-                              <Typography variant='body2' className='smallText'>
-                                <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
-                              </Typography>
-                            </Box>
-                          </>
-                        )}
-                      </Typography>
-
-                      {shippingFormData.packages.length > 1 && (
-                        <IconButton onClick={() => removePackage(index)} color='error' size='small'>
-                          <DeleteIcon />
-                        </IconButton>
-                      )}
-                    </Box>
-                  </Tooltip>
-                  {showPackageDetails && (
-                    <Grid container spacing={2}>
-                      {/* Top-right CBM section */}
-                      <Grid
-                        size={{ xs: 12 }}
-                        sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}
-                      >
-                        <Grid>
-                          <Typography variant='body2' component='h6'>
-                            <strong>CBM:</strong> {pkg?.CBM || '-'}
-                          </Typography>
-                        </Grid>
-                        <Grid>
-                          <Typography variant='body2' component='h6'>
-                            <strong>LDM:</strong> {pkg?.LDM || '-'}
-                          </Typography>
-                        </Grid>
-                        <Grid>
-                          <Typography variant='body2' component='h6'>
-                            <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-
-                      <Grid size={{ xs: 6 }}>
-                        <TextField
-                          label='Package Weight (kg)'
-                          name={`packageWeight_${index}`}
-                          type='number'
-                          value={pkg?.packageWeight}
-                          onChange={(e) =>
-                            handlePackageChange(index, 'packageWeight', e.target.value)
-                          }
-                          fullWidth
-                          size='small'
-                          required
-                          slotProps={{ htmlInput: { min: 0 } }}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 6 }}>
-                        <TextField
-                          select
-                          label='Package Type'
-                          name={'packageType'}
-                          value={pkg?.packageType}
-                          onChange={(e) =>
-                            handlePackageChange(index, 'packageType', e.target.value)
-                          }
-                          fullWidth
-                          size='small'
-                          required
-                        >
-                          {packageType.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                              {option.label}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField
-                          label='Length (cm)'
-                          name={`packageLength_${index}`}
-                          type='number'
-                          value={pkg?.packageLength}
-                          onChange={(e) =>
-                            handlePackageChange(index, 'packageLength', e.target.value)
-                          }
-                          fullWidth
-                          required
-                          size='small'
-                          slotProps={{ htmlInput: { min: 0 } }}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField
-                          label='Width (cm)'
-                          name={`packageWidth_${index}`}
-                          type='number'
-                          value={pkg?.packageWidth}
-                          onChange={(e) =>
-                            handlePackageChange(index, 'packageWidth', e.target.value)
-                          }
-                          fullWidth
-                          required
-                          size='small'
-                          slotProps={{ htmlInput: { min: 0 } }}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField
-                          label='Height (cm)'
-                          name={`packageHeight_${index}`}
-                          type='number'
-                          value={pkg?.packageHeight}
-                          onChange={(e) =>
-                            handlePackageChange(index, 'packageHeight', e.target.value)
-                          }
-                          fullWidth
-                          required
-                          size='small'
-                          slotProps={{ htmlInput: { min: 0 } }}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12 }}>
-                        <TextField
-                          label='Note'
-                          name={`packageNote_${index}`}
-                          value={pkg?.packageNote}
-                          onChange={(e) =>
-                            handlePackageChange(index, 'packageNote', e.target.value)
-                          }
-                          fullWidth
-                          required
-                          multiline
-                          size='small'
-                          rows={3}
-                        />
-                      </Grid>
-                      <TextField
-                        label='Marks and Numbers'
-                        name={`marksAndNumbers_${index}`}
-                        type='text'
-                        value={shippingFormData.packages[index]?.marksAndNumbers}
-                        onChange={(e) =>
-                          handlePackageChange(index, 'marksAndNumbers', e.target.value)
-                        }
-                        fullWidth
-                        size='small'
-                        required
-                      />
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1, mb: 1 }}>
-                        <TextField
-                          label='Package Value (EUR)'
-                          name={`packageValue_${index}`}
-                          type='number'
-                          value={pkg?.valueOfGoods}
-                          onChange={(e) =>
-                            handlePackageChange(index, 'valueOfGoods', e.target.value)
-                          }
-                          size='small'
-                          required
-                          sx={{ minWidth: 180 }}
-                          slotProps={{ htmlInput: { min: 0 } }}
-                        />
-
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={pkg?.stackable || false}
-                              onChange={(e) =>
-                                handlePackageChange(index, 'stackable', e.target.checked)
-                              }
-                              name={`stackable_${index}`}
-                              color='primary'
-                            />
-                          }
-                          label='Stackable'
-                        />
-
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={pkg?.dangerousGoods || false}
-                              onChange={(e) =>
-                                handlePackageChange(index, 'dangerousGoods', e.target.checked)
-                              }
-                              name={`dangerousGoods_${index}`}
-                              color='primary'
-                            />
-                          }
-                          label='Dangerous Goods'
-                        />
-
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={pkg?.customs || false}
-                              onChange={(e) =>
-                                handlePackageChange(index, 'customs', e.target.checked)
-                              }
-                              name={`customs_${index}`}
-                              color='primary'
-                            />
-                          }
-                          label='Customs'
-                        />
-                      </Box>
-
-                      {showSSCC && (
-                        <Grid size={{ xs: 12 }}>
-                          <TextField
-                            label='SSCC'
-                            name='sscc'
-                            type='text'
-                            value={pkg?.sscc}
-                            fullWidth
-                            size='small'
-                            margin='dense'
-                            disabled={true}
-                          />
-                        </Grid>
-                      )}
-                    </Grid>
-                  )}
-                </Box>
-              ))}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'right',
-                  mb: 2,
-                }}
-              >
-                <Button
-                  sx={{ marginRight: 1 }}
-                  variant='outlined'
-                  startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
-                  onClick={
-                    showPackageDetails
-                      ? () => setShowPackageDetails(false)
-                      : () => setShowPackageDetails(true)
-                  }
-                  size='small'
-                >
-                  {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
-                </Button>
-                <Button
-                  sx={{ marginRight: 1 }}
-                  variant='outlined'
-                  startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
-                  onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
-                  size='small'
-                >
-                  {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
-                </Button>
-
-                <Button
-                  variant='outlined'
-                  startIcon={<AddIcon />}
-                  onClick={addPackage}
-                  size='small'
-                >
-                  Add Package
-                </Button>
-                <Typography sx={{ ml: 2 }}>
-                  {shippingFormData.packages.length}{' '}
-                  {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
-                </Typography>
-                <Select
-                  size='small'
-                  displayEmpty
-                  value={selectedIndex}
-                  onChange={(e) => handleJumpToPackage(e.target.value)}
-                  sx={{ ml: 2 }}
-                >
-                  <MenuItem value='' disabled>
-                    Jump to package
-                  </MenuItem>
-                  {shippingFormData.packages.map((pkg, index) => (
-                    <MenuItem key={index} value={index}>
-                      <Tooltip
-                        title={
-                          <Box sx={{ p: 1 }}>
-                            <Typography variant='body2'>
-                              <strong>Weight:</strong> {pkg?.packageWeight} kg
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Type:</strong>{' '}
-                              {pkg?.packageType?.charAt(0).toUpperCase() +
-                                pkg?.packageType.slice(1)}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Length:</strong> {pkg?.packageLength} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Width:</strong> {pkg?.packageWidth} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Height:</strong> {pkg?.packageHeight} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Note:</strong> {pkg?.packageNote}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Value:</strong> {pkg?.valueOfGoods} EUR
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>CBM:</strong> {pkg?.CBM}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>LDM:</strong> {pkg?.LDM}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
-                            </Typography>
-                            {showSSCC && (
-                              <Typography variant='body2'>
-                                <strong>SSCC:</strong> {pkg?.sscc}
-                              </Typography>
-                            )}
-                          </Box>
-                        }
-                        arrow
-                        placement='top-start'
-                      >
-                        <span>Package {index + 1}</span>
-                      </Tooltip>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          {step === 0 && (
+            <>
               <Grid size={{ xs: 12 }}>
                 <TextField
-                  select
-                  label='Shipping Service'
-                  name={'shippingService'}
-                  value={shippingFormData.shippingService}
+                  label='Sender Name'
+                  name='senderName'
+                  value={shippingFormData.senderName}
                   onChange={handleChange}
                   fullWidth
-                  size='small'
                   required
-                >
-                  {shippingServices.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                />
               </Grid>
-            </Box>
-          </>
-        )}
-
-        {step === 3 && <ShippingFormReviewDetails formData={shippingFormData} />}
-      </Grid>
-
-      {/* Additional Info */}
-      <Box sx={{ mb: 4, marginTop: 3 }}>
-        <Typography variant='h6'>Payment Information</Typography>
-
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 4 }}>
-            <TextField
-              select
-              label='Shipping Payment'
-              name='shippingPayment'
-              value={shippingFormData.shippingPayment}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            >
-              {shippingPayment.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid size={{ xs: 4 }}>
-            <TextField
-              select
-              label='Payment'
-              name='shippingPaymentTo'
-              value={shippingFormData.shippingPaymentTo}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            >
-              {shippingPaymentTo.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid size={{ xs: 4 }}>
-            <TextField
-              label='NIF Destinatário'
-              name='recipientTaxId'
-              type='text'
-              value={shippingFormData.recipientTaxId}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-          </Grid>
-        </Grid>
-      </Box>
-
-      <Grid container spacing={2} justifyContent='space-between' sx={{ mt: 3 }}>
-        <Grid>
-          <Button disabled={step === 0} onClick={handleBack} variant='outlined' color='primary'>
-            Back
-          </Button>
-        </Grid>
-        {errorMessage && (
-          <Typography color='error' variant='h5' gutterBottom>
-            {errorMessage}
-          </Typography>
-        )}
-        {message && (
-          <Typography variant='h5' gutterBottom>
-            {message}
-          </Typography>
-        )}
-        <Grid>
-          {step < 3 ? (
-            <Button onClick={handleNext} variant='contained' color='primary'>
-              Next
-            </Button>
-          ) : (
-            <Button onClick={handleSubmit} variant='contained' color='success'>
-              Submit
-            </Button>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Sender Email'
+                  name='senderEmail'
+                  type='email'
+                  value={shippingFormData.senderEmail}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Sender Phone'
+                  name='senderPhone'
+                  type='tel'
+                  value={shippingFormData.senderPhone}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label='Street Address'
+                  name='senderStreet'
+                  value={shippingFormData.senderStreet}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='City'
+                  name='senderCity'
+                  value={shippingFormData.senderCity}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='State/Province'
+                  name='senderState'
+                  value={shippingFormData.senderState}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='ZIP/Postal Code'
+                  name='senderZip'
+                  value={shippingFormData.senderZip}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='Country'
+                  name='senderCountry'
+                  value={shippingFormData.senderCountry}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+            </>
           )}
+
+          {step === 1 && (
+            <>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label='Recipient Name'
+                  name='recipientName'
+                  value={shippingFormData.recipientName}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Recipient Email'
+                  name='recipientEmail'
+                  type='email'
+                  value={shippingFormData.recipientEmail}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Recipient Phone'
+                  name='recipientPhone'
+                  type='tel'
+                  value={shippingFormData.recipientPhone}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label='Street Address'
+                  name='recipientStreet'
+                  value={shippingFormData.recipientStreet}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='City'
+                  name='recipientCity'
+                  value={shippingFormData.recipientCity}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='State/Province'
+                  name='recipientState'
+                  value={shippingFormData.recipientState}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='ZIP/Postal Code'
+                  name='recipientZip'
+                  value={shippingFormData.recipientZip}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <TextField
+                  label='Country'
+                  name='recipientCountry'
+                  value={shippingFormData.recipientCountry}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              {/* Package Info - Multiple Packages */}
+              <Box sx={{ mb: 4, width: '100%' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'right',
+                    mb: 2,
+                  }}
+                >
+                  <Button
+                    sx={{ marginRight: 1 }}
+                    variant='outlined'
+                    startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
+                    onClick={
+                      showPackageDetails
+                        ? () => setShowPackageDetails(false)
+                        : () => setShowPackageDetails(true)
+                    }
+                    size='small'
+                  >
+                    {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
+                  </Button>
+
+                  <Button
+                    sx={{ marginRight: 1 }}
+                    variant='outlined'
+                    startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
+                    onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
+                    size='small'
+                  >
+                    {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
+                  </Button>
+
+                  <Button
+                    variant='outlined'
+                    startIcon={<AddIcon />}
+                    onClick={addPackage}
+                    size='small'
+                  >
+                    Add Package
+                  </Button>
+                  <Typography sx={{ ml: 2 }}>
+                    {shippingFormData.packages.length}{' '}
+                    {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
+                  </Typography>
+                  <Select
+                    size='small'
+                    displayEmpty
+                    value={selectedIndex}
+                    onChange={(e) => handleJumpToPackage(e.target.value)}
+                    sx={{ ml: 2 }}
+                  >
+                    <MenuItem value='' disabled>
+                      Jump to package
+                    </MenuItem>
+                    {shippingFormData.packages.map((pkg, index) => (
+                      <MenuItem key={index} value={index}>
+                        <Tooltip
+                          title={
+                            <Box sx={{ p: 1 }}>
+                              <Typography variant='body2'>
+                                <strong>Weight:</strong> {pkg?.packageWeight} kg
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Type:</strong>{' '}
+                                {pkg?.packageType?.charAt(0).toUpperCase() +
+                                  pkg?.packageType.slice(1)}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Length:</strong> {pkg?.packageLength} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Width:</strong> {pkg?.packageWidth} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Height:</strong> {pkg?.packageHeight} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Note:</strong> {pkg?.packageNote}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Value:</strong> {pkg?.valueOfGoods} EUR
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>CBM:</strong> {pkg?.CBM}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>LDM:</strong> {pkg?.LDM}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                              </Typography>
+                              {showSSCC && (
+                                <Typography variant='body2'>
+                                  <strong>SSCC:</strong> {pkg?.sscc}
+                                </Typography>
+                              )}
+                            </Box>
+                          }
+                          arrow
+                          placement='top-start'
+                        >
+                          <span>Package {index + 1}</span>
+                        </Tooltip>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+
+                {shippingFormData.packages.map((pkg, index) => (
+                  <Box
+                    key={index}
+                    ref={(el) => (packageRefs.current[index] = el)}
+                    sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
+                  >
+                    <Tooltip
+                      title={
+                        <Box sx={{ p: 1 }}>
+                          <Typography variant='body2'>
+                            <strong>Weight:</strong> {pkg?.packageWeight} kg
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Type:</strong>{' '}
+                            {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Length:</strong> {pkg?.packageLength} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Width:</strong> {pkg?.packageWidth} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Height:</strong> {pkg?.packageHeight} cm
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Note:</strong> {pkg?.packageNote}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Value:</strong> {pkg?.valueOfGoods} EUR
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>CBM:</strong> {pkg?.CBM}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>LDM:</strong> {pkg?.LDM}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                          </Typography>
+                          {showSSCC && (
+                            <Typography variant='body2'>
+                              <strong>SSCC:</strong> {pkg?.sscc}
+                            </Typography>
+                          )}
+                        </Box>
+                      }
+                      arrow
+                      placement='top-start'
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Typography
+                          variant='subtitle1'
+                          sx={{ display: 'flex', alignItems: 'center' }}
+                        >
+                          <Box
+                            component='span'
+                            sx={{
+                              display: 'inline-block',
+                              backgroundColor: 'primary.main',
+                              color: 'white',
+                              fontWeight: 'bold',
+                              borderRadius: '18px',
+                              px: 1.5,
+                              py: 0.5,
+                              fontSize: '0.75rem',
+                              mr: 1.5, // margin-right between badge and text
+                              minWidth: 24,
+                              textAlign: 'center',
+                              mb: 1.5, // margin-bottom to align with text
+                              cursor: 'pointer',
+                            }}
+                            onClick={
+                              showPackageDetails
+                                ? () => setShowPackageDetails(false)
+                                : () => setShowPackageDetails(true)
+                            }
+                          >
+                            # {index + 1}
+                          </Box>
+                          {!showPackageDetails && (
+                            <>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 2,
+                                  px: 1,
+                                  py: 1,
+                                  '& .smallText': {
+                                    fontSize: '0.85rem', // Smaller font size
+                                  },
+                                }}
+                              >
+                                <Typography variant='body2' className='smallText'>
+                                  <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
+                                </Typography>
+                                <Typography variant='body2' className='smallText'>
+                                  <strong>Type:</strong>{' '}
+                                  {pkg?.packageType
+                                    ? pkg.packageType.charAt(0).toUpperCase() +
+                                      pkg.packageType.slice(1)
+                                    : '-'}
+                                </Typography>
+                                <Typography variant='body2' className='smallText'>
+                                  <strong>CBM:</strong> {pkg?.CBM || '-'}
+                                </Typography>
+                                <Typography variant='body2' className='smallText'>
+                                  <strong>LDM:</strong> {pkg?.LDM || '-'}
+                                </Typography>
+                                <Typography variant='body2' className='smallText'>
+                                  <strong>Taxable:</strong> {pkg?.TaxableWeight || '-'}
+                                </Typography>
+                                <Typography variant='body2' className='smallText'>
+                                  <strong>Note:</strong>{' '}
+                                  {pkg?.packageNote?.length > 70
+                                    ? pkg.packageNote.slice(0, 70) + '...'
+                                    : pkg?.packageNote || '-'}
+                                </Typography>
+                                <Typography variant='body2' className='smallText'>
+                                  <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
+                                </Typography>
+                              </Box>
+                            </>
+                          )}
+                        </Typography>
+
+                        {shippingFormData.packages.length > 1 && (
+                          <IconButton
+                            onClick={() => removePackage(index)}
+                            color='error'
+                            size='small'
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Tooltip>
+                    {showPackageDetails && (
+                      <Grid container spacing={2}>
+                        {/* Top-right CBM section */}
+                        <Grid
+                          size={{ xs: 12 }}
+                          sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}
+                        >
+                          <Grid>
+                            <Typography variant='body2' component='h6'>
+                              <strong>CBM:</strong> {pkg?.CBM || '-'}
+                            </Typography>
+                          </Grid>
+                          <Grid>
+                            <Typography variant='body2' component='h6'>
+                              <strong>LDM:</strong> {pkg?.LDM || '-'}
+                            </Typography>
+                          </Grid>
+                          <Grid>
+                            <Typography variant='body2' component='h6'>
+                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+
+                        <Grid size={{ xs: 6 }}>
+                          <TextField
+                            label='Package Weight (kg)'
+                            name={`packageWeight_${index}`}
+                            type='number'
+                            value={pkg?.packageWeight}
+                            onChange={(e) =>
+                              handlePackageChange(index, 'packageWeight', e.target.value)
+                            }
+                            fullWidth
+                            size='small'
+                            required
+                            slotProps={{ htmlInput: { min: 0 } }}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 6 }}>
+                          <TextField
+                            select
+                            label='Package Type'
+                            name={'packageType'}
+                            value={pkg?.packageType}
+                            onChange={(e) =>
+                              handlePackageChange(index, 'packageType', e.target.value)
+                            }
+                            fullWidth
+                            size='small'
+                            required
+                          >
+                            {packageType.map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <TextField
+                            label='Length (cm)'
+                            name={`packageLength_${index}`}
+                            type='number'
+                            value={pkg?.packageLength}
+                            onChange={(e) =>
+                              handlePackageChange(index, 'packageLength', e.target.value)
+                            }
+                            fullWidth
+                            required
+                            size='small'
+                            slotProps={{ htmlInput: { min: 0 } }}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <TextField
+                            label='Width (cm)'
+                            name={`packageWidth_${index}`}
+                            type='number'
+                            value={pkg?.packageWidth}
+                            onChange={(e) =>
+                              handlePackageChange(index, 'packageWidth', e.target.value)
+                            }
+                            fullWidth
+                            required
+                            size='small'
+                            slotProps={{ htmlInput: { min: 0 } }}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <TextField
+                            label='Height (cm)'
+                            name={`packageHeight_${index}`}
+                            type='number'
+                            value={pkg?.packageHeight}
+                            onChange={(e) =>
+                              handlePackageChange(index, 'packageHeight', e.target.value)
+                            }
+                            fullWidth
+                            required
+                            size='small'
+                            slotProps={{ htmlInput: { min: 0 } }}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12 }}>
+                          <TextField
+                            label='Note'
+                            name={`packageNote_${index}`}
+                            value={pkg?.packageNote}
+                            onChange={(e) =>
+                              handlePackageChange(index, 'packageNote', e.target.value)
+                            }
+                            fullWidth
+                            required
+                            multiline
+                            size='small'
+                            rows={3}
+                          />
+                        </Grid>
+                        <TextField
+                          label='Marks and Numbers'
+                          name={`marksAndNumbers_${index}`}
+                          type='text'
+                          value={shippingFormData.packages[index]?.marksAndNumbers}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'marksAndNumbers', e.target.value)
+                          }
+                          fullWidth
+                          size='small'
+                          required
+                        />
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1, mb: 1 }}>
+                          <TextField
+                            label='Package Value (EUR)'
+                            name={`packageValue_${index}`}
+                            type='number'
+                            value={pkg?.valueOfGoods}
+                            onChange={(e) =>
+                              handlePackageChange(index, 'valueOfGoods', e.target.value)
+                            }
+                            size='small'
+                            required
+                            sx={{ minWidth: 180 }}
+                            slotProps={{ htmlInput: { min: 0 } }}
+                          />
+
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={pkg?.stackable || false}
+                                onChange={(e) =>
+                                  handlePackageChange(index, 'stackable', e.target.checked)
+                                }
+                                name={`stackable_${index}`}
+                                color='primary'
+                              />
+                            }
+                            label='Stackable'
+                          />
+
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={pkg?.dangerousGoods || false}
+                                onChange={(e) =>
+                                  handlePackageChange(index, 'dangerousGoods', e.target.checked)
+                                }
+                                name={`dangerousGoods_${index}`}
+                                color='primary'
+                              />
+                            }
+                            label='Dangerous Goods'
+                          />
+
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={pkg?.customs || false}
+                                onChange={(e) =>
+                                  handlePackageChange(index, 'customs', e.target.checked)
+                                }
+                                name={`customs_${index}`}
+                                color='primary'
+                              />
+                            }
+                            label='Customs'
+                          />
+                        </Box>
+
+                        {showSSCC && (
+                          <Grid size={{ xs: 12 }}>
+                            <TextField
+                              label='SSCC'
+                              name='sscc'
+                              type='text'
+                              value={pkg?.sscc}
+                              fullWidth
+                              size='small'
+                              margin='dense'
+                              disabled={true}
+                            />
+                          </Grid>
+                        )}
+                      </Grid>
+                    )}
+                  </Box>
+                ))}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'right',
+                    mb: 2,
+                  }}
+                >
+                  <Button
+                    sx={{ marginRight: 1 }}
+                    variant='outlined'
+                    startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
+                    onClick={
+                      showPackageDetails
+                        ? () => setShowPackageDetails(false)
+                        : () => setShowPackageDetails(true)
+                    }
+                    size='small'
+                  >
+                    {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
+                  </Button>
+                  <Button
+                    sx={{ marginRight: 1 }}
+                    variant='outlined'
+                    startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
+                    onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
+                    size='small'
+                  >
+                    {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
+                  </Button>
+
+                  <Button
+                    variant='outlined'
+                    startIcon={<AddIcon />}
+                    onClick={addPackage}
+                    size='small'
+                  >
+                    Add Package
+                  </Button>
+                  <Typography sx={{ ml: 2 }}>
+                    {shippingFormData.packages.length}{' '}
+                    {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
+                  </Typography>
+                  <Select
+                    size='small'
+                    displayEmpty
+                    value={selectedIndex}
+                    onChange={(e) => handleJumpToPackage(e.target.value)}
+                    sx={{ ml: 2 }}
+                  >
+                    <MenuItem value='' disabled>
+                      Jump to package
+                    </MenuItem>
+                    {shippingFormData.packages.map((pkg, index) => (
+                      <MenuItem key={index} value={index}>
+                        <Tooltip
+                          title={
+                            <Box sx={{ p: 1 }}>
+                              <Typography variant='body2'>
+                                <strong>Weight:</strong> {pkg?.packageWeight} kg
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Type:</strong>{' '}
+                                {pkg?.packageType?.charAt(0).toUpperCase() +
+                                  pkg?.packageType.slice(1)}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Length:</strong> {pkg?.packageLength} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Width:</strong> {pkg?.packageWidth} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Height:</strong> {pkg?.packageHeight} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Note:</strong> {pkg?.packageNote}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Value:</strong> {pkg?.valueOfGoods} EUR
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>CBM:</strong> {pkg?.CBM}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>LDM:</strong> {pkg?.LDM}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                              </Typography>
+                              {showSSCC && (
+                                <Typography variant='body2'>
+                                  <strong>SSCC:</strong> {pkg?.sscc}
+                                </Typography>
+                              )}
+                            </Box>
+                          }
+                          arrow
+                          placement='top-start'
+                        >
+                          <span>Package {index + 1}</span>
+                        </Tooltip>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    select
+                    label='Shipping Service'
+                    name={'shippingService'}
+                    value={shippingFormData.shippingService}
+                    onChange={handleChange}
+                    fullWidth
+                    size='small'
+                    required
+                  >
+                    {shippingServices.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Box>
+            </>
+          )}
+
+          {step === 3 && <ShippingFormReviewDetails formData={shippingFormData} />}
         </Grid>
-      </Grid>
-      <Button onClick={resetForm} variant='outlined' color='primary'>
-        Reset Form
-      </Button>
-    </Paper>
+
+        {/* Additional Info */}
+        <Box sx={{ mb: 4, marginTop: 3 }}>
+          <Typography variant='h6'>Payment Information</Typography>
+
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 4 }}>
+              <TextField
+                select
+                label='Shipping Payment'
+                name='shippingPayment'
+                value={shippingFormData.shippingPayment}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              >
+                {shippingPayment.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 4 }}>
+              <TextField
+                select
+                label='Payment'
+                name='shippingPaymentTo'
+                value={shippingFormData.shippingPaymentTo}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              >
+                {shippingPaymentTo.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 4 }}>
+              <TextField
+                label='NIF Destinatário'
+                name='recipientTaxId'
+                type='text'
+                value={shippingFormData.recipientTaxId}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Grid container spacing={2} justifyContent='space-between' sx={{ mt: 3 }}>
+          <Grid>
+            <Button disabled={step === 0} onClick={handleBack} variant='outlined' color='primary'>
+              Back
+            </Button>
+          </Grid>
+          {errorMessage && (
+            <Typography color='error' variant='h5' gutterBottom>
+              {errorMessage}
+            </Typography>
+          )}
+          {message && (
+            <Typography variant='h5' gutterBottom>
+              {message}
+            </Typography>
+          )}
+          <Grid>
+            {step < 3 ? (
+              <Button onClick={handleNext} variant='contained' color='primary'>
+                Next
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} variant='contained' color='success'>
+                Submit
+              </Button>
+            )}
+          </Grid>
+        </Grid>
+        <Button onClick={resetForm} variant='outlined' color='primary'>
+          Reset Form
+        </Button>
+      </Paper>
+    </>
   );
 }
 

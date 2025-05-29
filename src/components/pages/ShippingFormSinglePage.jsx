@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
-
+import * as stringUtils from '../../utils/stringOperations.js';
 import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
 
 import {
@@ -25,7 +25,6 @@ import {
   TablePagination,
   FormControlLabel,
   Checkbox,
-  CircularProgress,
   Alert,
 } from '@mui/material';
 
@@ -69,7 +68,6 @@ function ShippingForm({ handleChangeFormType }) {
     shippingFormData,
     setShippingFormData,
     resetShippingFormData,
-    loadingShippingForm,
     trackingNumberShippingForm,
     retryFetchTrackingNumber,
   } = useShippingFormContext();
@@ -473,6 +471,7 @@ function ShippingForm({ handleChangeFormType }) {
                 size='small'
                 margin='dense'
                 required
+                disabled
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
@@ -815,35 +814,57 @@ function ShippingForm({ handleChangeFormType }) {
                     title={
                       <Box sx={{ p: 1 }}>
                         <Typography variant='body2'>
-                          <strong>Weight:</strong> {pkg?.packageWeight} kg
+                          <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
                         </Typography>
                         <Typography variant='body2'>
                           <strong>Type:</strong>{' '}
-                          {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
+                          {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Length:</strong> {pkg?.packageLength} cm
+                          <strong>Length:</strong> {pkg?.packageLength || '-'} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Width:</strong> {pkg?.packageWidth} cm
+                          <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Height:</strong> {pkg?.packageHeight} cm
+                          <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Note:</strong> {pkg?.packageNote}
+                          <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Value:</strong> {pkg?.valueOfGoods} €
+                          <strong>Type of Goods:</strong>{' '}
+                          {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>CBM:</strong> {pkg?.CBM}
+                          <strong>Note:</strong> {pkg?.packageNote || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>LDM:</strong> {pkg?.LDM}
+                          <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                          <strong>CBM:</strong> {pkg?.CBM || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>LDM:</strong> {pkg?.LDM || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Dangerous Goods:</strong> {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                         </Typography>
                         {showSSCC && (
                           <Typography variant='body2'>
@@ -907,37 +928,57 @@ function ShippingForm({ handleChangeFormType }) {
                         title={
                           <Box sx={{ p: 1 }}>
                             <Typography variant='body2'>
-                              <strong>Weight:</strong> {pkg?.packageWeight} kg
+                              <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
                             </Typography>
                             <Typography variant='body2'>
                               <strong>Type:</strong>{' '}
-                              {pkg?.packageType?.charAt(0).toUpperCase() +
-                                pkg?.packageType.slice(1)}
+                              {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Length:</strong> {pkg?.packageLength} cm
+                              <strong>Length:</strong> {pkg?.packageLength || '-'} cm
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Width:</strong> {pkg?.packageWidth} cm
+                              <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Height:</strong> {pkg?.packageHeight} cm
+                              <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Note:</strong> {pkg?.packageNote}
+                              <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Value:</strong>{' '}
-                              {pkg?.insured ? pkg?.valueOfGoods + '€' : 'NOT INSURED'}
+                              <strong>Type of Goods:</strong>{' '}
+                              {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>CBM:</strong> {pkg?.CBM}
+                              <strong>Note:</strong> {pkg?.packageNote || '-'}
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>LDM:</strong> {pkg?.LDM}
+                              <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                             </Typography>
                             <Typography variant='body2'>
-                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                              <strong>CBM:</strong> {pkg?.CBM || '-'}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>LDM:</strong> {pkg?.LDM || '-'}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Dangerous Goods:</strong> {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                            </Typography>
+                            <Typography variant='body2'>
+                              <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                             </Typography>
                             {showSSCC && (
                               <Typography variant='body2'>
@@ -1073,47 +1114,78 @@ function ShippingForm({ handleChangeFormType }) {
               title={
                 <Box sx={{ p: 1 }}>
                   <Typography variant='body2'>
+                    <strong>Quantity:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageQuantity || '-'}
+                  </Typography>
+                  <Typography variant='body2'>
                     <strong>Weight:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.packageWeight} kg
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageWeight || '-'} kg
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Type:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.packageType
-                      ?.charAt(0)
-                      .toUpperCase() +
-                      shippingFormData?.packages[selectedPackageIndex]?.packageType.slice(1)}
+                    {stringUtils.capitalizeFirst(
+                      shippingFormData?.packages[selectedPackageIndex]?.packageType,
+                    ) || '-'}
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Length:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.packageLength} cm
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageLength || '-'} cm
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Width:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.packageWidth} cm
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageWidth || '-'} cm
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Height:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.packageHeight} cm
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageHeight || '-'} cm
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Marks and Numbers:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.marksAndNumbers || '-'}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Type of Goods:</strong>{' '}
+                    {stringUtils.toSpacedTitleCase(
+                      shippingFormData?.packages[selectedPackageIndex]?.typeOfGoods,
+                    ) || '-'}
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Note:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.packageNote}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageNote || '-'}
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Value:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.insured
-                      ? shippingFormData?.packages[selectedPackageIndex]?.valueOfGoods + '€'
-                      : 'NOT INSURED'}
+                    {shippingFormData?.packages[selectedPackageIndex]?.valueOfGoods || '-'} €
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>CBM:</strong> {shippingFormData?.packages[selectedPackageIndex]?.CBM}
+                    <strong>CBM:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.CBM || '-'}
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>LDM:</strong> {shippingFormData?.packages[selectedPackageIndex]?.LDM}
+                    <strong>LDM:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.LDM || '-'}
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Taxable Weight:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.TaxableWeight}
+                    {shippingFormData?.packages[selectedPackageIndex]?.TaxableWeight || '-'}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Insured:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.insured ? 'Yes' : 'No'}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Stackable:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.stackable ? 'Yes' : 'No'}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Dangerous Goods:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.dangerousGoods
+                      ? 'Yes'
+                      : 'No'}
+                  </Typography>
+                  <Typography variant='body2'>
+                    <strong>Customs:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.customs ? 'Yes' : 'No'}
                   </Typography>
                   {showSSCC && (
                     <Typography variant='body2'>
@@ -1404,9 +1476,11 @@ function ShippingForm({ handleChangeFormType }) {
                   <TextField
                     select
                     label='Type of Goods'
-                    name={'typeOfGoods'}
-                    value={shippingFormData.typeOfGoods || ''}
-                    onChange={handleChange}
+                    name={`typeOfGoods_${selectedPackageIndex}`}
+                    value={shippingFormData.packages[selectedPackageIndex]?.typeOfGoods || ''}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackageIndex, 'typeOfGoods', e.target.value)
+                    }
                     fullWidth
                     size='small'
                     margin='dense'
@@ -1578,36 +1652,57 @@ function ShippingForm({ handleChangeFormType }) {
                     title={
                       <Box sx={{ p: 1 }}>
                         <Typography variant='body2'>
-                          <strong>Weight:</strong> {pkg?.packageWeight} kg
+                          <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
                         </Typography>
                         <Typography variant='body2'>
                           <strong>Type:</strong>{' '}
-                          {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
+                          {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Length:</strong> {pkg?.packageLength} cm
+                          <strong>Length:</strong> {pkg?.packageLength || '-'} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Width:</strong> {pkg?.packageWidth} cm
+                          <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Height:</strong> {pkg?.packageHeight} cm
+                          <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Note:</strong> {pkg?.packageNote}
+                          <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Value:</strong>{' '}
-                          {pkg?.insured ? pkg?.valueOfGoods + '€' : 'NOT INSURED'}
+                          <strong>Type of Goods:</strong>{' '}
+                          {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>CBM:</strong> {pkg?.CBM}
+                          <strong>Note:</strong> {pkg?.packageNote || '-'}
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>LDM:</strong> {pkg?.LDM}
+                          <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                         </Typography>
                         <Typography variant='body2'>
-                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                          <strong>CBM:</strong> {pkg?.CBM || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>LDM:</strong> {pkg?.LDM || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Dangerous Goods:</strong> {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                         </Typography>
                         {showSSCC && (
                           <Typography variant='body2'>
