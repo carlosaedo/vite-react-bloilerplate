@@ -12,6 +12,13 @@ function toSpacedTitleCase(str) {
     .join(' ');
 }
 
+function toSpacedCapitalized(str) {
+  if (!str) return '';
+  return str
+    .replace(/([A-Z])/g, ' $1') // Add space before each uppercase letter
+    .replace(/^./, (char) => char.toUpperCase()); // Capitalize the first character
+}
+
 function toCamelCase(str) {
   if (!str) return '';
   const words = str.split(/[_-\s]+/);
@@ -46,4 +53,12 @@ function toSnakeCase(str) {
     .toLowerCase();
 }
 
-export { capitalizeFirst, toSpacedTitleCase, toCamelCase, toPascalCase, toKebabCase, toSnakeCase };
+export {
+  capitalizeFirst,
+  toSpacedTitleCase,
+  toSpacedCapitalized,
+  toCamelCase,
+  toPascalCase,
+  toKebabCase,
+  toSnakeCase,
+};

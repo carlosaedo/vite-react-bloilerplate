@@ -1,5 +1,5 @@
 import { Grid, Typography, Divider, Paper, Box, Card, CardContent } from '@mui/material';
-import { transform } from 'framer-motion';
+import * as stringUtils from '../../utils/stringOperations.js';
 
 function ReviewDetails({ formData }) {
   const renderSection = (title, data) => (
@@ -12,7 +12,7 @@ function ReviewDetails({ formData }) {
           {Object.entries(data).map(([key, value]) => (
             <Grid size={{ xs: 12, sm: 6 }} key={key}>
               <Typography variant='caption' color='text.secondary'>
-                {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                {stringUtils.toSpacedCapitalized(key)}
               </Typography>
               <Typography variant='body1' sx={{ fontWeight: 500 }}>
                 {value || '-'}
@@ -80,7 +80,7 @@ function ReviewDetails({ formData }) {
                 {Object.entries(pkg).map(([key, value]) => (
                   <Grid size={{ xs: 12, sm: 6 }} key={key}>
                     <Typography variant='caption' color='text.secondary'>
-                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                      {stringUtils.toSpacedCapitalized(key)}
                     </Typography>
                     <Typography variant='body1' sx={{ fontWeight: 500 }}>
                       {key === 'packageLength' || key === 'packageWidth' || key === 'packageHeight'
@@ -95,6 +95,18 @@ function ReviewDetails({ formData }) {
                         ? value
                           ? value + ' €'
                           : '- €'
+                        : ['insured', 'stackable', 'dangerousGoods', 'customs'].includes(key)
+                        ? value
+                          ? 'Yes'
+                          : 'No'
+                        : key === 'typeOfGoods'
+                        ? value
+                          ? stringUtils.toSpacedTitleCase(value)
+                          : '-'
+                        : key === 'packageType'
+                        ? value
+                          ? stringUtils.capitalizeFirst(value)
+                          : '-'
                         : value || '-'}
                     </Typography>
                   </Grid>
