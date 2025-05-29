@@ -112,25 +112,43 @@ function ShippingForm({ handleChangeFormType }) {
     setMessage(null);
     let newCalculationsForPackage = null;
 
+    // Create the updated package object FIRST
+    const currentPackage = shippingFormData.packages[index];
+    const updatedPackage = {
+      ...currentPackage,
+      [field]: value, // Use the NEW value
+    };
+
+    // Now use the updated package for calculations
     if (
-      shippingFormData?.packages[index]?.packageWeight &&
-      shippingFormData?.packages[index]?.packageLength &&
-      shippingFormData?.packages[index]?.packageWidth &&
-      shippingFormData?.packages[index]?.packageHeight
+      updatedPackage.packageWeight &&
+      updatedPackage.packageLength &&
+      updatedPackage.packageWidth &&
+      updatedPackage.packageHeight
     ) {
       newCalculationsForPackage = calculateShippingFormSizeValues(
-        shippingFormData?.packages[index]?.packageWeight,
-        shippingFormData?.packages[index]?.packageLength,
-        shippingFormData?.packages[index]?.packageWidth,
-        shippingFormData?.packages[index]?.packageHeight,
+        {
+          weightKg: parseFloat(updatedPackage.packageWeight) || 0,
+          lengthCm: parseFloat(updatedPackage.packageLength) || 0,
+          widthCm: parseFloat(updatedPackage.packageWidth) || 0,
+          heightCm: parseFloat(updatedPackage.packageHeight) || 0,
+        },
+        333,
+      );
+    } else if (updatedPackage.packageWeight && updatedPackage.CBM) {
+      newCalculationsForPackage = calculateShippingFormSizeValues(
+        {
+          weightKg: parseFloat(updatedPackage.packageWeight) || 0,
+          cbm: parseFloat(updatedPackage.CBM) || 0,
+        },
         333,
       );
     }
 
+    // Update the packages array
     const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
-      ...updatedPackages[index],
-      [field]: value,
+      ...updatedPackage,
       ...(newCalculationsForPackage || {}),
     };
 
