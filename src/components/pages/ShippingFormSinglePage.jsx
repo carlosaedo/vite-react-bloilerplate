@@ -181,6 +181,8 @@ function ShippingForm({ handleChangeFormType }) {
   };
 
   const addPackage = () => {
+    setErrorMessage(null);
+    setMessage(null);
     const newPackage = {
       packageQuantity: '',
       packageWeight: '',
@@ -208,6 +210,40 @@ function ShippingForm({ handleChangeFormType }) {
 
     setShippingFormData(updatedFormData);
     setSelectedPackageIndex(updatedFormData.packages.length - 1);
+  };
+
+  const removeAllPackages = () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to remove all packages? This action cannot be undone.',
+    );
+    if (!confirmed) return;
+    setErrorMessage(null);
+    setMessage(null);
+    const emptyPackage = {
+      packageQuantity: '',
+      packageWeight: '',
+      packageLength: '',
+      packageWidth: '',
+      packageHeight: '',
+      packageNote: '',
+      valueOfGoods: '',
+      packageType: '',
+      sscc: generateMockSSCC(),
+      CBM: '',
+      LDM: '',
+      TaxableWeight: '',
+      stackable: false,
+      dangerousGoods: false,
+      customs: false,
+      marksAndNumbers: '',
+      typeOfGoods: '',
+    };
+    const updatedFormData = {
+      ...shippingFormData,
+      packages: [emptyPackage],
+    };
+    setShippingFormData(updatedFormData);
+    setSelectedPackageIndex(0);
   };
 
   const removePackage = (index) => {
@@ -808,9 +844,25 @@ function ShippingForm({ handleChangeFormType }) {
             >
               {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
             </Button>
-            <Button variant='outlined' startIcon={<AddIcon />} onClick={addPackage} size='small'>
+            <Button
+              sx={{ marginRight: 1 }}
+              variant='outlined'
+              startIcon={<AddIcon />}
+              onClick={addPackage}
+              size='small'
+            >
               Add Package
             </Button>
+            <Button
+              variant='contained'
+              color='error'
+              startIcon={<DeleteIcon />}
+              onClick={removeAllPackages}
+              size='small'
+            >
+              Remove All
+            </Button>
+
             <Typography sx={{ ml: 2 }}>
               {shippingFormData?.packages?.length}{' '}
               {shippingFormData?.packages?.length > 1 ? 'Packages' : 'Package'}
@@ -1647,8 +1699,23 @@ function ShippingForm({ handleChangeFormType }) {
             >
               {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
             </Button>
-            <Button variant='outlined' startIcon={<AddIcon />} onClick={addPackage} size='small'>
+            <Button
+              sx={{ marginRight: 1 }}
+              variant='outlined'
+              startIcon={<AddIcon />}
+              onClick={addPackage}
+              size='small'
+            >
               Add Package
+            </Button>
+            <Button
+              variant='contained'
+              color='error'
+              startIcon={<DeleteIcon />}
+              onClick={removeAllPackages}
+              size='small'
+            >
+              Remove All
             </Button>
             <Typography sx={{ ml: 2 }}>
               {shippingFormData.packages.length}{' '}
