@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../api/api';
+import * as stringUtils from '../../utils/stringOperations.js';
 import { useShippingFormContext } from '../context/ShippingFormContext';
 import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
 
@@ -45,6 +46,8 @@ const packageType = [
   { value: 'volume', label: 'Volume' },
   { value: 'palete', label: 'Palete' },
 ];
+
+const typeOfGoodsOptions = [{ value: 'general_goods', label: 'General Goods' }];
 
 const shippingPayment = [
   { value: 'pronto', label: 'Pronto' },
@@ -530,6 +533,7 @@ function ShippingForm({ handleChangeFormType }) {
                 fullWidth
                 size='small'
                 margin='dense'
+                disabled
                 required
               />
             </Grid>
@@ -817,36 +821,58 @@ function ShippingForm({ handleChangeFormType }) {
                           title={
                             <Box sx={{ p: 1 }}>
                               <Typography variant='body2'>
-                                <strong>Weight:</strong> {pkg?.packageWeight} kg
+                                <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
                               </Typography>
                               <Typography variant='body2'>
                                 <strong>Type:</strong>{' '}
-                                {pkg?.packageType?.charAt(0).toUpperCase() +
-                                  pkg?.packageType.slice(1)}
+                                {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Length:</strong> {pkg?.packageLength} cm
+                                <strong>Length:</strong> {pkg?.packageLength || '-'} cm
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Width:</strong> {pkg?.packageWidth} cm
+                                <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Height:</strong> {pkg?.packageHeight} cm
+                                <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Note:</strong> {pkg?.packageNote}
+                                <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Value:</strong> {pkg?.valueOfGoods} EUR
+                                <strong>Type of Goods:</strong>{' '}
+                                {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>CBM:</strong> {pkg?.CBM}
+                                <strong>Note:</strong> {pkg?.packageNote || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>LDM:</strong> {pkg?.LDM}
+                                <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                                <strong>CBM:</strong> {pkg?.CBM || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>LDM:</strong> {pkg?.LDM || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Dangerous Goods:</strong>{' '}
+                                {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                               </Typography>
                               {showSSCC && (
                                 <Typography variant='body2'>
@@ -875,35 +901,57 @@ function ShippingForm({ handleChangeFormType }) {
                       title={
                         <Box sx={{ p: 1 }}>
                           <Typography variant='body2'>
-                            <strong>Weight:</strong> {pkg?.packageWeight} kg
+                            <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
                           </Typography>
                           <Typography variant='body2'>
                             <strong>Type:</strong>{' '}
-                            {pkg?.packageType?.charAt(0).toUpperCase() + pkg?.packageType.slice(1)}
+                            {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>Length:</strong> {pkg?.packageLength} cm
+                            <strong>Length:</strong> {pkg?.packageLength || '-'} cm
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>Width:</strong> {pkg?.packageWidth} cm
+                            <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>Height:</strong> {pkg?.packageHeight} cm
+                            <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>Note:</strong> {pkg?.packageNote}
+                            <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>Value:</strong> {pkg?.valueOfGoods} EUR
+                            <strong>Type of Goods:</strong>{' '}
+                            {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>CBM:</strong> {pkg?.CBM}
+                            <strong>Note:</strong> {pkg?.packageNote || '-'}
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>LDM:</strong> {pkg?.LDM}
+                            <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                           </Typography>
                           <Typography variant='body2'>
-                            <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                            <strong>CBM:</strong> {pkg?.CBM || '-'}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>LDM:</strong> {pkg?.LDM || '-'}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Dangerous Goods:</strong> {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                          </Typography>
+                          <Typography variant='body2'>
+                            <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                           </Typography>
                           {showSSCC && (
                             <Typography variant='body2'>
@@ -1010,149 +1058,303 @@ function ShippingForm({ handleChangeFormType }) {
                       </Box>
                     </Tooltip>
                     {showPackageDetails && (
-                      <Grid container spacing={2}>
-                        {/* Top-right CBM section */}
-                        <Grid
-                          size={{ xs: 12 }}
-                          sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}
-                        >
-                          <Grid>
-                            <Typography variant='body2' component='h6'>
-                              <strong>CBM:</strong> {pkg?.CBM || '-'}
-                            </Typography>
+                      <>
+                        <Grid container spacing={2}>
+                          {/* Top-right CBM section */}
+                          <Grid
+                            size={{ xs: 12 }}
+                            sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}
+                          >
+                            <Grid size={{ xs: 1.8 }}>
+                              <TextField
+                                label='Weight (kg)'
+                                name={`packageWeight_${index}`}
+                                type='number'
+                                value={pkg?.packageWeight}
+                                onChange={(e) =>
+                                  handlePackageChange(index, 'packageWeight', e.target.value)
+                                }
+                                fullWidth
+                                size='small'
+                                margin='dense'
+                                required
+                                slotProps={{ htmlInput: { min: 0 } }}
+                              />
+                            </Grid>
+                            {showDimensions && (
+                              <React.Fragment>
+                                <Grid size={{ xs: 1.8 }}>
+                                  <Tooltip
+                                    title='Setting this value will automatically calculate CBM'
+                                    placement='top'
+                                    arrow
+                                  >
+                                    <TextField
+                                      label='Length (cm)'
+                                      name={`packageLength_${index}`}
+                                      type='number'
+                                      value={pkg?.packageLength}
+                                      onChange={(e) =>
+                                        handlePackageChange(index, 'packageLength', e.target.value)
+                                      }
+                                      fullWidth
+                                      size='small'
+                                      margin='dense'
+                                      slotProps={{ htmlInput: { min: 0 } }}
+                                    />
+                                  </Tooltip>
+                                </Grid>
+                                <Grid size={{ xs: 1.8 }}>
+                                  <Tooltip
+                                    title='Setting this value will automatically calculate CBM'
+                                    placement='top'
+                                    arrow
+                                  >
+                                    <TextField
+                                      label='Width (cm)'
+                                      name={`packageWidth_${index}`}
+                                      type='number'
+                                      value={pkg?.packageWidth}
+                                      onChange={(e) =>
+                                        handlePackageChange(index, 'packageWidth', e.target.value)
+                                      }
+                                      fullWidth
+                                      size='small'
+                                      margin='dense'
+                                      slotProps={{ htmlInput: { min: 0 } }}
+                                    />
+                                  </Tooltip>
+                                </Grid>
+                                <Grid size={{ xs: 1.8 }}>
+                                  <Tooltip
+                                    title='Setting this value will automatically calculate CBM'
+                                    placement='top'
+                                    arrow
+                                  >
+                                    <TextField
+                                      label='Height (cm)'
+                                      name={`packageHeight_${index}`}
+                                      type='number'
+                                      value={pkg?.packageHeight}
+                                      onChange={(e) =>
+                                        handlePackageChange(index, 'packageHeight', e.target.value)
+                                      }
+                                      fullWidth
+                                      size='small'
+                                      margin='dense'
+                                      slotProps={{ htmlInput: { min: 0 } }}
+                                    />
+                                  </Tooltip>
+                                </Grid>
+                              </React.Fragment>
+                            )}
+                            {showCBM && (
+                              <Grid size={{ xs: 2 }}>
+                                <TextField
+                                  label='CBM'
+                                  name={`CBM_${index}`}
+                                  type='number'
+                                  value={pkg?.CBM}
+                                  onChange={(e) =>
+                                    handlePackageChange(index, 'CBM', e.target.value)
+                                  }
+                                  fullWidth
+                                  size='small'
+                                  margin='dense'
+                                  disabled={!activeCBM}
+                                  slotProps={{ htmlInput: { min: 0 } }}
+                                />
+                                <Tooltip
+                                  title='This will clear your package dimensions'
+                                  placement='top'
+                                  arrow
+                                >
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={activeCBM}
+                                        onChange={(e) => {
+                                          setActiveCBM(e.target.checked);
+                                          setShowLDM(!e.target.checked);
+                                          setShowDimensions(!e.target.checked);
+                                          handlePackageClearDimensions(index);
+                                        }}
+                                      />
+                                    }
+                                    label='Edit CBM'
+                                  />
+                                </Tooltip>
+                              </Grid>
+                            )}
+                            {hideLDM && (
+                              <Grid size={{ xs: 2 }}>
+                                <TextField
+                                  label='LDM'
+                                  name={`LDM_${index}`}
+                                  type='number'
+                                  value={pkg?.LDM}
+                                  onChange={(e) =>
+                                    handlePackageChange(index, 'LDM', e.target.value)
+                                  }
+                                  fullWidth
+                                  size='small'
+                                  margin='dense'
+                                  disabled={!activeLDM}
+                                  slotProps={{ htmlInput: { min: 0 } }}
+                                />
+                                <Tooltip
+                                  title='This will clear your package dimensions'
+                                  placement='top'
+                                  arrow
+                                >
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={activeLDM}
+                                        onChange={(e) => {
+                                          setActiveLDM(e.target.checked);
+                                          setShowCBM(!e.target.checked);
+                                          setShowDimensions(!e.target.checked);
+                                          handlePackageClearDimensions(index);
+                                        }}
+                                      />
+                                    }
+                                    label='Edit LDM'
+                                  />
+                                </Tooltip>
+                              </Grid>
+                            )}
+                            <Grid size={{ xs: 2 }}>
+                              <TextField
+                                label='TaxableWeight'
+                                name={`TaxableWeight_${index}`}
+                                type='number'
+                                value={pkg?.TaxableWeight}
+                                onChange={(e) =>
+                                  handlePackageChange(index, 'TaxableWeight', e.target.value)
+                                }
+                                fullWidth
+                                size='small'
+                                margin='dense'
+                                disabled
+                                slotProps={{ htmlInput: { min: 0 } }}
+                              />
+                            </Grid>
                           </Grid>
-                          <Grid>
-                            <Typography variant='body2' component='h6'>
-                              <strong>LDM:</strong> {pkg?.LDM || '-'}
-                            </Typography>
+
+                          <Grid size={{ xs: 4 }}>
+                            <TextField
+                              label='Quantity'
+                              name={`packageQuantity_${index}`}
+                              type='number'
+                              value={pkg?.packageQuantity}
+                              onChange={(e) =>
+                                handlePackageChange(index, 'packageQuantity', e.target.value)
+                              }
+                              fullWidth
+                              size='small'
+                              margin='dense'
+                              required
+                              slotProps={{ htmlInput: { min: 0 } }}
+                            />
                           </Grid>
-                          <Grid>
-                            <Typography variant='body2' component='h6'>
-                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
-                            </Typography>
+                          <Grid size={{ xs: 4 }}>
+                            <TextField
+                              select
+                              label='Package Type'
+                              name={`packageType_${index}`}
+                              value={pkg?.packageType}
+                              onChange={(e) =>
+                                handlePackageChange(index, 'packageType', e.target.value)
+                              }
+                              fullWidth
+                              size='small'
+                              margin='dense'
+                              required
+                            >
+                              {packageType.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          </Grid>
+                          <Grid size={{ xs: 4 }}>
+                            <TextField
+                              select
+                              label='Type of Goods'
+                              name={`typeOfGoods_${index}`}
+                              value={pkg?.typeOfGoods || ''}
+                              onChange={(e) =>
+                                handlePackageChange(index, 'typeOfGoods', e.target.value)
+                              }
+                              fullWidth
+                              size='small'
+                              margin='dense'
+                              required
+                            >
+                              {typeOfGoodsOptions.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </MenuItem>
+                              ))}
+                            </TextField>
                           </Grid>
                         </Grid>
 
-                        <Grid size={{ xs: 6 }}>
-                          <TextField
-                            label='Package Weight (kg)'
-                            name={`packageWeight_${index}`}
-                            type='number'
-                            value={pkg?.packageWeight}
-                            onChange={(e) =>
-                              handlePackageChange(index, 'packageWeight', e.target.value)
-                            }
-                            fullWidth
-                            size='small'
-                            required
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 6 }}>
-                          <TextField
-                            select
-                            label='Package Type'
-                            name={'packageType'}
-                            value={pkg?.packageType}
-                            onChange={(e) =>
-                              handlePackageChange(index, 'packageType', e.target.value)
-                            }
-                            fullWidth
-                            size='small'
-                            required
-                          >
-                            {packageType.map((option) => (
-                              <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                          <TextField
-                            label='Length (cm)'
-                            name={`packageLength_${index}`}
-                            type='number'
-                            value={pkg?.packageLength}
-                            onChange={(e) =>
-                              handlePackageChange(index, 'packageLength', e.target.value)
-                            }
-                            fullWidth
-                            required
-                            size='small'
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                          <TextField
-                            label='Width (cm)'
-                            name={`packageWidth_${index}`}
-                            type='number'
-                            value={pkg?.packageWidth}
-                            onChange={(e) =>
-                              handlePackageChange(index, 'packageWidth', e.target.value)
-                            }
-                            fullWidth
-                            required
-                            size='small'
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 4 }}>
-                          <TextField
-                            label='Height (cm)'
-                            name={`packageHeight_${index}`}
-                            type='number'
-                            value={pkg?.packageHeight}
-                            onChange={(e) =>
-                              handlePackageChange(index, 'packageHeight', e.target.value)
-                            }
-                            fullWidth
-                            required
-                            size='small'
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12 }}>
-                          <TextField
-                            label='Note'
-                            name={`packageNote_${index}`}
-                            value={pkg?.packageNote}
-                            onChange={(e) =>
-                              handlePackageChange(index, 'packageNote', e.target.value)
-                            }
-                            fullWidth
-                            required
-                            multiline
-                            size='small'
-                            rows={3}
-                          />
-                        </Grid>
+                        <TextField
+                          label='Note'
+                          name={`packageDescription_${index}`}
+                          value={pkg?.packageNote}
+                          onChange={(e) =>
+                            handlePackageChange(index, 'packageNote', e.target.value)
+                          }
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          multiline
+                          rows={2}
+                        />
                         <TextField
                           label='Marks and Numbers'
                           name={`marksAndNumbers_${index}`}
                           type='text'
-                          value={shippingFormData.packages[index]?.marksAndNumbers}
+                          value={pkg?.marksAndNumbers}
                           onChange={(e) =>
                             handlePackageChange(index, 'marksAndNumbers', e.target.value)
                           }
                           fullWidth
-                          size='small'
-                          required
+                          sx={{ mt: 2, mb: 1 }}
                         />
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1, mb: 1 }}>
-                          <TextField
-                            label='Package Value (EUR)'
-                            name={`packageValue_${index}`}
-                            type='number'
-                            value={pkg?.valueOfGoods}
-                            onChange={(e) =>
-                              handlePackageChange(index, 'valueOfGoods', e.target.value)
+                          {pkg?.insured && (
+                            <TextField
+                              label='Value of Goods (€)'
+                              name={`packageValue_${index}`}
+                              type='number'
+                              value={pkg?.valueOfGoods}
+                              onChange={(e) =>
+                                handlePackageChange(index, 'valueOfGoods', e.target.value)
+                              }
+                              size='small'
+                              required={pkg?.insured || false}
+                              sx={{ minWidth: 180 }}
+                              slotProps={{ htmlInput: { min: 0 } }}
+                            />
+                          )}
+
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={pkg?.insured || false}
+                                onChange={(e) =>
+                                  handlePackageChange(index, 'insured', e.target.checked)
+                                }
+                                name={`insured_${index}`}
+                                color='primary'
+                              />
                             }
-                            size='small'
-                            required
-                            sx={{ minWidth: 180 }}
-                            slotProps={{ htmlInput: { min: 0 } }}
+                            label='Insured'
                           />
 
                           <FormControlLabel
@@ -1168,7 +1370,6 @@ function ShippingForm({ handleChangeFormType }) {
                             }
                             label='Stackable'
                           />
-
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1182,7 +1383,6 @@ function ShippingForm({ handleChangeFormType }) {
                             }
                             label='Dangerous Goods'
                           />
-
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -1199,20 +1399,18 @@ function ShippingForm({ handleChangeFormType }) {
                         </Box>
 
                         {showSSCC && (
-                          <Grid size={{ xs: 12 }}>
-                            <TextField
-                              label='SSCC'
-                              name='sscc'
-                              type='text'
-                              value={pkg?.sscc}
-                              fullWidth
-                              size='small'
-                              margin='dense'
-                              disabled={true}
-                            />
-                          </Grid>
+                          <TextField
+                            label='SSCC'
+                            name='sscc'
+                            type='text'
+                            value={pkg?.sscc}
+                            fullWidth
+                            size='small'
+                            margin='dense'
+                            disabled={true}
+                          />
                         )}
-                      </Grid>
+                      </>
                     )}
                   </Box>
                 ))}
@@ -1275,36 +1473,58 @@ function ShippingForm({ handleChangeFormType }) {
                           title={
                             <Box sx={{ p: 1 }}>
                               <Typography variant='body2'>
-                                <strong>Weight:</strong> {pkg?.packageWeight} kg
+                                <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
                               </Typography>
                               <Typography variant='body2'>
                                 <strong>Type:</strong>{' '}
-                                {pkg?.packageType?.charAt(0).toUpperCase() +
-                                  pkg?.packageType.slice(1)}
+                                {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Length:</strong> {pkg?.packageLength} cm
+                                <strong>Length:</strong> {pkg?.packageLength || '-'} cm
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Width:</strong> {pkg?.packageWidth} cm
+                                <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Height:</strong> {pkg?.packageHeight} cm
+                                <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Note:</strong> {pkg?.packageNote}
+                                <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Value:</strong> {pkg?.valueOfGoods} EUR
+                                <strong>Type of Goods:</strong>{' '}
+                                {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>CBM:</strong> {pkg?.CBM}
+                                <strong>Note:</strong> {pkg?.packageNote || '-'}
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>LDM:</strong> {pkg?.LDM}
+                                <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                               </Typography>
                               <Typography variant='body2'>
-                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight}
+                                <strong>CBM:</strong> {pkg?.CBM || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>LDM:</strong> {pkg?.LDM || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Dangerous Goods:</strong>{' '}
+                                {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                               </Typography>
                               {showSSCC && (
                                 <Typography variant='body2'>
