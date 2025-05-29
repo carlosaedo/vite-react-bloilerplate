@@ -1073,7 +1073,7 @@ function ShippingForm({ handleChangeFormType }) {
                               borderBottom: showSSCC ? 'none !important' : undefined,
                             }}
                           >
-                            {pkg?.insured ? pkg?.valueOfGoods : 'NOT INSURED'}
+                            {pkg?.insured ? pkg?.valueOfGoods || '-' : 'NOT INSURED'}
                           </TableCell>
                         </TableRow>
                       </Tooltip>
