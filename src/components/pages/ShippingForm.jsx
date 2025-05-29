@@ -143,6 +143,9 @@ function ShippingForm({ handleChangeFormType }) {
       packageValue: '',
       packageType: '',
       sscc: generateMockSSCC(), // Generate a new SSCC for the new package
+      CBM: '',
+      LDM: '',
+      TaxableWeight: '',
     };
 
     const updatedFormData = {
@@ -861,36 +864,51 @@ function ShippingForm({ handleChangeFormType }) {
                               : () => setShowPackageDetails(true)
                           }
                         >
-                          Package {index + 1}
+                          # {index + 1}
                         </Box>
                         {!showPackageDetails && (
                           <>
-                            {pkg?.packageType && (
-                              <>
-                                {pkg?.packageType?.charAt(0).toUpperCase() +
-                                  pkg?.packageType.slice(1)}
-                              </>
-                            )}
-                            {pkg?.packageWeight && (
-                              <>
-                                {' | '}
-                                {pkg?.packageWeight} kg
-                              </>
-                            )}
-                            {pkg?.packageDescription && (
-                              <>
-                                {' | '}
-                                {pkg?.packageDescription.length > 70
-                                  ? pkg?.packageDescription.slice(0, 70) + '...'
-                                  : pkg?.packageDescription}
-                              </>
-                            )}
-                            {pkg?.packageValue && (
-                              <>
-                                {' | '}
-                                {pkg?.packageValue} EUR
-                              </>
-                            )}
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 2,
+                                px: 1,
+                                py: 1,
+                                '& .smallText': {
+                                  fontSize: '0.85rem', // Smaller font size
+                                },
+                              }}
+                            >
+                              <Typography variant='body2' className='smallText'>
+                                <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
+                              </Typography>
+                              <Typography variant='body2' className='smallText'>
+                                <strong>Type:</strong>{' '}
+                                {pkg?.packageType
+                                  ? pkg.packageType.charAt(0).toUpperCase() +
+                                    pkg.packageType.slice(1)
+                                  : '-'}
+                              </Typography>
+                              <Typography variant='body2' className='smallText'>
+                                <strong>CBM:</strong> {pkg?.CBM || '-'}
+                              </Typography>
+                              <Typography variant='body2' className='smallText'>
+                                <strong>LDM:</strong> {pkg?.LDM || '-'}
+                              </Typography>
+                              <Typography variant='body2' className='smallText'>
+                                <strong>Taxable:</strong> {pkg?.TaxableWeight || '-'}
+                              </Typography>
+                              <Typography variant='body2' className='smallText'>
+                                <strong>Description:</strong>{' '}
+                                {pkg?.packageDescription?.length > 70
+                                  ? pkg.packageDescription.slice(0, 70) + '...'
+                                  : pkg?.packageDescription || '-'}
+                              </Typography>
+                              <Typography variant='body2' className='smallText'>
+                                <strong>Value:</strong> {pkg?.packageValue || '-'} €
+                              </Typography>
+                            </Box>
                           </>
                         )}
                       </Typography>

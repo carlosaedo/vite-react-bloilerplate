@@ -59,12 +59,6 @@ const shippingPaymentTo = [
 ];
 
 function ShippingForm({ handleChangeFormType }) {
-  const handleJumpToPackage = (index) => {
-    setErrorMessage(null);
-    setMessage(null);
-    setSelectedPackage({ pkgData: shippingFormData.packages[index], pkgIndex: index });
-  };
-
   const { shippingFormData, setShippingFormData, resetShippingFormData } = useShippingFormContext();
 
   const [message, setMessage] = useState(null);
@@ -80,10 +74,13 @@ function ShippingForm({ handleChangeFormType }) {
 
   const [showSSCC, setShowSSCC] = useState(false);
 
-  const [selectedPackage, setSelectedPackage] = useState({
-    pkgData: shippingFormData.packages[0],
-    pkgIndex: 0,
-  });
+  const [selectedPackageIndex, setSelectedPackageIndex] = useState(0);
+
+  const handleJumpToPackage = (index) => {
+    setErrorMessage(null);
+    setMessage(null);
+    setSelectedPackageIndex(index);
+  };
 
   const handleChange = (event) => {
     setMessage(null);
@@ -136,6 +133,9 @@ function ShippingForm({ handleChangeFormType }) {
       packageValue: '',
       packageType: '',
       sscc: generateMockSSCC(), // Generate a mock SSCC for the new package
+      CBM: '',
+      LDM: '',
+      TaxableWeight: '',
     };
 
     const updatedFormData = {
@@ -144,6 +144,7 @@ function ShippingForm({ handleChangeFormType }) {
     };
 
     setShippingFormData(updatedFormData);
+    setSelectedPackageIndex(updatedFormData.packages.length - 1);
     localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
   };
 
@@ -158,6 +159,10 @@ function ShippingForm({ handleChangeFormType }) {
       };
 
       setShippingFormData(updatedFormData);
+      if (selectedPackageIndex === index) {
+        setSelectedPackageIndex(selectedPackageIndex - 1);
+      }
+
       localStorage.setItem('shippingFormData', JSON.stringify(updatedFormData));
     }
   };
@@ -737,7 +742,7 @@ function ShippingForm({ handleChangeFormType }) {
             <Select
               size='small'
               displayEmpty
-              value={selectedPackage?.pkgIndex}
+              value={selectedPackageIndex}
               onChange={(e) => handleJumpToPackage(e.target.value)}
               sx={{ ml: 2 }}
             >
@@ -995,7 +1000,7 @@ function ShippingForm({ handleChangeFormType }) {
             </Table>
             <TablePagination
               component='div'
-              count={shippingFormData.packages.length}
+              count={shippingFormData?.packages?.length}
               page={page}
               onPageChange={(event, newPage) => setPage(newPage)}
               rowsPerPage={rowsPerPage}
@@ -1008,40 +1013,50 @@ function ShippingForm({ handleChangeFormType }) {
               title={
                 <Box sx={{ p: 1 }}>
                   <Typography variant='body2'>
-                    <strong>Weight:</strong> {selectedPackage?.pkgData?.packageWeight} kg
+                    <strong>Weight:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageWeight} kg
                   </Typography>
                   <Typography variant='body2'>
                     <strong>Type:</strong>{' '}
-                    {selectedPackage?.pkgData?.packageType?.charAt(0).toUpperCase() +
-                      selectedPackage?.pkgData?.packageType.slice(1)}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageType
+                      ?.charAt(0)
+                      .toUpperCase() +
+                      shippingFormData?.packages[selectedPackageIndex]?.packageType.slice(1)}
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>Length:</strong> {selectedPackage?.pkgData?.packageLength} cm
+                    <strong>Length:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageLength} cm
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>Width:</strong> {selectedPackage?.pkgData?.packageWidth} cm
+                    <strong>Width:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageWidth} cm
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>Height:</strong> {selectedPackage?.pkgData?.packageHeight} cm
+                    <strong>Height:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageHeight} cm
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>Description:</strong> {selectedPackage?.pkgData?.packageDescription}
+                    <strong>Description:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageDescription}
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>Value:</strong> {selectedPackage?.pkgData?.packageValue} EUR
+                    <strong>Value:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.packageValue} EUR
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>CBM:</strong> {selectedPackage?.pkgData?.CBM}
+                    <strong>CBM:</strong> {shippingFormData?.packages[selectedPackageIndex]?.CBM}
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>LDM:</strong> {selectedPackage?.pkgData?.LDM}
+                    <strong>LDM:</strong> {shippingFormData?.packages[selectedPackageIndex]?.LDM}
                   </Typography>
                   <Typography variant='body2'>
-                    <strong>Taxable Weight:</strong> {selectedPackage?.pkgData?.TaxableWeight}
+                    <strong>Taxable Weight:</strong>{' '}
+                    {shippingFormData?.packages[selectedPackageIndex]?.TaxableWeight}
                   </Typography>
                   {showSSCC && (
                     <Typography variant='body2'>
-                      <strong>SSCC:</strong> {selectedPackage?.pkgData?.sscc}
+                      <strong>SSCC:</strong>{' '}
+                      {shippingFormData?.packages[selectedPackageIndex]?.sscc}
                     </Typography>
                   )}
                 </Box>
@@ -1074,13 +1089,13 @@ function ShippingForm({ handleChangeFormType }) {
                       cursor: 'pointer',
                     }}
                   >
-                    # {selectedPackage?.pkgIndex + 1}
+                    # {selectedPackageIndex + 1}
                   </Box>
                 </Typography>
 
                 {shippingFormData.packages.length > 1 && (
                   <IconButton
-                    onClick={() => removePackage(selectedPackage?.pkgIndex)}
+                    onClick={() => removePackage(selectedPackageIndex)}
                     color='error'
                     size='small'
                   >
@@ -1095,15 +1110,11 @@ function ShippingForm({ handleChangeFormType }) {
                 <Grid size={{ xs: 6 }}>
                   <TextField
                     label='Weight (kg)'
-                    name={`packageWeight_${selectedPackage?.pkgIndex}`}
+                    name={`packageWeight_${selectedPackageIndex}`}
                     type='number'
-                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageWeight}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageWeight}
                     onChange={(e) =>
-                      handlePackageChange(
-                        selectedPackage?.pkgIndex,
-                        'packageWeight',
-                        e.target.value,
-                      )
+                      handlePackageChange(selectedPackageIndex, 'packageWeight', e.target.value)
                     }
                     fullWidth
                     size='small'
@@ -1116,10 +1127,10 @@ function ShippingForm({ handleChangeFormType }) {
                   <TextField
                     select
                     label='Package Type'
-                    name={`packageType_${selectedPackage?.pkgIndex}`}
-                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageType}
+                    name={`packageType_${selectedPackageIndex}`}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageType}
                     onChange={(e) =>
-                      handlePackageChange(selectedPackage?.pkgIndex, 'packageType', e.target.value)
+                      handlePackageChange(selectedPackageIndex, 'packageType', e.target.value)
                     }
                     fullWidth
                     size='small'
@@ -1138,15 +1149,11 @@ function ShippingForm({ handleChangeFormType }) {
                 <Grid size={{ xs: 4 }}>
                   <TextField
                     label='Length (cm)'
-                    name={`packageLength_${selectedPackage?.pkgIndex}`}
+                    name={`packageLength_${selectedPackageIndex}`}
                     type='number'
-                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageLength}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageLength}
                     onChange={(e) =>
-                      handlePackageChange(
-                        selectedPackage?.pkgIndex,
-                        'packageLength',
-                        e.target.value,
-                      )
+                      handlePackageChange(selectedPackageIndex, 'packageLength', e.target.value)
                     }
                     fullWidth
                     size='small'
@@ -1158,11 +1165,11 @@ function ShippingForm({ handleChangeFormType }) {
                 <Grid size={{ xs: 4 }}>
                   <TextField
                     label='Width (cm)'
-                    name={`packageWidth_${selectedPackage?.pkgIndex}`}
+                    name={`packageWidth_${selectedPackageIndex}`}
                     type='number'
-                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageWidth}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageWidth}
                     onChange={(e) =>
-                      handlePackageChange(selectedPackage?.pkgIndex, 'packageWidth', e.target.value)
+                      handlePackageChange(selectedPackageIndex, 'packageWidth', e.target.value)
                     }
                     fullWidth
                     size='small'
@@ -1174,15 +1181,11 @@ function ShippingForm({ handleChangeFormType }) {
                 <Grid size={{ xs: 4 }}>
                   <TextField
                     label='Height (cm)'
-                    name={`packageHeight_${selectedPackage?.pkgIndex}`}
+                    name={`packageHeight_${selectedPackageIndex}`}
                     type='number'
-                    value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageHeight}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageHeight}
                     onChange={(e) =>
-                      handlePackageChange(
-                        selectedPackage?.pkgIndex,
-                        'packageHeight',
-                        e.target.value,
-                      )
+                      handlePackageChange(selectedPackageIndex, 'packageHeight', e.target.value)
                     }
                     fullWidth
                     size='small'
@@ -1194,14 +1197,10 @@ function ShippingForm({ handleChangeFormType }) {
               </Grid>
               <TextField
                 label='Description'
-                name={`packageDescription_${selectedPackage?.pkgIndex}`}
-                value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageDescription}
+                name={`packageDescription_${selectedPackageIndex}`}
+                value={shippingFormData.packages[selectedPackageIndex]?.packageDescription}
                 onChange={(e) =>
-                  handlePackageChange(
-                    selectedPackage?.pkgIndex,
-                    'packageDescription',
-                    e.target.value,
-                  )
+                  handlePackageChange(selectedPackageIndex, 'packageDescription', e.target.value)
                 }
                 fullWidth
                 size='small'
@@ -1212,11 +1211,11 @@ function ShippingForm({ handleChangeFormType }) {
               />
               <TextField
                 label='Package Value (EUR)'
-                name={`packageValue_${selectedPackage?.pkgIndex}`}
+                name={`packageValue_${selectedPackageIndex}`}
                 type='number'
-                value={shippingFormData.packages[selectedPackage?.pkgIndex]?.packageValue}
+                value={shippingFormData.packages[selectedPackageIndex]?.packageValue}
                 onChange={(e) =>
-                  handlePackageChange(selectedPackage?.pkgIndex, 'packageValue', e.target.value)
+                  handlePackageChange(selectedPackageIndex, 'packageValue', e.target.value)
                 }
                 fullWidth
                 size='small'
@@ -1229,7 +1228,7 @@ function ShippingForm({ handleChangeFormType }) {
                   label='SSCC'
                   name='sscc'
                   type='text'
-                  value={shippingFormData.packages[selectedPackage?.pkgIndex]?.sscc}
+                  value={shippingFormData.packages[selectedPackageIndex]?.sscc}
                   fullWidth
                   size='small'
                   margin='dense'
@@ -1266,7 +1265,7 @@ function ShippingForm({ handleChangeFormType }) {
             <Select
               size='small'
               displayEmpty
-              value={selectedPackage?.pkgIndex}
+              value={selectedPackageIndex}
               onChange={(e) => handleJumpToPackage(e.target.value)}
               sx={{ ml: 2 }}
             >
