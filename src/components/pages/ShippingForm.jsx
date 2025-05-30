@@ -3,7 +3,7 @@ import api from '../api/api';
 import * as stringUtils from '../../utils/stringOperations.js';
 import { useShippingFormContext } from '../context/ShippingFormContext';
 import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
-
+import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
 import {
   Box,
   Grid,
@@ -20,6 +20,7 @@ import {
   FormControlLabel,
   Checkbox,
   Alert,
+  Stack,
 } from '@mui/material';
 import { RiPagesLine } from 'react-icons/ri';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -59,9 +60,9 @@ const shippingPaymentTo = [
   { value: 'destinatario', label: 'Destinatário' },
 ];
 
-function ShippingForm({ handleChangeFormType }) {
+function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const packageRefs = useRef([]);
-  const [selectedIndex, setSelectedIndex] = useState('');
+  const [selectedPackageIndex, setSelectedPackageIndex] = useState('');
 
   /*const handleJumpToPackage = (index) => {
       packageRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -76,7 +77,7 @@ function ShippingForm({ handleChangeFormType }) {
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
     // Reset dropdown after scroll
-    setSelectedIndex('');
+    setSelectedPackageIndex('');
   };
 
   const {
@@ -98,7 +99,10 @@ function ShippingForm({ handleChangeFormType }) {
   const [showDimensions, setShowDimensions] = useState(true);
 
   const [showPackageDetails, setShowPackageDetails] = useState(true);
-
+  const [infoValues, setInfoValues] = useState(() => {
+    const { totalQuantity, totalWeight } = calculateShippingFormTotals(shippingFormData.packages);
+    return { totalWeight, totalQuantity };
+  });
   const [message, setMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -167,6 +171,10 @@ function ShippingForm({ handleChangeFormType }) {
       ...shippingFormData,
       packages: updatedPackages,
     };
+
+    const { totalPackages, totalWeight } = calculateShippingFormTotals(updatedPackages);
+
+    setInfoValues({ totalWeight, totalPackages });
 
     setShippingFormData(updatedFormData);
   };
@@ -428,7 +436,7 @@ function ShippingForm({ handleChangeFormType }) {
           Cannot get tracking number from the server. Retrying automatically every 10 seconds...
         </Alert>
       )}
-      <Paper sx={{ p: 3, maxWidth: 900, margin: 'auto', mt: 5 }}>
+      <Paper sx={{ p: 3, width: '98%', margin: 'auto', mt: 5 }}>
         <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
           <Typography
             variant='h5'
@@ -812,146 +820,6 @@ function ShippingForm({ handleChangeFormType }) {
             <>
               {/* Package Info - Multiple Packages */}
               <Box sx={{ mb: 4, width: '100%' }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'right',
-                    mb: 2,
-                  }}
-                >
-                  <Button
-                    sx={{ marginRight: 1 }}
-                    variant='outlined'
-                    startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
-                    onClick={
-                      showPackageDetails
-                        ? () => setShowPackageDetails(false)
-                        : () => setShowPackageDetails(true)
-                    }
-                    size='small'
-                  >
-                    {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
-                  </Button>
-
-                  <Button
-                    sx={{ marginRight: 1 }}
-                    variant='outlined'
-                    startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
-                    onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
-                    size='small'
-                  >
-                    {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
-                  </Button>
-
-                  <Button
-                    sx={{ marginRight: 1 }}
-                    variant='outlined'
-                    startIcon={<AddIcon />}
-                    onClick={addPackage}
-                    size='small'
-                  >
-                    Add Package
-                  </Button>
-                  <Button
-                    variant='contained'
-                    color='error'
-                    startIcon={<DeleteIcon />}
-                    onClick={removeAllPackages}
-                    size='small'
-                  >
-                    Remove All
-                  </Button>
-                  <Typography sx={{ ml: 2 }}>
-                    {shippingFormData.packages.length}{' '}
-                    {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
-                  </Typography>
-                  <Select
-                    size='small'
-                    displayEmpty
-                    value={selectedIndex}
-                    onChange={(e) => handleJumpToPackage(e.target.value)}
-                    sx={{ ml: 2 }}
-                  >
-                    <MenuItem value='' disabled>
-                      Jump to package
-                    </MenuItem>
-                    {shippingFormData.packages.map((pkg, index) => (
-                      <MenuItem key={index} value={index}>
-                        <Tooltip
-                          title={
-                            <Box sx={{ p: 1 }}>
-                              <Typography variant='body2'>
-                                <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Type:</strong>{' '}
-                                {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Length:</strong> {pkg?.packageLength || '-'} cm
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Type of Goods:</strong>{' '}
-                                {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Note:</strong> {pkg?.packageNote || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>CBM:</strong> {pkg?.CBM || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>LDM:</strong> {pkg?.LDM || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Dangerous Goods:</strong>{' '}
-                                {pkg?.dangerousGoods ? 'Yes' : 'No'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
-                              </Typography>
-                              {showSSCC && (
-                                <Typography variant='body2'>
-                                  <strong>SSCC:</strong> {pkg?.sscc}
-                                </Typography>
-                              )}
-                            </Box>
-                          }
-                          arrow
-                          placement='top-start'
-                        >
-                          <span>Package {index + 1}</span>
-                        </Tooltip>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Box>
-
                 {shippingFormData.packages.map((pkg, index) => (
                   <Box
                     key={index}
@@ -1475,144 +1343,7 @@ function ShippingForm({ handleChangeFormType }) {
                     )}
                   </Box>
                 ))}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'right',
-                    mb: 2,
-                  }}
-                >
-                  <Button
-                    sx={{ marginRight: 1 }}
-                    variant='outlined'
-                    startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
-                    onClick={
-                      showPackageDetails
-                        ? () => setShowPackageDetails(false)
-                        : () => setShowPackageDetails(true)
-                    }
-                    size='small'
-                  >
-                    {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
-                  </Button>
-                  <Button
-                    sx={{ marginRight: 1 }}
-                    variant='outlined'
-                    startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
-                    onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
-                    size='small'
-                  >
-                    {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
-                  </Button>
 
-                  <Button
-                    sx={{ marginRight: 1 }}
-                    variant='outlined'
-                    startIcon={<AddIcon />}
-                    onClick={addPackage}
-                    size='small'
-                  >
-                    Add Package
-                  </Button>
-                  <Button
-                    variant='contained'
-                    color='error'
-                    startIcon={<DeleteIcon />}
-                    onClick={removeAllPackages}
-                    size='small'
-                  >
-                    Remove All
-                  </Button>
-                  <Typography sx={{ ml: 2 }}>
-                    {shippingFormData.packages.length}{' '}
-                    {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
-                  </Typography>
-                  <Select
-                    size='small'
-                    displayEmpty
-                    value={selectedIndex}
-                    onChange={(e) => handleJumpToPackage(e.target.value)}
-                    sx={{ ml: 2 }}
-                  >
-                    <MenuItem value='' disabled>
-                      Jump to package
-                    </MenuItem>
-                    {shippingFormData.packages.map((pkg, index) => (
-                      <MenuItem key={index} value={index}>
-                        <Tooltip
-                          title={
-                            <Box sx={{ p: 1 }}>
-                              <Typography variant='body2'>
-                                <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Type:</strong>{' '}
-                                {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Length:</strong> {pkg?.packageLength || '-'} cm
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Type of Goods:</strong>{' '}
-                                {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Note:</strong> {pkg?.packageNote || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>CBM:</strong> {pkg?.CBM || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>LDM:</strong> {pkg?.LDM || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Dangerous Goods:</strong>{' '}
-                                {pkg?.dangerousGoods ? 'Yes' : 'No'}
-                              </Typography>
-                              <Typography variant='body2'>
-                                <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
-                              </Typography>
-                              {showSSCC && (
-                                <Typography variant='body2'>
-                                  <strong>SSCC:</strong> {pkg?.sscc}
-                                </Typography>
-                              )}
-                            </Box>
-                          }
-                          arrow
-                          placement='top-start'
-                        >
-                          <span>Package {index + 1}</span>
-                        </Tooltip>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Box>
                 <Grid size={{ xs: 12 }}>
                   <TextField
                     select
@@ -1697,37 +1428,192 @@ function ShippingForm({ handleChangeFormType }) {
           </Grid>
         </Box>
 
-        <Grid container spacing={2} justifyContent='space-between' sx={{ mt: 3 }}>
-          <Grid>
-            <Button disabled={step === 0} onClick={handleBack} variant='outlined' color='primary'>
-              Back
+        <Box
+          position='fixed'
+          bottom={0}
+          left={sidebarWidth}
+          width={`calc(100% - ${sidebarWidth}px)`}
+          bgcolor='#fff' // solid white background
+          boxShadow={3}
+          p={2}
+          textAlign='right'
+          zIndex={100}
+        >
+          {/* here */}
+          <Stack
+            direction='row'
+            spacing={2}
+            alignItems='center'
+            justifyContent='flex-end'
+            flexWrap='wrap'
+          >
+            <Typography>
+              Total Weight: <strong>{infoValues.totalWeight} kg</strong>
+            </Typography>
+            <Button
+              sx={{ marginRight: 1 }}
+              variant='outlined'
+              startIcon={showPackageDetails ? <IoMdEyeOff /> : <IoMdEye />}
+              onClick={
+                showPackageDetails
+                  ? () => setShowPackageDetails(false)
+                  : () => setShowPackageDetails(true)
+              }
+              size='small'
+            >
+              {showPackageDetails ? 'Hide Package Details' : 'Show Package Details'}
             </Button>
-          </Grid>
-          {errorMessage && (
-            <Typography color='error' variant='h5' gutterBottom>
-              {errorMessage}
+            <Button
+              sx={{ marginRight: 1 }}
+              variant='outlined'
+              startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
+              onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
+              size='small'
+            >
+              {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
+            </Button>
+            <Button
+              sx={{ marginRight: 1 }}
+              variant='outlined'
+              startIcon={<AddIcon />}
+              onClick={addPackage}
+              size='small'
+            >
+              Add Package
+            </Button>
+            <Button
+              variant='contained'
+              color='error'
+              startIcon={<DeleteIcon />}
+              onClick={removeAllPackages}
+              size='small'
+            >
+              Remove All
+            </Button>
+            <Typography sx={{ ml: 2 }}>
+              <strong>
+                {shippingFormData.packages.length}{' '}
+                {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
+              </strong>
             </Typography>
-          )}
-          {message && (
-            <Typography variant='h5' gutterBottom>
-              {message}
-            </Typography>
-          )}
-          <Grid>
-            {step < 3 ? (
-              <Button onClick={handleNext} variant='contained' color='primary'>
-                Next
-              </Button>
-            ) : (
-              <Button onClick={handleSubmit} variant='contained' color='success'>
-                Submit
-              </Button>
-            )}
-          </Grid>
-        </Grid>
-        <Button onClick={resetForm} variant='outlined' color='primary'>
-          Reset Form
-        </Button>
+            <Select
+              size='small'
+              displayEmpty
+              value={selectedPackageIndex}
+              onChange={(e) => handleJumpToPackage(e.target.value)}
+              sx={{ ml: 2 }}
+            >
+              <MenuItem value='' disabled>
+                Select Package
+              </MenuItem>
+              {shippingFormData.packages.map((pkg, index) => (
+                <MenuItem key={index} value={index}>
+                  <Tooltip
+                    title={
+                      <Box sx={{ p: 1 }}>
+                        <Typography variant='body2'>
+                          <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Type:</strong>{' '}
+                          {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Length:</strong> {pkg?.packageLength || '-'} cm
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Type of Goods:</strong>{' '}
+                          {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Note:</strong> {pkg?.packageNote || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>CBM:</strong> {pkg?.CBM || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>LDM:</strong> {pkg?.LDM || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Dangerous Goods:</strong> {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                        </Typography>
+                        <Typography variant='body2'>
+                          <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
+                        </Typography>
+                        {showSSCC && (
+                          <Typography variant='body2'>
+                            <strong>SSCC:</strong> {pkg?.sscc}
+                          </Typography>
+                        )}
+                      </Box>
+                    }
+                    arrow
+                    placement='top-start'
+                  >
+                    <span>Package {index + 1}</span>
+                  </Tooltip>
+                </MenuItem>
+              ))}
+            </Select>
+            <Grid container spacing={2} justifyContent='space-between' sx={{ mt: 3 }}>
+              <Grid>
+                <Button
+                  disabled={step === 0}
+                  onClick={handleBack}
+                  variant='outlined'
+                  color='primary'
+                >
+                  Back
+                </Button>
+              </Grid>
+              {errorMessage && (
+                <Typography color='error' variant='h5' gutterBottom>
+                  {errorMessage}
+                </Typography>
+              )}
+              {message && (
+                <Typography variant='h5' gutterBottom>
+                  {message}
+                </Typography>
+              )}
+              <Grid>
+                {step < 3 ? (
+                  <Button onClick={handleNext} variant='contained' color='primary'>
+                    Next
+                  </Button>
+                ) : (
+                  <Button onClick={handleSubmit} variant='contained' color='success'>
+                    Submit
+                  </Button>
+                )}
+              </Grid>
+            </Grid>
+          </Stack>
+        </Box>
       </Paper>
     </>
   );

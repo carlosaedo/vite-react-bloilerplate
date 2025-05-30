@@ -4,7 +4,7 @@ import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
 import * as stringUtils from '../../utils/stringOperations.js';
 import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
-
+import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
 import {
   Grid,
   Box,
@@ -26,6 +26,7 @@ import {
   FormControlLabel,
   Checkbox,
   Alert,
+  Stack,
 } from '@mui/material';
 
 import { LiaWpforms } from 'react-icons/lia';
@@ -63,7 +64,7 @@ const shippingPaymentTo = [
   { value: 'destinatario', label: 'Destinatário' },
 ];
 
-function ShippingForm({ handleChangeFormType }) {
+function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const {
     shippingFormData,
     setShippingFormData,
@@ -91,6 +92,11 @@ function ShippingForm({ handleChangeFormType }) {
   const [showDimensions, setShowDimensions] = useState(true);
 
   const [selectedPackageIndex, setSelectedPackageIndex] = useState(0);
+
+  const [infoValues, setInfoValues] = useState(() => {
+    const { totalQuantity, totalWeight } = calculateShippingFormTotals(shippingFormData.packages);
+    return { totalWeight, totalQuantity };
+  });
 
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
@@ -156,6 +162,10 @@ function ShippingForm({ handleChangeFormType }) {
       ...shippingFormData,
       packages: updatedPackages,
     };
+
+    const { totalPackages, totalWeight } = calculateShippingFormTotals(updatedPackages);
+
+    setInfoValues({ totalWeight, totalPackages });
 
     setShippingFormData(updatedFormData);
   };
@@ -367,7 +377,7 @@ function ShippingForm({ handleChangeFormType }) {
         </Alert>
       )}
 
-      <Paper sx={{ p: 2, maxWidth: 900, margin: 'auto', mt: 5 }}>
+      <Paper sx={{ p: 2, width: '98%', margin: 'auto', mt: 5 }}>
         <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
           <Typography
             variant='h5'
@@ -430,7 +440,7 @@ function ShippingForm({ handleChangeFormType }) {
           <Divider sx={{ mb: 2 }} />
 
           <Grid container spacing={2}>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Year'
                 name='year'
@@ -442,7 +452,7 @@ function ShippingForm({ handleChangeFormType }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Date'
                 name='date'
@@ -456,7 +466,7 @@ function ShippingForm({ handleChangeFormType }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Delivery Date'
                 name='deliveryDate'
@@ -470,7 +480,7 @@ function ShippingForm({ handleChangeFormType }) {
                 slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label overlapping issue
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Hour'
                 name='hour'
@@ -484,9 +494,8 @@ function ShippingForm({ handleChangeFormType }) {
                 required
               />
             </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Shipper Reference'
                 name='shipperRef'
@@ -499,7 +508,7 @@ function ShippingForm({ handleChangeFormType }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Consignee Reference'
                 name='consigneeRef'
@@ -512,9 +521,7 @@ function ShippingForm({ handleChangeFormType }) {
                 required
               />
             </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Waybill Reference'
                 name='trackingRef'
@@ -528,7 +535,7 @@ function ShippingForm({ handleChangeFormType }) {
                 disabled
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Ext. Number'
                 name='extNumber'
@@ -541,7 +548,7 @@ function ShippingForm({ handleChangeFormType }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Ext. Number 2'
                 name='extNumber2'
@@ -557,212 +564,214 @@ function ShippingForm({ handleChangeFormType }) {
           </Grid>
         </Box>
 
-        {/* Sender Info */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant='h6'>Sender Information</Typography>
-          <Divider sx={{ mb: 2 }} />
-          <TextField
-            label='Name'
-            name='senderName'
-            value={shippingFormData.senderName}
-            onChange={handleChange}
-            fullWidth
-            size='small'
-            margin='dense'
-            required
-          />
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label='Email'
-                name='senderEmail'
-                type='email'
-                value={shippingFormData.senderEmail}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
+        <Box display='flex' gap={4} flexWrap='wrap' sx={{ mb: 4 }}>
+          {/* Sender Info */}
+          <Box flex={1} minWidth={300}>
+            <Typography variant='h6'>Sender Information</Typography>
+            <Divider sx={{ mb: 2 }} />
+            <TextField
+              label='Name'
+              name='senderName'
+              value={shippingFormData.senderName}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Email'
+                  name='senderEmail'
+                  type='email'
+                  value={shippingFormData.senderEmail}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Phone'
+                  name='senderPhone'
+                  type='tel'
+                  value={shippingFormData.senderPhone}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label='Phone'
-                name='senderPhone'
-                type='tel'
-                value={shippingFormData.senderPhone}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
+            <TextField
+              label='Street'
+              name='senderStreet'
+              value={shippingFormData.senderStreet}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='City'
+                  name='senderCity'
+                  value={shippingFormData.senderCity}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='State'
+                  name='senderState'
+                  value={shippingFormData.senderState}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='ZIP'
+                  name='senderZip'
+                  value={shippingFormData.senderZip}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='Country'
+                  name='senderCountry'
+                  value={shippingFormData.senderCountry}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
             </Grid>
-          </Grid>
-          <TextField
-            label='Street'
-            name='senderStreet'
-            value={shippingFormData.senderStreet}
-            onChange={handleChange}
-            fullWidth
-            size='small'
-            margin='dense'
-            required
-          />
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='City'
-                name='senderCity'
-                value={shippingFormData.senderCity}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='State'
-                name='senderState'
-                value={shippingFormData.senderState}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='ZIP'
-                name='senderZip'
-                value={shippingFormData.senderZip}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='Country'
-                name='senderCountry'
-                value={shippingFormData.senderCountry}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-          </Grid>
-        </Box>
+          </Box>
 
-        {/* Recipient Info */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant='h6'>Recipient Information</Typography>
-          <Divider sx={{ mb: 2 }} />
-          <TextField
-            label='Name'
-            name='recipientName'
-            value={shippingFormData.recipientName}
-            onChange={handleChange}
-            fullWidth
-            size='small'
-            margin='dense'
-            required
-          />
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label='Email'
-                name='recipientEmail'
-                type='email'
-                value={shippingFormData.recipientEmail}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
+          {/* Recipient Info */}
+          <Box flex={1} minWidth={300}>
+            <Typography variant='h6'>Recipient Information</Typography>
+            <Divider sx={{ mb: 2 }} />
+            <TextField
+              label='Name'
+              name='recipientName'
+              value={shippingFormData.recipientName}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Email'
+                  name='recipientEmail'
+                  type='email'
+                  value={shippingFormData.recipientEmail}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label='Phone'
+                  name='recipientPhone'
+                  type='tel'
+                  value={shippingFormData.recipientPhone}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label='Phone'
-                name='recipientPhone'
-                type='tel'
-                value={shippingFormData.recipientPhone}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
+            <TextField
+              label='Street'
+              name='recipientStreet'
+              value={shippingFormData.recipientStreet}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='City'
+                  name='recipientCity'
+                  value={shippingFormData.recipientCity}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='State'
+                  name='recipientState'
+                  value={shippingFormData.recipientState}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='ZIP'
+                  name='recipientZip'
+                  value={shippingFormData.recipientZip}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  label='Country'
+                  name='recipientCountry'
+                  value={shippingFormData.recipientCountry}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+              </Grid>
             </Grid>
-          </Grid>
-          <TextField
-            label='Street'
-            name='recipientStreet'
-            value={shippingFormData.recipientStreet}
-            onChange={handleChange}
-            fullWidth
-            size='small'
-            margin='dense'
-            required
-          />
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='City'
-                name='recipientCity'
-                value={shippingFormData.recipientCity}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='State'
-                name='recipientState'
-                value={shippingFormData.recipientState}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='ZIP'
-                name='recipientZip'
-                value={shippingFormData.recipientZip}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
-              <TextField
-                label='Country'
-                name='recipientCountry'
-                value={shippingFormData.recipientCountry}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-          </Grid>
+          </Box>
         </Box>
 
         {/* Additional Info */}
@@ -827,131 +836,7 @@ function ShippingForm({ handleChangeFormType }) {
         {/* Package Info - Multiple Packages */}
         <Box sx={{ mb: 4, width: '100%' }}>
           <Typography variant='h6'>Package Details</Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'right',
-              mb: 2,
-            }}
-          >
-            <Button
-              sx={{ marginRight: 1 }}
-              variant='outlined'
-              startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
-              onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
-              size='small'
-            >
-              {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
-            </Button>
-            <Button
-              sx={{ marginRight: 1 }}
-              variant='outlined'
-              startIcon={<AddIcon />}
-              onClick={addPackage}
-              size='small'
-            >
-              Add Package
-            </Button>
-            <Button
-              variant='contained'
-              color='error'
-              startIcon={<DeleteIcon />}
-              onClick={removeAllPackages}
-              size='small'
-            >
-              Remove All
-            </Button>
 
-            <Typography sx={{ ml: 2 }}>
-              {shippingFormData?.packages?.length}{' '}
-              {shippingFormData?.packages?.length > 1 ? 'Packages' : 'Package'}
-            </Typography>
-            <Select
-              size='small'
-              displayEmpty
-              value={selectedPackageIndex}
-              onChange={(e) => handleJumpToPackage(e.target.value)}
-              sx={{ ml: 2 }}
-            >
-              <MenuItem value='' disabled>
-                Select Package
-              </MenuItem>
-
-              {shippingFormData?.packages?.map((pkg, index) => (
-                <MenuItem key={index} value={index}>
-                  <Tooltip
-                    title={
-                      <Box sx={{ p: 1 }}>
-                        <Typography variant='body2'>
-                          <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Type:</strong>{' '}
-                          {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Length:</strong> {pkg?.packageLength || '-'} cm
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Type of Goods:</strong>{' '}
-                          {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Note:</strong> {pkg?.packageNote || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>CBM:</strong> {pkg?.CBM || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>LDM:</strong> {pkg?.LDM || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Dangerous Goods:</strong> {pkg?.dangerousGoods ? 'Yes' : 'No'}
-                        </Typography>
-                        <Typography variant='body2'>
-                          <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
-                        </Typography>
-                        {showSSCC && (
-                          <Typography variant='body2'>
-                            <strong>SSCC:</strong> {pkg?.sscc}
-                          </Typography>
-                        )}
-                      </Box>
-                    }
-                    arrow
-                    placement='top-start'
-                  >
-                    <span>Package {index + 1}</span>
-                  </Tooltip>
-                </MenuItem>
-              ))}
-            </Select>
-          </Box>
           <Divider sx={{ mb: 2 }} />
           <Paper elevation={2} sx={{ mt: 2, p: 2, mb: 2 }}>
             <Typography variant='h6' gutterBottom>
@@ -1682,14 +1567,47 @@ function ShippingForm({ handleChangeFormType }) {
             </>
           </Box>
 
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'right',
-              mb: 2,
-            }}
+          <TextField
+            select
+            label='Shipping Service'
+            name={'shippingService'}
+            value={shippingFormData.shippingService}
+            onChange={handleChange}
+            fullWidth
+            size='small'
+            margin='dense'
+            required
           >
+            {shippingServices.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
+        <Box
+          position='fixed'
+          bottom={0}
+          left={sidebarWidth}
+          width={`calc(100% - ${sidebarWidth}px)`}
+          bgcolor='#fff' // solid white background
+          boxShadow={3}
+          p={2}
+          textAlign='right'
+          zIndex={100}
+        >
+          {/* here */}
+          <Stack
+            direction='row'
+            spacing={2}
+            alignItems='center'
+            justifyContent='flex-end'
+            flexWrap='wrap'
+          >
+            <Typography>
+              Total Weight: <strong>{infoValues.totalWeight} kg</strong>
+            </Typography>
             <Button
               sx={{ marginRight: 1 }}
               variant='outlined'
@@ -1718,8 +1636,10 @@ function ShippingForm({ handleChangeFormType }) {
               Remove All
             </Button>
             <Typography sx={{ ml: 2 }}>
-              {shippingFormData.packages.length}{' '}
-              {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
+              <strong>
+                {shippingFormData.packages.length}{' '}
+                {shippingFormData.packages.length > 1 ? 'Packages' : 'Package'}
+              </strong>
             </Typography>
             <Select
               size='small'
@@ -1804,44 +1724,23 @@ function ShippingForm({ handleChangeFormType }) {
                 </MenuItem>
               ))}
             </Select>
-          </Box>
-          <TextField
-            select
-            label='Shipping Service'
-            name={'shippingService'}
-            value={shippingFormData.shippingService}
-            onChange={handleChange}
-            fullWidth
-            size='small'
-            margin='dense'
-            required
-          >
-            {shippingServices.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-
-        {/* Submit */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          {errorMessage && (
-            <Typography color='error' variant='h5' gutterBottom>
-              {errorMessage}
-            </Typography>
-          )}
-          {message && (
-            <Typography variant='h5' gutterBottom>
-              {message}
-            </Typography>
-          )}
-          <Button onClick={resetForm} variant='outlined' color='primary'>
-            Reset Form
-          </Button>
-          <Button variant='contained' color='primary' onClick={handleSubmit}>
-            Submit
-          </Button>
+            {errorMessage && (
+              <Typography color='error' variant='h5' gutterBottom>
+                {errorMessage}
+              </Typography>
+            )}
+            {message && (
+              <Typography variant='h5' gutterBottom>
+                {message}
+              </Typography>
+            )}
+            <Button onClick={resetForm} variant='outlined' color='primary'>
+              Reset Form
+            </Button>
+            <Button variant='contained' color='primary' onClick={handleSubmit}>
+              Submit
+            </Button>
+          </Stack>
         </Box>
       </Paper>
     </>

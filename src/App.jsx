@@ -96,7 +96,7 @@ const App = () => {
             <Route path='/404' element={<Page404 />} />
             <Route path='/tracking' element={<TrackingSearch />} />
             <Route path='/tracking/:trackingNumber' element={<Tracking />} />
-            <Route path='/shipping-form' element={<ShippingForm />} />
+            <Route path='/shipping-form' element={<ShippingForm sidebarWidth={sidebarWidth} />} />
           </Routes>
           <Footer />
         </div>

@@ -7,7 +7,7 @@ import { CircularProgress } from '@mui/material';
 import { ShippingFormProvider } from '../context/ShippingFormContext';
 import { useAuth } from '../context/AuthContext';
 
-function ShippingFormParent() {
+function ShippingFormParent({ sidebarWidth }) {
   const navigateTo = useNavigate();
   const { checkLoginStatusAuth, loadingAuth } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -47,9 +47,12 @@ function ShippingFormParent() {
     <>
       <ShippingFormProvider>
         {shippingFormTypeSinglePage ? (
-          <ShippingFormSinglePage handleChangeFormType={handleChangeFormType} />
+          <ShippingFormSinglePage
+            handleChangeFormType={handleChangeFormType}
+            sidebarWidth={sidebarWidth}
+          />
         ) : (
-          <ShippingForm handleChangeFormType={handleChangeFormType} />
+          <ShippingForm handleChangeFormType={handleChangeFormType} sidebarWidth={sidebarWidth} />
         )}
       </ShippingFormProvider>
     </>
