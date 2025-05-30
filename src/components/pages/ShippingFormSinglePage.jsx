@@ -28,6 +28,9 @@ import {
   Alert,
   Stack,
   useMediaQuery,
+  CircularProgress,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
@@ -78,6 +81,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [message, setMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const [entitiesData, setEntitiesData] = useState([]);
+  const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
 
@@ -100,6 +107,24 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const { totalQuantity, totalWeight } = calculateShippingFormTotals(shippingFormData.packages);
     return { totalWeight, totalQuantity };
   });
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await api.get(`/shipping-form/get-entities`, {});
+        if (response?.data?.entities) {
+          setEntitiesData(response?.data?.entities);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setErrorMessage('Failed to load data.');
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
@@ -171,6 +196,23 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setInfoValues({ totalWeight, totalPackages });
 
     setShippingFormData(updatedFormData);
+  };
+
+  const handleEntityChange = (value) => {
+    setMessage(null);
+    setErrorMessage(null);
+    setShippingFormData({
+      ...shippingFormData,
+      recipientName: entitiesData[value].Name,
+      recipientStreet: entitiesData[value].Add1,
+      recipientCity: entitiesData[value].city,
+      recipientState: entitiesData[value].state,
+      recipientZip: entitiesData[value].zip_code,
+      recipientCountry: entitiesData[value].country,
+      extNumber: entitiesData[value].external_ref,
+      recipientTaxId: entitiesData[value].VAT,
+    });
+    setSelectedEntityIndex(value);
   };
 
   const handlePackageClearDimensions = (index) => {
@@ -372,7 +414,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   //if (loadingShippingForm) return <CircularProgress />;
   //
-
+  if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
   return (
     <>
       {(shippingFormData.trackingRef === null || trackingNumberShippingForm === null) && (
@@ -571,6 +613,25 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 margin='dense'
                 required
               />
+            </Grid>
+            <Grid size={{ sm: 2, xs: 6 }}>
+              <FormControl fullWidth size='small' margin='dense' required>
+                <InputLabel>Select Entity</InputLabel>
+                <Select
+                  value={selectedEntityIndex || ''}
+                  onChange={(e) => handleEntityChange(e.target.value)}
+                  label='Select Entity'
+                >
+                  <MenuItem value='' disabled>
+                    Select Entity
+                  </MenuItem>
+                  {entitiesData.map((entity, index) => (
+                    <MenuItem key={index} value={index}>
+                      {entity.Name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
         </Box>

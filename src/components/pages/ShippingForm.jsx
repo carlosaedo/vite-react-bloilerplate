@@ -23,6 +23,9 @@ import {
   Stack,
   Divider,
   useMediaQuery,
+  CircularProgress,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { RiPagesLine } from 'react-icons/ri';
@@ -68,10 +71,30 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const packageRefs = useRef([]);
   const [selectedPackageIndex, setSelectedPackageIndex] = useState('');
-
+  const [entitiesData, setEntitiesData] = useState([]);
+  const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
+  const [loading, setLoading] = useState(true);
   /*const handleJumpToPackage = (index) => {
       packageRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };*/
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await api.get(`/shipping-form/get-entities`, {});
+        if (response?.data?.entities) {
+          setEntitiesData(response?.data?.entities);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setErrorMessage('Failed to load data.');
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const handleJumpToPackage = (index) => {
     setMessage(null);
@@ -233,6 +256,23 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     };
 
     setShippingFormData(updatedFormData);
+  };
+
+  const handleEntityChange = (value) => {
+    setMessage(null);
+    setErrorMessage(null);
+    setShippingFormData({
+      ...shippingFormData,
+      recipientName: entitiesData[value].Name,
+      recipientStreet: entitiesData[value].Add1,
+      recipientCity: entitiesData[value].city,
+      recipientState: entitiesData[value].state,
+      recipientZip: entitiesData[value].zip_code,
+      recipientCountry: entitiesData[value].country,
+      extNumber: entitiesData[value].external_ref,
+      recipientTaxId: entitiesData[value].VAT,
+    });
+    setSelectedEntityIndex(value);
   };
 
   const removeAllPackages = () => {
@@ -434,6 +474,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     }
   };
 
+  if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
+
   return (
     <>
       {(shippingFormData.trackingRef === null || trackingNumberShippingForm === null) && (
@@ -510,7 +552,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           <Typography variant='h6'>Booking Information</Typography>
 
           <Grid container spacing={2}>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Year'
                 name='year'
@@ -522,7 +564,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Date'
                 name='date'
@@ -536,7 +578,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Delivery Date'
                 name='deliveryDate'
@@ -550,7 +592,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label overlapping issue
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Hour'
                 name='hour'
@@ -564,9 +606,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Shipper Reference'
                 name='shipperRef'
@@ -579,7 +620,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Consignee Reference'
                 name='consigneeRef'
@@ -592,9 +633,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Waybill Reference'
                 name='trackingRef'
@@ -604,11 +643,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 fullWidth
                 size='small'
                 margin='dense'
-                disabled
                 required
+                disabled
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Ext. Number'
                 name='extNumber'
@@ -621,7 +660,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{ sm: 2, xs: 6 }}>
               <TextField
                 label='Ext. Number 2'
                 name='extNumber2'
@@ -634,19 +673,70 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
+            <Grid size={{ sm: 2, xs: 6 }}>
+              <FormControl fullWidth size='small' margin='dense' required>
+                <InputLabel>Select Entity</InputLabel>
+                <Select
+                  value={selectedEntityIndex || ''}
+                  onChange={(e) => handleEntityChange(e.target.value)}
+                  label='Select Entity'
+                >
+                  <MenuItem value='' disabled>
+                    Select Entity
+                  </MenuItem>
+                  {entitiesData.map((entity, index) => (
+                    <MenuItem key={index} value={index}>
+                      {entity.Name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
         </Box>
-        <Tabs value={step} onChange={handleStepChange} variant='fullWidth'>
+
+        <Tabs
+          value={step}
+          onChange={handleStepChange}
+          variant='fullWidth'
+          sx={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            minHeight: '52px',
+            p: 0.5,
+            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.08)',
+            '& .MuiTabs-flexContainer': {
+              gap: 0.5,
+            },
+            '& .MuiTabs-indicator': {
+              display: 'none',
+            },
+          }}
+        >
           {['Sender Info', 'Recipient Info', 'Package Details', 'Review & Submit'].map(
             (label, index) => (
               <Tab
                 key={index}
                 label={label}
                 sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.92rem',
+                  borderRadius: '12px',
+                  minHeight: '44px',
+                  mx: 0.25,
                   color: '#003D2C',
-                  '&.Mui-selected': { color: '#003D2C' },
-                  '&.Mui-selected:hover': { color: 'white' },
-                  '&:hover': { color: step ? 'white' : 'white' },
+                  backgroundColor: '#ffffff',
+                  transition: 'all 0.3s ease',
+                  '&.Mui-selected': {
+                    backgroundColor: '#003D2C',
+                    color: '#ffffff',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                  },
+                  '&:hover': {
+                    backgroundColor: '#ffc928',
+                    color: '#003D2C',
+                  },
                 }}
               />
             ),
@@ -1418,7 +1508,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
           {step === 3 && <ShippingFormReviewDetails formData={shippingFormData} />}
         </Grid>
-
         {/* Additional Info */}
         <Box sx={{ mb: 4, marginTop: 3 }}>
           <Typography variant='h6'>Payment Information</Typography>
@@ -1477,7 +1566,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             </Grid>
           </Grid>
         </Box>
-
         <Box
           position='fixed'
           bottom={0}
