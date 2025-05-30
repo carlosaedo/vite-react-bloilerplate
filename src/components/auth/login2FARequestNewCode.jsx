@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import torrestirApi from '../api/torrestirApi';
 import { Box, Button, Typography, Link as MuiLink } from '@mui/material';

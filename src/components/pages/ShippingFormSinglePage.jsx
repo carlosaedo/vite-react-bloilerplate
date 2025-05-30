@@ -432,7 +432,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       )}
 
       <Paper sx={{ p: 2, width: '98%', margin: 'auto', mt: 5 }}>
-        <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
           <Typography
             variant='h5'
             gutterBottom

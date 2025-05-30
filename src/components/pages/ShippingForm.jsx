@@ -490,8 +490,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           Cannot get tracking number from the server. Retrying automatically every 10 seconds...
         </Alert>
       )}
-      <Paper sx={{ p: 3, width: '98%', margin: 'auto', mt: 5 }}>
-        <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
+      <Paper sx={{ p: 2, width: '98%', margin: 'auto', mt: 5 }}>
+        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
           <Typography
             variant='h5'
             gutterBottom
