@@ -1,3 +1,5 @@
+import React from 'react';
+
 const ResetPassNew = () => {
   return (
     <React.Fragment>

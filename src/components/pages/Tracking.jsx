@@ -1,6 +1,5 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TrackingMap from '../trackingMap/TrackingMap';
 import api from '../api/api';
 import './Tracking.css';
