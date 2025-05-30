@@ -27,8 +27,9 @@ import {
   Checkbox,
   Alert,
   Stack,
+  useMediaQuery,
 } from '@mui/material';
-
+import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
@@ -65,6 +66,8 @@ const shippingPaymentTo = [
 ];
 
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const {
     shippingFormData,
     setShippingFormData,
@@ -1637,21 +1640,25 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         <Box
           position='fixed'
           bottom={0}
-          left={sidebarWidth}
-          width={`calc(100% - ${sidebarWidth}px)`}
+          // Responsive left and width for mobile:
+          left={{ xs: sidebarWidth, sm: sidebarWidth }}
+          width={{ xs: `calc(100% - ${sidebarWidth}px)`, sm: `calc(100% - ${sidebarWidth}px)` }}
           sx={{
             transition: 'left 0.3s ease, width 0.3s ease',
             bgcolor: '#fff',
             boxShadow: 3,
-            p: 2,
+            p: { xs: 1, sm: 2 }, // less padding on mobile
             textAlign: 'right',
             zIndex: 100,
+            // enforce font size on all descendants:
+            '& *': {
+              fontSize: !isMobile && '0.8rem !important',
+            },
           }}
         >
-          {/* here */}
           <Stack
             direction='row'
-            spacing={2}
+            spacing={{ xs: 1, sm: 2 }} // less spacing on mobile
             alignItems='center'
             justifyContent='flex-end'
             flexWrap='wrap'
@@ -1770,7 +1777,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     arrow
                     placement='top-start'
                   >
-                    <span>Package {index + 1}</span>
+                    <span>Package: {index + 1}</span>
                   </Tooltip>
                 </MenuItem>
               ))}
