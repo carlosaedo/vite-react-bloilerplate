@@ -9,6 +9,11 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Transitions only for layout-affecting properties */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, left 0.3s ease, width 0.3s ease;
+}
+
 body {
   margin: 0;
   place-items: center;

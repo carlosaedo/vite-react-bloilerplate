@@ -1207,9 +1207,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 {/* Top-right CBM section */}
                 <Grid
                   size={{ xs: 12 }}
-                  sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-end',
+                    gap: 2,
+                  }}
                 >
-                  <Grid size={{ xs: 1.8 }}>
+                  <Grid size={{ xs: 12, sm: 2 }}>
                     <TextField
                       label='Weight (kg)'
                       name={`packageWeight_${selectedPackageIndex}`}
@@ -1225,9 +1230,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       slotProps={{ htmlInput: { min: 0 } }}
                     />
                   </Grid>
+
                   {showDimensions && (
-                    <React.Fragment>
-                      <Grid size={{ xs: 1.8 }}>
+                    <>
+                      <Grid size={{ xs: 12, sm: 2 }}>
                         <Tooltip
                           title='Setting this value will automatically calculate CBM'
                           placement='top'
@@ -1252,7 +1258,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           />
                         </Tooltip>
                       </Grid>
-                      <Grid size={{ xs: 1.8 }}>
+                      <Grid size={{ xs: 12, sm: 2 }}>
                         <Tooltip
                           title='Setting this value will automatically calculate CBM'
                           placement='top'
@@ -1277,7 +1283,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           />
                         </Tooltip>
                       </Grid>
-                      <Grid size={{ xs: 1.8 }}>
+                      <Grid size={{ xs: 12, sm: 2 }}>
                         <Tooltip
                           title='Setting this value will automatically calculate CBM'
                           placement='top'
@@ -1302,10 +1308,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           />
                         </Tooltip>
                       </Grid>
-                    </React.Fragment>
+                    </>
                   )}
+
                   {showCBM && (
-                    <Grid size={{ xs: 2 }}>
+                    <Grid size={{ xs: 12, sm: 2 }}>
                       <TextField
                         label='CBM'
                         name={`CBM_${selectedPackageIndex}`}
@@ -1342,8 +1349,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       </Tooltip>
                     </Grid>
                   )}
+
                   {hideLDM && (
-                    <Grid size={{ xs: 2 }}>
+                    <Grid size={{ xs: 12, sm: 2 }}>
                       <TextField
                         label='LDM'
                         name={`LDM_${selectedPackageIndex}`}
@@ -1380,7 +1388,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       </Tooltip>
                     </Grid>
                   )}
-                  <Grid size={{ xs: 2 }}>
+
+                  <Grid size={{ xs: 12, sm: 2 }}>
                     <TextField
                       label='TaxableWeight'
                       name={`TaxableWeight_${selectedPackageIndex}`}
@@ -1397,8 +1406,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     />
                   </Grid>
                 </Grid>
-
-                <Grid size={{ xs: 4 }}>
+              </Grid>
+              <Divider sx={{ mb: 2 }} />
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 2 }}>
                   <TextField
                     label='Quantity'
                     name={`packageQuantity_${selectedPackageIndex}`}
@@ -1414,7 +1425,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     slotProps={{ htmlInput: { min: 0 } }}
                   />
                 </Grid>
-                <Grid size={{ xs: 4 }}>
+
+                <Grid size={{ xs: 12, sm: 3 }}>
                   <TextField
                     select
                     label='Package Type'
@@ -1435,7 +1447,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     ))}
                   </TextField>
                 </Grid>
-                <Grid size={{ xs: 4 }}>
+
+                <Grid size={{ xs: 12, sm: 3 }}>
                   <TextField
                     select
                     label='Type of Goods'
@@ -1458,108 +1471,133 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 </Grid>
               </Grid>
 
-              <TextField
-                label='Note'
-                name={`packageDescription_${selectedPackageIndex}`}
-                value={shippingFormData.packages[selectedPackageIndex]?.packageNote}
-                onChange={(e) =>
-                  handlePackageChange(selectedPackageIndex, 'packageNote', e.target.value)
-                }
-                fullWidth
-                size='small'
-                margin='dense'
-                multiline
-                rows={2}
-              />
-              <TextField
-                label='Marks and Numbers'
-                name={`marksAndNumbers_${selectedPackageIndex}`}
-                type='text'
-                value={shippingFormData.packages[selectedPackageIndex]?.marksAndNumbers}
-                onChange={(e) =>
-                  handlePackageChange(selectedPackageIndex, 'marksAndNumbers', e.target.value)
-                }
-                fullWidth
-                sx={{ mt: 2, mb: 1 }}
-              />
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1, mb: 1 }}>
-                {shippingFormData.packages[selectedPackageIndex]?.insured && (
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    label='Value of Goods (€)'
-                    name={`packageValue_${selectedPackageIndex}`}
-                    type='number'
-                    value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods}
+                    label='Note'
+                    name={`packageDescription_${selectedPackageIndex}`}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageNote}
                     onChange={(e) =>
-                      handlePackageChange(selectedPackageIndex, 'valueOfGoods', e.target.value)
+                      handlePackageChange(selectedPackageIndex, 'packageNote', e.target.value)
                     }
+                    fullWidth
                     size='small'
-                    required={shippingFormData.packages[selectedPackageIndex]?.insured || false}
-                    sx={{ minWidth: 180 }}
-                    slotProps={{ htmlInput: { min: 0 } }}
+                    margin='dense'
+                    multiline
+                    rows={2}
                   />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Marks and Numbers'
+                    name={`marksAndNumbers_${selectedPackageIndex}`}
+                    type='text'
+                    value={shippingFormData.packages[selectedPackageIndex]?.marksAndNumbers}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackageIndex, 'marksAndNumbers', e.target.value)
+                    }
+                    fullWidth
+                    multiline
+                    size='small'
+                    margin='dense'
+                    rows={2}
+                  />
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                {shippingFormData.packages[selectedPackageIndex]?.insured && (
+                  <Grid size={{ xs: 12, sm: 2 }}>
+                    <TextField
+                      label='Value of Goods (€)'
+                      name={`packageValue_${selectedPackageIndex}`}
+                      type='number'
+                      value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods}
+                      onChange={(e) =>
+                        handlePackageChange(selectedPackageIndex, 'valueOfGoods', e.target.value)
+                      }
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required={shippingFormData.packages[selectedPackageIndex]?.insured || false}
+                      sx={{ minWidth: 180 }}
+                      slotProps={{ htmlInput: { min: 0 } }}
+                    />
+                  </Grid>
                 )}
 
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={shippingFormData.packages[selectedPackageIndex]?.insured || false}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'insured', e.target.checked)
-                      }
-                      name={`insured_${selectedPackageIndex}`}
-                      color='primary'
-                    />
-                  }
-                  label='Insured'
-                />
-
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={shippingFormData.packages[selectedPackageIndex]?.stackable || false}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'stackable', e.target.checked)
-                      }
-                      name={`stackable_${selectedPackageIndex}`}
-                      color='primary'
-                    />
-                  }
-                  label='Stackable'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={
-                        shippingFormData.packages[selectedPackageIndex]?.dangerousGoods || false
-                      }
-                      onChange={(e) =>
-                        handlePackageChange(
-                          selectedPackageIndex,
-                          'dangerousGoods',
-                          e.target.checked,
-                        )
-                      }
-                      name={`dangerousGoods_${selectedPackageIndex}`}
-                      color='primary'
-                    />
-                  }
-                  label='Dangerous Goods'
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={shippingFormData.packages[selectedPackageIndex]?.customs || false}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'customs', e.target.checked)
-                      }
-                      name={`customs_${selectedPackageIndex}`}
-                      color='primary'
-                    />
-                  }
-                  label='Customs'
-                />
-              </Box>
-
+                <Grid size={{ xs: 12, sm: 2 }}>
+                  <FormControlLabel
+                    sx={{ mt: 1 }}
+                    control={
+                      <Checkbox
+                        checked={shippingFormData.packages[selectedPackageIndex]?.insured || false}
+                        onChange={(e) =>
+                          handlePackageChange(selectedPackageIndex, 'insured', e.target.checked)
+                        }
+                        name={`insured_${selectedPackageIndex}`}
+                        color='primary'
+                      />
+                    }
+                    label='Insured'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 2 }}>
+                  <FormControlLabel
+                    sx={{ mt: 1 }}
+                    control={
+                      <Checkbox
+                        checked={
+                          shippingFormData.packages[selectedPackageIndex]?.stackable || false
+                        }
+                        onChange={(e) =>
+                          handlePackageChange(selectedPackageIndex, 'stackable', e.target.checked)
+                        }
+                        name={`stackable_${selectedPackageIndex}`}
+                        color='primary'
+                      />
+                    }
+                    label='Stackable'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 2 }}>
+                  <FormControlLabel
+                    sx={{ mt: 1 }}
+                    control={
+                      <Checkbox
+                        checked={
+                          shippingFormData.packages[selectedPackageIndex]?.dangerousGoods || false
+                        }
+                        onChange={(e) =>
+                          handlePackageChange(
+                            selectedPackageIndex,
+                            'dangerousGoods',
+                            e.target.checked,
+                          )
+                        }
+                        name={`dangerousGoods_${selectedPackageIndex}`}
+                        color='primary'
+                      />
+                    }
+                    label='Dangerous Goods'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 2 }}>
+                  <FormControlLabel
+                    sx={{ mt: 1 }}
+                    control={
+                      <Checkbox
+                        checked={shippingFormData.packages[selectedPackageIndex]?.customs || false}
+                        onChange={(e) =>
+                          handlePackageChange(selectedPackageIndex, 'customs', e.target.checked)
+                        }
+                        name={`customs_${selectedPackageIndex}`}
+                        color='primary'
+                      />
+                    }
+                    label='Customs'
+                  />
+                </Grid>
+              </Grid>
               {showSSCC && (
                 <TextField
                   label='SSCC'
