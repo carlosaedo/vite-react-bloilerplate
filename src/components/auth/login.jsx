@@ -127,7 +127,7 @@ const Login = () => {
   };
 
   return (
-    <>
+    <React.Fragment>
       {isTokenPresent ? (
         <div>
           {!showChangingPassword && !showEditProfile && <Logout userInfoData={userInfo} />}
@@ -261,7 +261,7 @@ const Login = () => {
           </Box>
         </Box>
       )}
-    </>
+    </React.Fragment>
   );
 };
 

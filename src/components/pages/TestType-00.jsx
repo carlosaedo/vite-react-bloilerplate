@@ -356,7 +356,7 @@ const TestType = () => {
   ];
 
   return (
-    <>
+    <React.Fragment>
       {error && (
         <Alert severity='error' onClose={() => setError(null)}>
           {error}
@@ -599,7 +599,7 @@ const TestType = () => {
           </Button>
         </Box>
       </Box>
-    </>
+    </React.Fragment>
   );
 };
 

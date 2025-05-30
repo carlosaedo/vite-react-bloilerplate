@@ -249,7 +249,7 @@ const ClientDetails = () => {
 
         <Stack direction='row' spacing={2} mt={3}>
           {editMode ? (
-            <>
+            <React.Fragment>
               <Button variant='outlined' color='primary' onClick={() => setEditMode(false)}>
                 Cancel
               </Button>
@@ -271,16 +271,16 @@ const ClientDetails = () => {
               <Button variant='contained' onClick={handleUpdate} color='primary'>
                 Save
               </Button>
-            </>
+            </React.Fragment>
           ) : (
-            <>
+            <React.Fragment>
               <Button variant='contained' onClick={() => setEditMode(true)}>
                 Edit
               </Button>
               <Button variant='contained' color='secondary' onClick={handleCreateNew}>
                 Create New
               </Button>
-            </>
+            </React.Fragment>
           )}
         </Stack>
       </Box>

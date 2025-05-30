@@ -477,7 +477,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   return (
-    <>
+    <React.Fragment>
       {(shippingFormData.trackingRef === null || trackingNumberShippingForm === null) && (
         <Alert
           severity='error'
@@ -745,7 +745,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
         <Grid container spacing={2} sx={{ mt: 1 }}>
           {step === 0 && (
-            <>
+            <React.Fragment>
               <Grid size={{ xs: 12 }}>
                 <TextField
                   label='Sender Name'
@@ -828,11 +828,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   required
                 />
               </Grid>
-            </>
+            </React.Fragment>
           )}
 
           {step === 1 && (
-            <>
+            <React.Fragment>
               <Grid size={{ xs: 12 }}>
                 <TextField
                   label='Recipient Name'
@@ -915,11 +915,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   required
                 />
               </Grid>
-            </>
+            </React.Fragment>
           )}
 
           {step === 2 && (
-            <>
+            <React.Fragment>
               {/* Package Info - Multiple Packages */}
               <Box sx={{ mb: 4, width: '100%' }}>
                 {shippingFormData.packages.map((pkg, index) => (
@@ -1031,7 +1031,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             # {index + 1}
                           </Box>
                           {!showPackageDetails && (
-                            <>
+                            <React.Fragment>
                               <Box
                                 sx={{
                                   display: 'flex',
@@ -1073,7 +1073,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                   <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
                                 </Typography>
                               </Box>
-                            </>
+                            </React.Fragment>
                           )}
                         </Typography>
 
@@ -1089,7 +1089,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       </Box>
                     </Tooltip>
                     {showPackageDetails && (
-                      <>
+                      <React.Fragment>
                         <Grid container spacing={2}>
                           {/* Top-right CBM section */}
                           <Grid
@@ -1119,7 +1119,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             </Grid>
 
                             {showDimensions && (
-                              <>
+                              <React.Fragment>
                                 <Grid size={{ xs: 12, sm: 2 }}>
                                   <Tooltip
                                     title='Setting this value will automatically calculate CBM'
@@ -1183,7 +1183,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                     />
                                   </Tooltip>
                                 </Grid>
-                              </>
+                              </React.Fragment>
                             )}
 
                             {showCBM && (
@@ -1479,7 +1479,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             disabled={true}
                           />
                         )}
-                      </>
+                      </React.Fragment>
                     )}
                   </Box>
                 ))}
@@ -1503,7 +1503,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </TextField>
                 </Grid>
               </Box>
-            </>
+            </React.Fragment>
           )}
 
           {step === 3 && <ShippingFormReviewDetails formData={shippingFormData} />}
@@ -1760,7 +1760,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           </Stack>
         </Box>
       </Paper>
-    </>
+    </React.Fragment>
   );
 }
 

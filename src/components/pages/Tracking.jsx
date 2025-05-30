@@ -169,7 +169,7 @@ const Tracking = () => {
   const progressPercentage = 60; // Example value, adjust as needed
 
   return (
-    <>
+    <React.Fragment>
       <div className='tracking-wrapper'>
         <div className='tracker-container'>
           {modifiedStages.map((stage, index) => {
@@ -393,7 +393,7 @@ const Tracking = () => {
           </div>
         )}
       </div>
-    </>
+    </React.Fragment>
   );
 };
 

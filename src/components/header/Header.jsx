@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -234,7 +235,7 @@ const Header = () => {
 
   const displayName = user?.email || localStorage.getItem('userEmail') || 'user';
 
-  if (loadingAuth) return <></>;
+  if (loadingAuth) return <React.Fragment></React.Fragment>;
 
   return (
     <StyledAppBar position='sticky'>
@@ -248,7 +249,7 @@ const Header = () => {
 
         {/* Right Section */}
         {isTokenPresent ? (
-          <>
+          <React.Fragment>
             {/* Desktop/Tablet View */}
             {!isMobile ? (
               <NavSection>
@@ -430,7 +431,7 @@ const Header = () => {
 
               <List>
                 {userRole === 'admin' && (
-                  <>
+                  <React.Fragment>
                     <ListItem>
                       <ListItemText
                         primary='Client'
@@ -468,7 +469,7 @@ const Header = () => {
                       />
                     </ListItem>
                     <Divider sx={{ my: 2, bgcolor: alpha('#ffc928', 0.2) }} />
-                  </>
+                  </React.Fragment>
                 )}
                 <ListItem>
                   <ListItemText
@@ -501,7 +502,7 @@ const Header = () => {
                 </ListItem>
               </List>
             </Drawer>
-          </>
+          </React.Fragment>
         ) : (
           <MuiLink
             component={Link}

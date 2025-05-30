@@ -192,7 +192,7 @@ const Home = () => {
   return (
     <DashboardContainer>
       {isTokenPresent ? (
-        <>
+        <React.Fragment>
           <WelcomeCard elevation={0}>
             <Grid container spacing={3} alignItems='center'>
               <Grid size={{ xs: 12, sm: 8 }}>
@@ -374,7 +374,7 @@ const Home = () => {
               </StatsCard>
             </Grid>
           </StatsGrid>
-        </>
+        </React.Fragment>
       ) : (
         <GuestContainer>
           <Box sx={{ mb: 4 }}>

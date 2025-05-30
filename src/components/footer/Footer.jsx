@@ -23,14 +23,14 @@ const Footer = () => {
         }}
       >
         {isMobile ? (
-          <>
+          <React.Fragment>
             Torrestir Shipping Portal v{appVersion} <br />
             build {appBuildVersion}
-          </>
+          </React.Fragment>
         ) : (
-          <>
+          <React.Fragment>
             Torrestir Shipping Portal v{appVersion} build {appBuildVersion}
-          </>
+          </React.Fragment>
         )}
       </Typography>
     </Box>

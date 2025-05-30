@@ -44,7 +44,7 @@ function ShippingFormParent({ sidebarWidth }) {
   if (loading || loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   return (
-    <>
+    <React.Fragment>
       <ShippingFormProvider>
         {shippingFormTypeSinglePage ? (
           <ShippingFormSinglePage
@@ -55,7 +55,7 @@ function ShippingFormParent({ sidebarWidth }) {
           <ShippingForm handleChangeFormType={handleChangeFormType} sidebarWidth={sidebarWidth} />
         )}
       </ShippingFormProvider>
-    </>
+    </React.Fragment>
   );
 }
 

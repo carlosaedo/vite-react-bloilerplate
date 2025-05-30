@@ -107,7 +107,7 @@ const TrackingPage = () => {
   };
 
   return (
-    <>
+    <React.Fragment>
       <div
         className='page-wrapper'
         style={{
@@ -247,7 +247,7 @@ const TrackingPage = () => {
           </div>
         </div>
       )}
-    </>
+    </React.Fragment>
   );
 };
 

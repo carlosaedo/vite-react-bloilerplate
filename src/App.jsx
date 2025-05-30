@@ -44,7 +44,7 @@ const App = () => {
   `);
 
   return (
-    <>
+    <React.Fragment>
       <ConnectionBanner />
       <Sidebar onToggle={setSidebarWidth} />
       <div
@@ -59,7 +59,7 @@ const App = () => {
           <Header />
           <Routes>
             {isLoggedIn ? (
-              <>
+              <React.Fragment>
                 {/* Admin-only routes */}
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/test-type-00' element={<TestType00 />} />
@@ -73,7 +73,7 @@ const App = () => {
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/client-new' element={<ClientNew />} />
                 </Route>
-              </>
+              </React.Fragment>
             ) : (
               <Route path='*' element={<Navigate to='/login' replace />} />
             )}
@@ -101,7 +101,7 @@ const App = () => {
           <Footer />
         </div>
       </div>
-    </>
+    </React.Fragment>
   );
 };
 

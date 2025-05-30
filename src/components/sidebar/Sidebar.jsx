@@ -290,7 +290,7 @@ const Sidebar = ({ onToggle }) => {
 
         <List>
           {isLoggedIn ? (
-            <>
+            <React.Fragment>
               {renderMenu()}
 
               <ListItem disablePadding sx={{ marginTop: 'auto' }}>
@@ -326,9 +326,9 @@ const Sidebar = ({ onToggle }) => {
                   </ListItemButton>
                 </Tooltip>
               </ListItem>
-            </>
+            </React.Fragment>
           ) : (
-            <>
+            <React.Fragment>
               <ListItem disablePadding sx={{ marginTop: 'auto' }}>
                 <Tooltip title='Home' placement='right' arrow>
                   <ListItemButton
@@ -379,7 +379,7 @@ const Sidebar = ({ onToggle }) => {
                   </ListItemButton>
                 </Tooltip>
               </ListItem>
-            </>
+            </React.Fragment>
           )}
         </List>
       </Box>
