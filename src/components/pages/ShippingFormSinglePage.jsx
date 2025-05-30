@@ -436,7 +436,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           <Typography
             variant='h5'
             gutterBottom
-            sx={{ fontWeight: 700, color: '#003e2d', display: 'flex', alignItems: 'center' }}
+            sx={{ fontWeight: 700, color: '#003e2d', display: 'flex' }}
           >
             Shipping Form
             {shippingFormData.trackingRef ? (

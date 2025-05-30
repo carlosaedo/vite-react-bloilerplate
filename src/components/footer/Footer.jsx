@@ -10,7 +10,7 @@ const Footer = () => {
     <Box
       sx={{
         marginTop: 2,
-        marginBottom: isMobile ? '150px' : '80px',
+        marginBottom: isMobile ? '160px' : '120px',
         textAlign: 'center',
       }}
     >
