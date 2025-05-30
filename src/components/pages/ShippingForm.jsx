@@ -1433,11 +1433,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           bottom={0}
           left={sidebarWidth}
           width={`calc(100% - ${sidebarWidth}px)`}
-          bgcolor='#fff' // solid white background
-          boxShadow={3}
-          p={2}
-          textAlign='right'
-          zIndex={100}
+          sx={{
+            transition: 'left 0.3s ease, width 0.3s ease',
+            bgcolor: '#fff',
+            boxShadow: 3,
+            p: 2,
+            textAlign: 'right',
+            zIndex: 100,
+          }}
         >
           {/* here */}
           <Stack
