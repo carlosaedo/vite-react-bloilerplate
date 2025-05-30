@@ -850,218 +850,220 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <Typography variant='h6' gutterBottom>
               Package Table
             </Typography>
+            <Box sx={{ width: '100%', overflowX: 'auto' }}>
+              <Table size='small'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>#</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Weight (kg)</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Type</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>CBM</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>LDM</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Taxable Weight</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Note</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Value (€)</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
 
-            <Table size='small'>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <strong>#</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Weight (kg)</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Type</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>CBM</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>LDM</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Taxable Weight</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Note</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Value (€)</strong>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
+                <TableBody>
+                  {packagesToShow?.map((pkg, index) => {
+                    const globalIndex = page * rowsPerPage + index;
 
-              <TableBody>
-                {packagesToShow?.map((pkg, index) => {
-                  const globalIndex = page * rowsPerPage + index;
-
-                  return (
-                    <React.Fragment key={globalIndex}>
-                      <Tooltip
-                        title={
-                          <Box sx={{ p: 1 }}>
-                            <Typography variant='body2'>
-                              <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Type:</strong>{' '}
-                              {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Length:</strong> {pkg?.packageLength || '-'} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Type of Goods:</strong>{' '}
-                              {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Note:</strong> {pkg?.packageNote || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>CBM:</strong> {pkg?.CBM || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>LDM:</strong> {pkg?.LDM || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Dangerous Goods:</strong> {pkg?.dangerousGoods ? 'Yes' : 'No'}
-                            </Typography>
-                            <Typography variant='body2'>
-                              <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
-                            </Typography>
-                            {showSSCC && (
+                    return (
+                      <React.Fragment key={globalIndex}>
+                        <Tooltip
+                          title={
+                            <Box sx={{ p: 1 }}>
                               <Typography variant='body2'>
+                                <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Type:</strong>{' '}
+                                {stringUtils.capitalizeFirst(pkg?.packageType) || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Length:</strong> {pkg?.packageLength || '-'} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Width:</strong> {pkg?.packageWidth || '-'} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Height:</strong> {pkg?.packageHeight || '-'} cm
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Marks and Numbers:</strong> {pkg?.marksAndNumbers || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Type of Goods:</strong>{' '}
+                                {stringUtils.toSpacedTitleCase(pkg?.typeOfGoods) || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Note:</strong> {pkg?.packageNote || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Value:</strong> {pkg?.valueOfGoods || '-'} €
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>CBM:</strong> {pkg?.CBM || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>LDM:</strong> {pkg?.LDM || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Taxable Weight:</strong> {pkg?.TaxableWeight || '-'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Insured:</strong> {pkg?.insured ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Stackable:</strong> {pkg?.stackable ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Dangerous Goods:</strong>{' '}
+                                {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                              </Typography>
+                              <Typography variant='body2'>
+                                <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
+                              </Typography>
+                              {showSSCC && (
+                                <Typography variant='body2'>
+                                  <strong>SSCC:</strong> {pkg?.sscc}
+                                </Typography>
+                              )}
+                            </Box>
+                          }
+                          arrow
+                          placement='top-start'
+                        >
+                          <TableRow
+                            onClick={() => handleJumpToPackage(globalIndex)}
+                            sx={{
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              <Typography
+                                variant='subtitle1'
+                                sx={{ display: 'flex', alignItems: 'center' }}
+                              >
+                                <Box
+                                  component='span'
+                                  sx={{
+                                    display: 'inline-block',
+                                    backgroundColor: 'primary.main',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    borderRadius: '18px',
+                                    px: 1.5,
+                                    py: 0.5,
+                                    fontSize: '0.75rem',
+                                    mr: 1.5,
+                                    minWidth: 24,
+                                    textAlign: 'center',
+                                  }}
+                                >
+                                  {globalIndex + 1}
+                                </Box>
+                              </Typography>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.packageWeight || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.packageType?.charAt(0).toUpperCase() +
+                                pkg?.packageType?.slice(1) || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.CBM || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.LDM || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.TaxableWeight || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.packageNote || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.insured ? pkg?.valueOfGoods || '-' : 'NOT INSURED'}
+                            </TableCell>
+                          </TableRow>
+                        </Tooltip>
+                        {showSSCC && (
+                          <TableRow>
+                            <TableCell colSpan={8}>
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  pl: 5,
+                                  color: 'text.secondary',
+                                  fontSize: '0.75rem',
+                                }}
+                                style={{ fontStyle: 'italic !important' }} // inline style with !important
+                              >
                                 <strong>SSCC:</strong> {pkg?.sscc}
                               </Typography>
-                            )}
-                          </Box>
-                        }
-                        arrow
-                        placement='top-start'
-                      >
-                        <TableRow
-                          onClick={() => handleJumpToPackage(globalIndex)}
-                          sx={{
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            <Typography
-                              variant='subtitle1'
-                              sx={{ display: 'flex', alignItems: 'center' }}
-                            >
-                              <Box
-                                component='span'
-                                sx={{
-                                  display: 'inline-block',
-                                  backgroundColor: 'primary.main',
-                                  color: 'white',
-                                  fontWeight: 'bold',
-                                  borderRadius: '18px',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  fontSize: '0.75rem',
-                                  mr: 1.5,
-                                  minWidth: 24,
-                                  textAlign: 'center',
-                                }}
-                              >
-                                {globalIndex + 1}
-                              </Box>
-                            </Typography>
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            {pkg?.packageWeight || '-'}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            {pkg?.packageType?.charAt(0).toUpperCase() +
-                              pkg?.packageType?.slice(1) || '-'}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            {pkg?.CBM || '-'}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            {pkg?.LDM || '-'}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            {pkg?.TaxableWeight || '-'}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            {pkg?.packageNote || '-'}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              borderBottom: showSSCC ? 'none !important' : undefined,
-                            }}
-                          >
-                            {pkg?.insured ? pkg?.valueOfGoods || '-' : 'NOT INSURED'}
-                          </TableCell>
-                        </TableRow>
-                      </Tooltip>
-                      {showSSCC && (
-                        <TableRow>
-                          <TableCell colSpan={8}>
-                            <Typography
-                              variant='body2'
-                              sx={{
-                                pl: 5,
-                                color: 'text.secondary',
-                                fontSize: '0.75rem',
-                              }}
-                              style={{ fontStyle: 'italic !important' }} // inline style with !important
-                            >
-                              <strong>SSCC:</strong> {pkg?.sscc}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </Box>
             <TablePagination
               component='div'
               count={shippingFormData?.packages?.length}
