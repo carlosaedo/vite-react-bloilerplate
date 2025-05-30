@@ -260,7 +260,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       ...shippingFormData,
       packages: [emptyPackage],
     };
+    setInfoValues({ totalWeight: 0, totalPackages: 0 });
     setShippingFormData(updatedFormData);
+    setSelectedPackageIndex(0);
   };
 
   const removePackage = (index) => {
@@ -273,6 +275,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         packages: updatedPackages,
       };
 
+      const { totalPackages, totalWeight } = calculateShippingFormTotals(updatedPackages);
+
+      setInfoValues({ totalWeight, totalPackages });
+
       setShippingFormData(updatedFormData);
     }
   };
@@ -281,6 +287,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setMessage(null);
     setErrorMessage(null);
     resetShippingFormData();
+    setInfoValues({ totalWeight: 0, totalPackages: 0 });
   };
 
   useEffect(() => {

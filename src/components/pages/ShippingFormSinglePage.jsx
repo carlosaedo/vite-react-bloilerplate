@@ -252,6 +252,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       ...shippingFormData,
       packages: [emptyPackage],
     };
+
+    setInfoValues({ totalWeight: 0, totalPackages: 0 });
+
     setShippingFormData(updatedFormData);
     setSelectedPackageIndex(0);
   };
@@ -266,6 +269,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         packages: updatedPackages,
       };
 
+      const { totalPackages, totalWeight } = calculateShippingFormTotals(updatedPackages);
+
+      setInfoValues({ totalWeight, totalPackages });
+
       setShippingFormData(updatedFormData);
       if (selectedPackageIndex === index) {
         setSelectedPackageIndex(selectedPackageIndex - 1);
@@ -277,6 +284,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setMessage(null);
     resetShippingFormData();
+    setInfoValues({ totalWeight: 0, totalPackages: 0 });
   };
 
   const validateFromBeforeSubmit = () => {
