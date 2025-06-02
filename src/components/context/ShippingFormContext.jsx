@@ -57,14 +57,14 @@ export const ShippingFormProvider = ({ children }) => {
     recipientCountry: '',
     packages: [
       {
-        packageQuantity: '',
+        packageQuantity: '1',
         packageWeight: '',
         packageLength: '',
         packageWidth: '',
         packageHeight: '',
         packageNote: '',
         valueOfGoods: '',
-        packageType: '',
+        packageType: 'volume',
         sscc: generateMockSSCC(),
         CBM: '',
         LDM: '',
@@ -74,7 +74,7 @@ export const ShippingFormProvider = ({ children }) => {
         dangerousGoods: false,
         customs: false,
         marksAndNumbers: '',
-        typeOfGoods: '',
+        typeOfGoods: 'general_goods',
       },
     ],
     shippingService: 'standard',
@@ -224,6 +224,7 @@ export const ShippingFormProvider = ({ children }) => {
   };
 
   const updateFormData = (newData) => {
+    console.log('New data on context: ', newData);
     setFormData((prevData) => ({
       ...prevData,
       ...newData,

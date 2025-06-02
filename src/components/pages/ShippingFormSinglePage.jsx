@@ -31,12 +31,13 @@ import {
   CircularProgress,
   FormControl,
   InputLabel,
+  Autocomplete,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-
+import EntitySelector from '../entityComponent/EntitySelector';
 const shippingServices = [
   { value: 'standard', label: 'Standard' },
   { value: 'express', label: 'Express' },
@@ -52,6 +53,26 @@ function generateMockSSCC() {
   }
   return '00' + randomDigits;
 }
+
+const defaultPackageValues = {
+  packageQuantity: '1',
+  packageWeight: '',
+  packageLength: '',
+  packageWidth: '',
+  packageHeight: '',
+  packageNote: '',
+  valueOfGoods: '',
+  packageType: 'volume',
+  sscc: generateMockSSCC(),
+  CBM: '',
+  LDM: '',
+  TaxableWeight: '',
+  stackable: false,
+  dangerousGoods: false,
+  customs: false,
+  marksAndNumbers: '',
+  typeOfGoods: 'general_goods',
+};
 
 const packageType = [
   { value: 'volume', label: 'Volume' },
@@ -81,8 +102,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [message, setMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const [entitiesData, setEntitiesData] = useState([]);
-  const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
+  const [recipientEntitiesData, setRecipientEntitiesData] = useState([]);
+  const [senderEntitiesData, setSenderEntitiesData] = useState([]);
+
+  const [senderCreated, setSenderCreated] = useState(false);
+  const [recipientCreated, setRecipientCreated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(0);
@@ -109,22 +133,43 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   });
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchRecipientEntitiesData() {
       try {
-        const response = await api.get(`/shipping-form/get-entities`, {});
+        console.log('Fetching recipient entities...');
+        const response = await api.post(`/shipping-form/get-entities`, { isRecipient: true });
         if (response?.data?.entities) {
-          setEntitiesData(response?.data?.entities);
+          setRecipientEntitiesData(response?.data?.entities);
           setLoading(false);
+          setRecipientCreated(false);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
         setErrorMessage('Failed to load data.');
         setLoading(false);
+        setRecipientCreated(false);
       }
     }
 
-    fetchData();
-  }, []);
+    fetchRecipientEntitiesData();
+
+    async function fetchSenderEntitiesData() {
+      try {
+        const response = await api.post(`/shipping-form/get-entities`, { isSender: true });
+        if (response?.data?.entities) {
+          setSenderEntitiesData(response?.data?.entities);
+          setLoading(false);
+          setSenderCreated(false);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setErrorMessage('Failed to load data.');
+        setLoading(false);
+        setSenderCreated(false);
+      }
+    }
+
+    fetchSenderEntitiesData();
+  }, [senderCreated, recipientCreated]);
 
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
@@ -198,21 +243,80 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setShippingFormData(updatedFormData);
   };
 
-  const handleEntityChange = (value) => {
+  const handleRecipientEntityChange = (index) => {
+    if (index === null) {
+      return;
+    }
     setMessage(null);
     setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
-      recipientName: entitiesData[value].Name,
-      recipientStreet: entitiesData[value].Add1,
-      recipientCity: entitiesData[value].city,
-      recipientState: entitiesData[value].state,
-      recipientZip: entitiesData[value].zip_code,
-      recipientCountry: entitiesData[value].country,
-      extNumber: entitiesData[value].external_ref,
-      recipientTaxId: entitiesData[value].VAT,
+      recipientName: recipientEntitiesData[index].Name,
+      recipientStreet: recipientEntitiesData[index].Add1,
+      recipientCity: recipientEntitiesData[index].city,
+      recipientState: recipientEntitiesData[index].state,
+      recipientZip: recipientEntitiesData[index].zip_code,
+      recipientCountry: recipientEntitiesData[index].country,
+      extNumber: recipientEntitiesData[index].external_ref,
+      recipientTaxId: recipientEntitiesData[index].VAT,
     });
-    setSelectedEntityIndex(value);
+  };
+
+  const handleSenderEntityChange = (index) => {
+    if (index === null) {
+      return;
+    }
+    setMessage(null);
+    setErrorMessage(null);
+    setShippingFormData({
+      ...shippingFormData,
+      senderName: senderEntitiesData[index].Name,
+      senderStreet: senderEntitiesData[index].Add1,
+      senderCity: senderEntitiesData[index].city,
+      senderState: senderEntitiesData[index].state,
+      senderZip: senderEntitiesData[index].zip_code,
+      senderCountry: senderEntitiesData[index].country,
+      extNumber: senderEntitiesData[index].external_ref,
+      senderTaxId: senderEntitiesData[index].VAT,
+    });
+  };
+
+  const handleSenderEntityCreated = (object) => {
+    if (!object) return;
+
+    setMessage(null);
+    setErrorMessage(null);
+    setShippingFormData({
+      ...shippingFormData,
+      senderName: object.Name,
+      senderStreet: object.Add1,
+      senderCity: object.city,
+      senderState: object.state,
+      senderZip: object.zip_code,
+      senderCountry: object.country,
+      extNumber: object.external_ref,
+      senderTaxId: object.VAT,
+    });
+    setSenderCreated(true);
+  };
+
+  const handleRecipientEntityCreated = (object) => {
+    if (!object) return;
+
+    setMessage(null);
+    setErrorMessage(null);
+    setShippingFormData({
+      ...shippingFormData,
+      recipientName: object.Name,
+      recipientStreet: object.Add1,
+      recipientCity: object.city,
+      recipientState: object.state,
+      recipientZip: object.zip_code,
+      recipientCountry: object.country,
+      recipientExtNumber: object.external_ref,
+      recipientTaxId: object.VAT,
+    });
+    setRecipientCreated(true);
   };
 
   const handlePackageClearDimensions = (index) => {
@@ -238,25 +342,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const addPackage = () => {
     setErrorMessage(null);
     setMessage(null);
-    const newPackage = {
-      packageQuantity: '',
-      packageWeight: '',
-      packageLength: '',
-      packageWidth: '',
-      packageHeight: '',
-      packageNote: '',
-      valueOfGoods: '',
-      packageType: '',
-      sscc: generateMockSSCC(),
-      CBM: '',
-      LDM: '',
-      TaxableWeight: '',
-      stackable: false,
-      dangerousGoods: false,
-      customs: false,
-      marksAndNumbers: '',
-      typeOfGoods: '',
-    };
+    const newPackage = defaultPackageValues;
 
     const updatedFormData = {
       ...shippingFormData,
@@ -274,25 +360,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     if (!confirmed) return;
     setErrorMessage(null);
     setMessage(null);
-    const emptyPackage = {
-      packageQuantity: '',
-      packageWeight: '',
-      packageLength: '',
-      packageWidth: '',
-      packageHeight: '',
-      packageNote: '',
-      valueOfGoods: '',
-      packageType: '',
-      sscc: generateMockSSCC(),
-      CBM: '',
-      LDM: '',
-      TaxableWeight: '',
-      stackable: false,
-      dangerousGoods: false,
-      customs: false,
-      marksAndNumbers: '',
-      typeOfGoods: '',
-    };
+    const emptyPackage = defaultPackageValues;
     const updatedFormData = {
       ...shippingFormData,
       packages: [emptyPackage],
@@ -614,25 +682,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
-              <FormControl fullWidth size='small' margin='dense' required>
-                <InputLabel>Select Entity</InputLabel>
-                <Select
-                  value={selectedEntityIndex || ''}
-                  onChange={(e) => handleEntityChange(e.target.value)}
-                  label='Select Entity'
-                >
-                  <MenuItem value='' disabled>
-                    Select Entity
-                  </MenuItem>
-                  {entitiesData.map((entity, index) => (
-                    <MenuItem key={index} value={index}>
-                      {entity.Name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
           </Grid>
         </Box>
 
@@ -641,6 +690,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           <Box flex={1} minWidth={300}>
             <Typography variant='h6'>Sender Information</Typography>
             <Divider sx={{ mb: 2 }} />
+            <EntitySelector
+              entitiesData={senderEntitiesData}
+              selectedEntityName={shippingFormData.senderName}
+              handleEntityChange={handleSenderEntityChange}
+              onEntityCreated={(newEntityData) => {
+                handleSenderEntityCreated(newEntityData);
+              }}
+            />
             <TextField
               label='Name'
               name='senderName'
@@ -745,6 +802,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           <Box flex={1} minWidth={300}>
             <Typography variant='h6'>Recipient Information</Typography>
             <Divider sx={{ mb: 2 }} />
+            <EntitySelector
+              entitiesData={recipientEntitiesData}
+              selectedEntityName={shippingFormData.recipientName}
+              handleEntityChange={handleRecipientEntityChange}
+              onEntityCreated={(newEntityData) => {
+                handleRecipientEntityCreated(newEntityData);
+              }}
+            />
             <TextField
               label='Name'
               name='recipientName'
@@ -1270,6 +1335,101 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
             <React.Fragment>
               <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+                  <TextField
+                    label='Marks and Numbers'
+                    name={`marksAndNumbers_${selectedPackageIndex}`}
+                    type='text'
+                    value={shippingFormData.packages[selectedPackageIndex]?.marksAndNumbers}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackageIndex, 'marksAndNumbers', e.target.value)
+                    }
+                    fullWidth
+                    multiline
+                    size='small'
+                    margin='dense'
+                    rows={2}
+                  />
+                </Grid>
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                  <TextField
+                    label='Quantity'
+                    name={`packageQuantity_${selectedPackageIndex}`}
+                    type='number'
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageQuantity}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackageIndex, 'packageQuantity', e.target.value)
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                    slotProps={{ htmlInput: { min: 0 } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <TextField
+                    select
+                    label='Package Type'
+                    name={`packageType_${selectedPackageIndex}`}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageType}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackageIndex, 'packageType', e.target.value)
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                  >
+                    {packageType.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <TextField
+                    select
+                    label='Type of Goods'
+                    name={`typeOfGoods_${selectedPackageIndex}`}
+                    value={shippingFormData.packages[selectedPackageIndex]?.typeOfGoods || ''}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackageIndex, 'typeOfGoods', e.target.value)
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                  >
+                    {typeOfGoodsOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                  <TextField
+                    label='Weight (kg)'
+                    name={`packageWeight_${selectedPackageIndex}`}
+                    type='number'
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageWeight}
+                    onChange={(e) =>
+                      handlePackageChange(selectedPackageIndex, 'packageWeight', e.target.value)
+                    }
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                    slotProps={{ htmlInput: { min: 0 } }}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={2}>
                 {/* Top-right CBM section */}
                 <Grid
                   size={{ xs: 12 }}
@@ -1280,23 +1440,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     gap: 2,
                   }}
                 >
-                  <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                    <TextField
-                      label='Weight (kg)'
-                      name={`packageWeight_${selectedPackageIndex}`}
-                      type='number'
-                      value={shippingFormData.packages[selectedPackageIndex]?.packageWeight}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'packageWeight', e.target.value)
-                      }
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                      slotProps={{ htmlInput: { min: 0 } }}
-                    />
-                  </Grid>
-
                   {showDimensions && (
                     <React.Fragment>
                       <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
@@ -1473,72 +1616,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Grid>
                 </Grid>
               </Grid>
-              <Divider sx={{ mb: 2 }} />
-              <Grid container spacing={2}>
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                  <TextField
-                    label='Quantity'
-                    name={`packageQuantity_${selectedPackageIndex}`}
-                    type='number'
-                    value={shippingFormData.packages[selectedPackageIndex]?.packageQuantity}
-                    onChange={(e) =>
-                      handlePackageChange(selectedPackageIndex, 'packageQuantity', e.target.value)
-                    }
-                    fullWidth
-                    size='small'
-                    margin='dense'
-                    required
-                    slotProps={{ htmlInput: { min: 0 } }}
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 3 }}>
-                  <TextField
-                    select
-                    label='Package Type'
-                    name={`packageType_${selectedPackageIndex}`}
-                    value={shippingFormData.packages[selectedPackageIndex]?.packageType}
-                    onChange={(e) =>
-                      handlePackageChange(selectedPackageIndex, 'packageType', e.target.value)
-                    }
-                    fullWidth
-                    size='small'
-                    margin='dense'
-                    required
-                  >
-                    {packageType.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 3 }}>
-                  <TextField
-                    select
-                    label='Type of Goods'
-                    name={`typeOfGoods_${selectedPackageIndex}`}
-                    value={shippingFormData.packages[selectedPackageIndex]?.typeOfGoods || ''}
-                    onChange={(e) =>
-                      handlePackageChange(selectedPackageIndex, 'typeOfGoods', e.target.value)
-                    }
-                    fullWidth
-                    size='small'
-                    margin='dense'
-                    required
-                  >
-                    {typeOfGoodsOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-              </Grid>
 
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
                   <TextField
                     label='Note'
                     name={`packageDescription_${selectedPackageIndex}`}
@@ -1553,26 +1633,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     rows={2}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    label='Marks and Numbers'
-                    name={`marksAndNumbers_${selectedPackageIndex}`}
-                    type='text'
-                    value={shippingFormData.packages[selectedPackageIndex]?.marksAndNumbers}
-                    onChange={(e) =>
-                      handlePackageChange(selectedPackageIndex, 'marksAndNumbers', e.target.value)
-                    }
-                    fullWidth
-                    multiline
-                    size='small'
-                    margin='dense'
-                    rows={2}
-                  />
-                </Grid>
-              </Grid>
-              <Grid container spacing={2}>
+
                 {shippingFormData.packages[selectedPackageIndex]?.insured && (
-                  <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                  <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                     <TextField
                       label='Value of Goods (€)'
                       name={`packageValue_${selectedPackageIndex}`}
@@ -1591,7 +1654,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Grid>
                 )}
 
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
@@ -1607,7 +1670,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Insured'
                   />
                 </Grid>
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
@@ -1625,7 +1688,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Stackable'
                   />
                 </Grid>
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
@@ -1647,7 +1710,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Dangerous Goods'
                   />
                 </Grid>
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
