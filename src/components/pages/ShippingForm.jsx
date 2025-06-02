@@ -494,8 +494,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
           <Typography
             variant='h5'
-            gutterBottom
-            sx={{ fontWeight: 700, color: '#003e2d', display: 'flex' }}
+            sx={{ fontWeight: 700, color: '#003e2d', display: 'flex', alignItems: 'baseline' }}
           >
             Shipping Form
             {shippingFormData.trackingRef ? (
@@ -1101,7 +1100,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               gap: 2,
                             }}
                           >
-                            <Grid size={{ xs: 12, sm: 2 }}>
+                            <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                               <TextField
                                 label='Weight (kg)'
                                 name={`packageWeight_${index}`}
@@ -1120,7 +1119,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
                             {showDimensions && (
                               <React.Fragment>
-                                <Grid size={{ xs: 12, sm: 2 }}>
+                                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                                   <Tooltip
                                     title='Setting this value will automatically calculate CBM'
                                     placement='top'
@@ -1141,7 +1140,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                     />
                                   </Tooltip>
                                 </Grid>
-                                <Grid size={{ xs: 12, sm: 2 }}>
+                                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                                   <Tooltip
                                     title='Setting this value will automatically calculate CBM'
                                     placement='top'
@@ -1162,7 +1161,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                     />
                                   </Tooltip>
                                 </Grid>
-                                <Grid size={{ xs: 12, sm: 2 }}>
+                                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                                   <Tooltip
                                     title='Setting this value will automatically calculate CBM'
                                     placement='top'
@@ -1187,7 +1186,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             )}
 
                             {showCBM && (
-                              <Grid size={{ xs: 12, sm: 2 }}>
+                              <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                                 <TextField
                                   label='CBM'
                                   name={`CBM_${index}`}
@@ -1226,7 +1225,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             )}
 
                             {hideLDM && (
-                              <Grid size={{ xs: 12, sm: 2 }}>
+                              <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                                 <TextField
                                   label='LDM'
                                   name={`LDM_${index}`}
@@ -1264,7 +1263,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               </Grid>
                             )}
 
-                            <Grid size={{ xs: 12, sm: 2 }}>
+                            <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                               <TextField
                                 label='TaxableWeight'
                                 name={`TaxableWeight_${index}`}
@@ -1284,7 +1283,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         </Grid>
                         <Divider sx={{ mb: 2 }} />
                         <Grid container spacing={2}>
-                          <Grid size={{ xs: 12, sm: 2 }}>
+                          <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                             <TextField
                               label='Quantity'
                               name={`packageQuantity_${index}`}
@@ -1381,7 +1380,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         </Grid>
                         <Grid container spacing={2}>
                           {shippingFormData.packages[index]?.insured && (
-                            <Grid size={{ xs: 12, sm: 2 }}>
+                            <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                               <TextField
                                 label='Value of Goods (€)'
                                 name={`packageValue_${index}`}
@@ -1400,7 +1399,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             </Grid>
                           )}
 
-                          <Grid size={{ xs: 12, sm: 2 }}>
+                          <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                             <FormControlLabel
                               sx={{ mt: 1 }}
                               control={
@@ -1416,7 +1415,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               label='Insured'
                             />
                           </Grid>
-                          <Grid size={{ xs: 12, sm: 2 }}>
+                          <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                             <FormControlLabel
                               sx={{ mt: 1 }}
                               control={
@@ -1432,7 +1431,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               label='Stackable'
                             />
                           </Grid>
-                          <Grid size={{ xs: 12, sm: 2 }}>
+                          <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                             <FormControlLabel
                               sx={{ mt: 1 }}
                               control={
@@ -1450,7 +1449,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               label='Dangerous Goods'
                             />
                           </Grid>
-                          <Grid size={{ xs: 12, sm: 2 }}>
+                          <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                             <FormControlLabel
                               sx={{ mt: 1 }}
                               control={
