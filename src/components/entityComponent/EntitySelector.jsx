@@ -12,9 +12,14 @@ import {
   Checkbox,
 } from '@mui/material';
 
+import api from '../api/api';
+import { Add } from '@mui/icons-material';
+
 const defaultNewEntity = {
   Name: '',
   Add1: '',
+  Add2: '',
+  Add3: '',
   city: '',
   state: '',
   zip_code: '',
@@ -41,17 +46,16 @@ const EntitySelector = ({
 
     try {
       // Mock API call
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            status: 200,
-            data: newEntityData,
-            newEntityType,
-          });
-        }, 1000);
+      console.log({
+        ...newEntityData,
+        ...newEntityType,
+      });
+      const response = await api.post(`/shipping-form/create-entity`, {
+        ...newEntityData,
+        ...newEntityType,
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         onEntityCreated(newEntityData); // pass name to parent
         setOpenDialog(false);
         setNewEntityData(defaultNewEntity);
