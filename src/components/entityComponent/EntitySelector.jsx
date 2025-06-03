@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Autocomplete,
   TextField,
@@ -10,10 +10,10 @@ import {
   Grid,
   FormControlLabel,
   Checkbox,
+  CircularProgress,
 } from '@mui/material';
-
-import api from '../api/api';
 import { Add } from '@mui/icons-material';
+import api from '../api/api';
 
 const defaultNewEntity = {
   Name: '',
@@ -29,66 +29,123 @@ const defaultNewEntity = {
 };
 
 const EntitySelector = ({
-  entitiesData,
   selectedEntityName,
   handleEntityChange,
-  onEntityCreated, // <-- new prop to notify parent to refetch
+  onEntityCreated,
+  isSender = false,
+  isRecipient = false,
 }) => {
+  const [options, setOptions] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [inputValue, setInputValue] = useState('');
   const [newEntityData, setNewEntityData] = useState(defaultNewEntity);
-
   const [newEntityType, setNewEntityType] = useState({ shipping: false, delivery: false });
+  const [inputValue, setInputValue] = useState('');
+
+  const [selectedValue, setSelectedValue] = useState(null);
+
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const pageSize = 10;
+  const totalCount = useRef(0);
+
+  const fetchEntities = async (search = '', page = 1) => {
+    setFetching(true);
+    try {
+      const res = await api.post(`/shipping-form/get-entities`, {
+        isSender,
+        isRecipient,
+        search,
+        page,
+        pageSize,
+        orderBy: 'Name',
+        orderDirection: 'asc',
+      });
+
+      const { data, total } = res.data.entities;
+      totalCount.current = total;
+
+      setOptions((prev) => (page === 1 ? data : [...prev, ...data]));
+      setHasMore(page * pageSize < total);
+    } catch (err) {
+      console.error('Failed to fetch entities:', err);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedEntityName) {
+      setSelectedValue({ Name: selectedEntityName });
+    } else {
+      setSelectedValue(null);
+    }
+  }, [selectedEntityName]);
+
+  useEffect(() => {
+    fetchEntities('', 1);
+  }, []);
+
+  const handleScroll = (event) => {
+    const listboxNode = event.currentTarget;
+    const bottom =
+      listboxNode.scrollHeight - listboxNode.scrollTop <= listboxNode.clientHeight + 50;
+
+    if (bottom && hasMore && !fetching) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchEntities(inputValue, nextPage);
+    }
+  };
+
+  const handleInputChange = (event, newInput = '') => {
+    setInputValue(newInput);
+    setPage(1);
+    fetchEntities(newInput, 1);
+  };
+
+  const handleChange = (event, newValue) => {
+    if (newValue?.isNew) {
+      setNewEntityData({ ...defaultNewEntity, Name: inputValue });
+      setOpenDialog(true);
+    } else if (newValue) {
+      setSelectedValue(newValue);
+      handleEntityChange(newValue);
+    } else {
+      setSelectedValue(null);
+      handleEntityChange(null);
+    }
+  };
 
   const handleCreateEntity = async () => {
     setLoading(true);
-
     try {
-      // Mock API call
-      console.log({
-        ...newEntityData,
-        ...newEntityType,
-      });
       const response = await api.post(`/shipping-form/create-entity`, {
         ...newEntityData,
         ...newEntityType,
       });
 
       if (response.status === 201) {
-        onEntityCreated(newEntityData); // pass name to parent
+        onEntityCreated(newEntityData); // Parent will refetch
         setOpenDialog(false);
         setNewEntityData(defaultNewEntity);
         setInputValue('');
+        fetchEntities('', 1);
       }
-    } catch (error) {
-      console.error('Failed to create entity', error);
+    } catch (err) {
+      console.error('Failed to create entity', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const filterOptions = (options, state) => {
-    const filtered = options.filter((option) =>
-      option.Name.toLowerCase().includes(state.inputValue.toLowerCase()),
-    );
-
-    /*if (
-      state.inputValue !== '' &&
-      !options.some((option) => option.Name.toLowerCase() === state.inputValue.toLowerCase())
-    ) {
-      filtered.push({
-        Name: `Create new entity "${state.inputValue}"`,
-        isNew: true,
-      });
-    }*/
-
-    // Always add the "Create new entity" option at the top, even if input is empty
+  const filterOptions = (options) => {
+    const filtered = [...options];
     filtered.unshift({
-      Name: state.inputValue ? `Create new entity "${state.inputValue}"` : 'Create new entity',
+      Name: inputValue ? `Create new entity "${inputValue}"` : 'Create new entity',
       isNew: true,
     });
-
     return filtered;
   };
 
@@ -97,27 +154,33 @@ const EntitySelector = ({
       <Autocomplete
         fullWidth
         size='small'
-        options={entitiesData}
-        getOptionLabel={(option) => option.Name}
+        options={options}
+        getOptionLabel={(option) => option?.Name || ''}
         filterOptions={filterOptions}
-        value={entitiesData.find((e) => e.Name === selectedEntityName) || null}
-        inputValue={inputValue}
-        onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue);
-        }}
-        onChange={(event, newValue) => {
-          if (newValue?.isNew) {
-            setNewEntityData({ ...defaultNewEntity, Name: inputValue });
-            setOpenDialog(true);
-          } else if (newValue) {
-            const index = entitiesData.findIndex((entity) => entity.Name === newValue.Name);
-            handleEntityChange(index !== -1 ? index : null);
-          } else {
-            handleEntityChange(null);
-          }
-        }}
+        value={selectedValue}
+        inputValue={inputValue || ''}
+        loading={fetching}
+        onInputChange={handleInputChange}
+        onChange={handleChange}
+        slotProps={{ listbox: { onScroll: handleScroll } }}
         renderInput={(params) => (
-          <TextField {...params} label='Select Entity' margin='dense' required />
+          <TextField
+            {...params}
+            label='Select Entity'
+            margin='dense'
+            required
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {fetching ? <CircularProgress color='inherit' size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              },
+            }}
+          />
         )}
       />
 
@@ -125,12 +188,12 @@ const EntitySelector = ({
         <DialogTitle>Create New Entity</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} mt={1}>
-            {Object.entries(defaultNewEntity).map(([key]) => (
-              <Grid size={{ sm: 6, xs: 12, md: 4, lg: 4 }} key={key}>
+            {Object.keys(defaultNewEntity).map((key) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
                 <TextField
                   label={key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                   fullWidth
-                  value={newEntityData[key]}
+                  value={newEntityData[key] ?? ''}
                   onChange={(e) => setNewEntityData({ ...newEntityData, [key]: e.target.value })}
                   margin='dense'
                 />
@@ -138,33 +201,27 @@ const EntitySelector = ({
             ))}
           </Grid>
           <Grid container spacing={2} mt={1}>
-            <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 4 }}>
               <FormControlLabel
-                sx={{ mt: 1 }}
                 control={
                   <Checkbox
-                    checked={newEntityType.shipping || false}
+                    checked={!!newEntityType.shipping}
                     onChange={(e) =>
                       setNewEntityType({ ...newEntityType, shipping: e.target.checked })
                     }
-                    name='shipping'
-                    color='primary'
                   />
                 }
                 label='Shipping'
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 4 }}>
               <FormControlLabel
-                sx={{ mt: 1 }}
                 control={
                   <Checkbox
-                    checked={newEntityType.delivery || false}
+                    checked={!!newEntityType.delivery}
                     onChange={(e) =>
                       setNewEntityType({ ...newEntityType, delivery: e.target.checked })
                     }
-                    name='delivery'
-                    color='primary'
                   />
                 }
                 label='Delivery'
@@ -176,7 +233,7 @@ const EntitySelector = ({
           <Button onClick={() => setOpenDialog(false)} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleCreateEntity} variant='contained' disabled={loading}>
+          <Button onClick={handleCreateEntity} disabled={loading} variant='contained'>
             {loading ? 'Creating...' : 'Create'}
           </Button>
         </DialogActions>

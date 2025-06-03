@@ -32,12 +32,14 @@ import {
   FormControl,
   InputLabel,
   Autocomplete,
+  InputAdornment,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon, Edit, EditOff } from '@mui/icons-material';
 import EntitySelector from '../entityComponent/EntitySelector';
+
 const shippingServices = [
   { value: 'standard', label: 'Standard' },
   { value: 'express', label: 'Express' },
@@ -120,7 +122,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [showSSCC, setShowSSCC] = useState(false);
 
   const [showCBM, setShowCBM] = useState(true);
-  const [hideLDM, setShowLDM] = useState(true);
+  const [showLDM, setShowLDM] = useState(true);
   const [activeCBM, setActiveCBM] = useState(false);
   const [activeLDM, setActiveLDM] = useState(false);
   const [showDimensions, setShowDimensions] = useState(true);
@@ -133,42 +135,40 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   });
 
   useEffect(() => {
-    async function fetchRecipientEntitiesData() {
-      try {
-        console.log('Fetching recipient entities...');
-        const response = await api.post(`/shipping-form/get-entities`, { isRecipient: true });
-        if (response?.data?.entities) {
-          setRecipientEntitiesData(response?.data?.entities);
-          setLoading(false);
-          setRecipientCreated(false);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setErrorMessage('Failed to load data.');
-        setLoading(false);
-        setRecipientCreated(false);
-      }
-    }
-
-    fetchRecipientEntitiesData();
-
     async function fetchSenderEntitiesData() {
       try {
         const response = await api.post(`/shipping-form/get-entities`, { isSender: true });
-        if (response?.data?.entities) {
-          setSenderEntitiesData(response?.data?.entities);
+        if (response?.data?.entities?.data) {
+          setSenderEntitiesData(response.data.entities.data);
           setLoading(false);
           setSenderCreated(false);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
-        setErrorMessage('Failed to load data.');
+        console.error('Error fetching sender entities:', error);
+        setErrorMessage('Failed to load sender data.');
         setLoading(false);
         setSenderCreated(false);
       }
     }
 
+    async function fetchRecipientEntitiesData() {
+      try {
+        const response = await api.post(`/shipping-form/get-entities`, { isRecipient: true });
+        if (response?.data?.entities?.data) {
+          setRecipientEntitiesData(response.data.entities.data);
+          setLoading(false);
+          setRecipientCreated(false);
+        }
+      } catch (error) {
+        console.error('Error fetching sender entities:', error);
+        setErrorMessage('Failed to load sender data.');
+        setLoading(false);
+        setRecipientCreated(false);
+      }
+    }
+
     fetchSenderEntitiesData();
+    fetchRecipientEntitiesData();
   }, [senderCreated, recipientCreated]);
 
   const handleJumpToPackage = (index) => {
@@ -243,41 +243,41 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setShippingFormData(updatedFormData);
   };
 
-  const handleRecipientEntityChange = (index) => {
-    if (index === null) {
+  const handleRecipientEntityChange = (object) => {
+    if (object === null) {
       return;
     }
     setMessage(null);
     setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
-      recipientName: recipientEntitiesData[index].Name,
-      recipientStreet: recipientEntitiesData[index].Add1,
-      recipientCity: recipientEntitiesData[index].city,
-      recipientState: recipientEntitiesData[index].state,
-      recipientZip: recipientEntitiesData[index].zip_code,
-      recipientCountry: recipientEntitiesData[index].country,
-      extNumber: recipientEntitiesData[index].external_ref,
-      recipientTaxId: recipientEntitiesData[index].VAT,
+      recipientName: object.Name,
+      recipientStreet: object.Add1,
+      recipientCity: object.city,
+      recipientState: object.state,
+      recipientZip: object.zip_code,
+      recipientCountry: object.country,
+      extNumber: object.external_ref,
+      recipientTaxId: object.VAT,
     });
   };
 
-  const handleSenderEntityChange = (index) => {
-    if (index === null) {
+  const handleSenderEntityChange = (object) => {
+    if (object === null) {
       return;
     }
     setMessage(null);
     setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
-      senderName: senderEntitiesData[index].Name,
-      senderStreet: senderEntitiesData[index].Add1,
-      senderCity: senderEntitiesData[index].city,
-      senderState: senderEntitiesData[index].state,
-      senderZip: senderEntitiesData[index].zip_code,
-      senderCountry: senderEntitiesData[index].country,
-      extNumber: senderEntitiesData[index].external_ref,
-      senderTaxId: senderEntitiesData[index].VAT,
+      senderName: object.Name,
+      senderStreet: object.Add1,
+      senderCity: object.city,
+      senderState: object.state,
+      senderZip: object.zip_code,
+      senderCountry: object.country,
+      extNumber: object.external_ref,
+      senderTaxId: object.VAT,
     });
   };
 
@@ -320,6 +320,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   };
 
   const handlePackageClearDimensions = (index) => {
+    console.log('clearing dimensions');
     setErrorMessage(null);
     setMessage(null);
 
@@ -329,6 +330,28 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       ['packageHeight']: '',
       ['packageLength']: '',
       ['packageWidth']: '',
+    };
+
+    const updatedFormData = {
+      ...shippingFormData,
+      packages: updatedPackages,
+    };
+
+    setShippingFormData(updatedFormData);
+  };
+
+  const clearPackageDimensionsAndUnsetStackable = (index) => {
+    console.log('clearing dimensions');
+    setErrorMessage(null);
+    setMessage(null);
+
+    const updatedPackages = [...shippingFormData.packages];
+    updatedPackages[index] = {
+      ...updatedPackages[index],
+      ['packageHeight']: '',
+      ['packageLength']: '',
+      ['packageWidth']: '',
+      ['stackable']: false,
     };
 
     const updatedFormData = {
@@ -690,18 +713,20 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           <Box flex={1} minWidth={300}>
             <Typography variant='h6'>Sender Information</Typography>
             <Divider sx={{ mb: 2 }} />
+
             <EntitySelector
-              entitiesData={senderEntitiesData}
               selectedEntityName={shippingFormData.senderName}
               handleEntityChange={handleSenderEntityChange}
               onEntityCreated={(newEntityData) => {
+                setSenderCreated(true);
                 handleSenderEntityCreated(newEntityData);
               }}
+              isSender={true}
             />
             <TextField
               label='Name'
               name='senderName'
-              value={shippingFormData.senderName}
+              value={shippingFormData.senderName || ''}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -714,7 +739,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   label='Email'
                   name='senderEmail'
                   type='email'
-                  value={shippingFormData.senderEmail}
+                  value={shippingFormData.senderEmail || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -727,7 +752,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   label='Phone'
                   name='senderPhone'
                   type='tel'
-                  value={shippingFormData.senderPhone}
+                  value={shippingFormData.senderPhone || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -739,7 +764,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <TextField
               label='Street'
               name='senderStreet'
-              value={shippingFormData.senderStreet}
+              value={shippingFormData.senderStreet || ''}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -751,7 +776,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='City'
                   name='senderCity'
-                  value={shippingFormData.senderCity}
+                  value={shippingFormData.senderCity || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -763,7 +788,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='State'
                   name='senderState'
-                  value={shippingFormData.senderState}
+                  value={shippingFormData.senderState || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -775,7 +800,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='ZIP'
                   name='senderZip'
-                  value={shippingFormData.senderZip}
+                  value={shippingFormData.senderZip || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -787,7 +812,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='Country'
                   name='senderCountry'
-                  value={shippingFormData.senderCountry}
+                  value={shippingFormData.senderCountry || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -803,17 +828,18 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <Typography variant='h6'>Recipient Information</Typography>
             <Divider sx={{ mb: 2 }} />
             <EntitySelector
-              entitiesData={recipientEntitiesData}
               selectedEntityName={shippingFormData.recipientName}
               handleEntityChange={handleRecipientEntityChange}
               onEntityCreated={(newEntityData) => {
+                setRecipientCreated(true);
                 handleRecipientEntityCreated(newEntityData);
               }}
+              isRecipient={true}
             />
             <TextField
               label='Name'
               name='recipientName'
-              value={shippingFormData.recipientName}
+              value={shippingFormData.recipientName || ''}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -826,7 +852,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   label='Email'
                   name='recipientEmail'
                   type='email'
-                  value={shippingFormData.recipientEmail}
+                  value={shippingFormData.recipientEmail || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -839,7 +865,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   label='Phone'
                   name='recipientPhone'
                   type='tel'
-                  value={shippingFormData.recipientPhone}
+                  value={shippingFormData.recipientPhone || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -851,7 +877,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <TextField
               label='Street'
               name='recipientStreet'
-              value={shippingFormData.recipientStreet}
+              value={shippingFormData.recipientStreet || ''}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -863,7 +889,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='City'
                   name='recipientCity'
-                  value={shippingFormData.recipientCity}
+                  value={shippingFormData.recipientCity || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -875,7 +901,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='State'
                   name='recipientState'
-                  value={shippingFormData.recipientState}
+                  value={shippingFormData.recipientState || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -887,7 +913,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='ZIP'
                   name='recipientZip'
-                  value={shippingFormData.recipientZip}
+                  value={shippingFormData.recipientZip || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -899,7 +925,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 <TextField
                   label='Country'
                   name='recipientCountry'
-                  value={shippingFormData.recipientCountry}
+                  value={shippingFormData.recipientCountry || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -1297,9 +1323,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  flexWrap: 'wrap',
                 }}
               >
-                <Typography variant='subtitle1' sx={{ display: 'flex', alignItems: 'center' }}>
+                {/* Left: Package Index Badge */}
+                <Typography
+                  variant='subtitle1'
+                  sx={{ display: 'flex', alignItems: 'center', mr: 2 }}
+                >
                   <Box
                     component='span'
                     sx={{
@@ -1311,7 +1342,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       px: 1.5,
                       py: 0.5,
                       fontSize: '0.75rem',
-                      mr: 1.5, // margin-right between badge and text
                       minWidth: 24,
                       textAlign: 'center',
                       cursor: 'pointer',
@@ -1321,21 +1351,161 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Box>
                 </Typography>
 
-                {shippingFormData.packages.length > 1 && (
-                  <IconButton
-                    onClick={() => removePackage(selectedPackageIndex)}
-                    color='error'
-                    size='small'
+                {/* Center: Inputs Grouped */}
+                {showDimensions && (
+                  <Grid
+                    container
+                    spacing={1}
+                    justifyContent='center'
+                    alignItems='center'
+                    sx={{ flexGrow: 1, maxWidth: '100%' }}
                   >
-                    <DeleteIcon />
-                  </IconButton>
+                    <Grid size={{ xs: 6, sm: 4, md: 2, lg: 1 }}>
+                      <Tooltip
+                        title='Setting this value will automatically calculate CBM'
+                        placement='top'
+                        arrow
+                      >
+                        <TextField
+                          label='Length (cm)'
+                          name={`packageLength_${selectedPackageIndex}`}
+                          type='number'
+                          value={
+                            shippingFormData.packages[selectedPackageIndex]?.packageLength || ''
+                          }
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedPackageIndex,
+                              'packageLength',
+                              e.target.value,
+                            )
+                          }
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          slotProps={{ htmlInput: { min: 0 } }}
+                          sx={{
+                            '& .MuiInputBase-root': {
+                              fontSize: '0.75rem',
+                              padding: '2px 8px',
+                              height: '32px',
+                            },
+                            '& .MuiInputLabel-root': {
+                              fontSize: '0.75rem',
+                              top: '-4px',
+                            },
+                            '& .MuiInputLabel-shrink': {
+                              top: 0,
+                            },
+                          }}
+                        />
+                      </Tooltip>
+                    </Grid>
+
+                    <Grid size={{ xs: 6, sm: 4, md: 2, lg: 1 }}>
+                      <Tooltip
+                        title='Setting this value will automatically calculate CBM'
+                        placement='top'
+                        arrow
+                      >
+                        <TextField
+                          label='Width (cm)'
+                          name={`packageWidth_${selectedPackageIndex}`}
+                          type='number'
+                          value={
+                            shippingFormData.packages[selectedPackageIndex]?.packageWidth || ''
+                          }
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedPackageIndex,
+                              'packageWidth',
+                              e.target.value,
+                            )
+                          }
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          slotProps={{ htmlInput: { min: 0 } }}
+                          sx={{
+                            '& .MuiInputBase-root': {
+                              fontSize: '0.75rem',
+                              padding: '2px 8px',
+                              height: '32px',
+                            },
+                            '& .MuiInputLabel-root': {
+                              fontSize: '0.75rem',
+                              top: '-4px',
+                            },
+                            '& .MuiInputLabel-shrink': {
+                              top: 0,
+                            },
+                          }}
+                        />
+                      </Tooltip>
+                    </Grid>
+
+                    <Grid size={{ xs: 6, sm: 4, md: 2, lg: 1 }}>
+                      <Tooltip
+                        title='Setting this value will automatically calculate CBM'
+                        placement='top'
+                        arrow
+                      >
+                        <TextField
+                          label='Height (cm)'
+                          name={`packageHeight_${selectedPackageIndex}`}
+                          type='number'
+                          value={
+                            shippingFormData.packages[selectedPackageIndex]?.packageHeight || ''
+                          }
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedPackageIndex,
+                              'packageHeight',
+                              e.target.value,
+                            )
+                          }
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          slotProps={{ htmlInput: { min: 0 } }}
+                          sx={{
+                            '& .MuiInputBase-root': {
+                              fontSize: '0.75rem',
+                              padding: '2px 8px',
+                              height: '32px',
+                            },
+                            '& .MuiInputLabel-root': {
+                              fontSize: '0.75rem',
+                              top: '-4px',
+                            },
+                            '& .MuiInputLabel-shrink': {
+                              top: 0,
+                            },
+                          }}
+                        />
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                )}
+
+                {/* Right: Delete Button */}
+                {shippingFormData.packages.length > 1 && (
+                  <Box sx={{ ml: 'auto' }}>
+                    <IconButton
+                      onClick={() => removePackage(selectedPackageIndex)}
+                      color='error'
+                      size='small'
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 )}
               </Box>
             </Tooltip>
 
             <React.Fragment>
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
                   <TextField
                     label='Marks and Numbers'
                     name={`marksAndNumbers_${selectedPackageIndex}`}
@@ -1345,10 +1515,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       handlePackageChange(selectedPackageIndex, 'marksAndNumbers', e.target.value)
                     }
                     fullWidth
-                    multiline
                     size='small'
                     margin='dense'
-                    rows={2}
                   />
                 </Grid>
                 <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
@@ -1367,7 +1535,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     slotProps={{ htmlInput: { min: 0 } }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 3 }}>
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 2 }}>
                   <TextField
                     select
                     label='Package Type'
@@ -1389,7 +1557,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </TextField>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 3 }}>
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 2 }}>
                   <TextField
                     select
                     label='Type of Goods'
@@ -1427,6 +1595,119 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     slotProps={{ htmlInput: { min: 0 } }}
                   />
                 </Grid>
+
+                {showCBM && (
+                  <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                    <TextField
+                      label='CBM'
+                      name={`CBM_${selectedPackageIndex}`}
+                      type='number'
+                      value={shippingFormData.packages[selectedPackageIndex]?.CBM}
+                      onChange={(e) =>
+                        handlePackageChange(selectedPackageIndex, 'CBM', e.target.value)
+                      }
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      disabled={!activeCBM}
+                      slotProps={{
+                        htmlInput: { min: 0 },
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <Tooltip title='Enable/Disable CBM editing - This will clear your package dimensions'>
+                                <IconButton
+                                  onClick={() => {
+                                    const next = !activeCBM;
+                                    setActiveCBM(next);
+                                    setShowLDM(!next);
+                                    setShowDimensions(!next);
+                                    handlePackageClearDimensions(selectedPackageIndex);
+                                  }}
+                                  edge='end'
+                                  size='small'
+                                >
+                                  {activeCBM ? (
+                                    <EditOff fontSize='small' />
+                                  ) : (
+                                    <Edit fontSize='small' />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
+                            </InputAdornment>
+                          ),
+                        },
+                      }}
+                    />
+                  </Grid>
+                )}
+
+                {showLDM && (
+                  <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                    <TextField
+                      label='LDM'
+                      name={`LDM_${selectedPackageIndex}`}
+                      type='number'
+                      value={shippingFormData.packages[selectedPackageIndex]?.LDM}
+                      onChange={(e) =>
+                        handlePackageChange(selectedPackageIndex, 'LDM', e.target.value)
+                      }
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      disabled={!activeLDM}
+                      slotProps={{
+                        htmlInput: { min: 0 },
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <Tooltip title='Enable/Disable LDM editing - This will clear your package dimensions'>
+                                <IconButton
+                                  onClick={() => {
+                                    const next = !activeLDM;
+                                    setActiveLDM(next);
+                                    setShowCBM(!next);
+                                    setShowDimensions(!next);
+                                    clearPackageDimensionsAndUnsetStackable(selectedPackageIndex);
+                                  }}
+                                  edge='end'
+                                  size='small'
+                                >
+                                  {activeLDM ? (
+                                    <EditOff fontSize='small' />
+                                  ) : (
+                                    <Edit fontSize='small' />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
+                            </InputAdornment>
+                          ),
+                        },
+                      }}
+                    />
+                  </Grid>
+                )}
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      p: 1,
+                      minHeight: '56px', // matches MUI TextField height (dense size)
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      borderRadius: 1.5,
+                      backgroundColor: '#f5f5f5',
+                    }}
+                  >
+                    <Typography variant='caption' color='text.secondary'>
+                      Taxable Weight
+                    </Typography>
+                    <Typography variant='body2' fontWeight='bold'>
+                      {shippingFormData.packages[selectedPackageIndex]?.TaxableWeight ?? '—'} Kg
+                    </Typography>
+                  </Paper>
+                </Grid>
               </Grid>
 
               <Grid container spacing={2}>
@@ -1439,182 +1720,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     justifyContent: 'flex-end',
                     gap: 2,
                   }}
-                >
-                  {showDimensions && (
-                    <React.Fragment>
-                      <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                        <Tooltip
-                          title='Setting this value will automatically calculate CBM'
-                          placement='top'
-                          arrow
-                        >
-                          <TextField
-                            label='Length (cm)'
-                            name={`packageLength_${selectedPackageIndex}`}
-                            type='number'
-                            value={shippingFormData.packages[selectedPackageIndex]?.packageLength}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                selectedPackageIndex,
-                                'packageLength',
-                                e.target.value,
-                              )
-                            }
-                            fullWidth
-                            size='small'
-                            margin='dense'
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Tooltip>
-                      </Grid>
-                      <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                        <Tooltip
-                          title='Setting this value will automatically calculate CBM'
-                          placement='top'
-                          arrow
-                        >
-                          <TextField
-                            label='Width (cm)'
-                            name={`packageWidth_${selectedPackageIndex}`}
-                            type='number'
-                            value={shippingFormData.packages[selectedPackageIndex]?.packageWidth}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                selectedPackageIndex,
-                                'packageWidth',
-                                e.target.value,
-                              )
-                            }
-                            fullWidth
-                            size='small'
-                            margin='dense'
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Tooltip>
-                      </Grid>
-                      <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                        <Tooltip
-                          title='Setting this value will automatically calculate CBM'
-                          placement='top'
-                          arrow
-                        >
-                          <TextField
-                            label='Height (cm)'
-                            name={`packageHeight_${selectedPackageIndex}`}
-                            type='number'
-                            value={shippingFormData.packages[selectedPackageIndex]?.packageHeight}
-                            onChange={(e) =>
-                              handlePackageChange(
-                                selectedPackageIndex,
-                                'packageHeight',
-                                e.target.value,
-                              )
-                            }
-                            fullWidth
-                            size='small'
-                            margin='dense'
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Tooltip>
-                      </Grid>
-                    </React.Fragment>
-                  )}
-
-                  {showCBM && (
-                    <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                      <TextField
-                        label='CBM'
-                        name={`CBM_${selectedPackageIndex}`}
-                        type='number'
-                        value={shippingFormData.packages[selectedPackageIndex]?.CBM}
-                        onChange={(e) =>
-                          handlePackageChange(selectedPackageIndex, 'CBM', e.target.value)
-                        }
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        disabled={!activeCBM}
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                      <Tooltip
-                        title='This will clear your package dimensions'
-                        placement='top'
-                        arrow
-                      >
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={activeCBM}
-                              onChange={(e) => {
-                                setActiveCBM(e.target.checked);
-                                setShowLDM(!e.target.checked);
-                                setShowDimensions(!e.target.checked);
-                                handlePackageClearDimensions(selectedPackageIndex);
-                              }}
-                            />
-                          }
-                          label='Edit CBM'
-                        />
-                      </Tooltip>
-                    </Grid>
-                  )}
-
-                  {hideLDM && (
-                    <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                      <TextField
-                        label='LDM'
-                        name={`LDM_${selectedPackageIndex}`}
-                        type='number'
-                        value={shippingFormData.packages[selectedPackageIndex]?.LDM}
-                        onChange={(e) =>
-                          handlePackageChange(selectedPackageIndex, 'LDM', e.target.value)
-                        }
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        disabled={!activeLDM}
-                        slotProps={{ htmlInput: { min: 0 } }}
-                      />
-                      <Tooltip
-                        title='This will clear your package dimensions'
-                        placement='top'
-                        arrow
-                      >
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={activeLDM}
-                              onChange={(e) => {
-                                setActiveLDM(e.target.checked);
-                                setShowCBM(!e.target.checked);
-                                setShowDimensions(!e.target.checked);
-                                handlePackageClearDimensions(selectedPackageIndex);
-                              }}
-                            />
-                          }
-                          label='Edit LDM'
-                        />
-                      </Tooltip>
-                    </Grid>
-                  )}
-
-                  <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                    <TextField
-                      label='TaxableWeight'
-                      name={`TaxableWeight_${selectedPackageIndex}`}
-                      type='number'
-                      value={shippingFormData.packages[selectedPackageIndex]?.TaxableWeight}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'TaxableWeight', e.target.value)
-                      }
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      disabled
-                      slotProps={{ htmlInput: { min: 0 } }}
-                    />
-                  </Grid>
-                </Grid>
+                ></Grid>
               </Grid>
 
               <Grid container spacing={2}>
@@ -1629,8 +1735,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     fullWidth
                     size='small'
                     margin='dense'
-                    multiline
-                    rows={2}
                   />
                 </Grid>
 
@@ -1670,24 +1774,27 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Insured'
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
-                  <FormControlLabel
-                    sx={{ mt: 1 }}
-                    control={
-                      <Checkbox
-                        checked={
-                          shippingFormData.packages[selectedPackageIndex]?.stackable || false
-                        }
-                        onChange={(e) =>
-                          handlePackageChange(selectedPackageIndex, 'stackable', e.target.checked)
-                        }
-                        name={`stackable_${selectedPackageIndex}`}
-                        color='primary'
-                      />
-                    }
-                    label='Stackable'
-                  />
-                </Grid>
+                {!activeLDM && (
+                  <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+                    <FormControlLabel
+                      sx={{ mt: 1 }}
+                      control={
+                        <Checkbox
+                          checked={
+                            shippingFormData.packages[selectedPackageIndex]?.stackable || false
+                          }
+                          onChange={(e) =>
+                            handlePackageChange(selectedPackageIndex, 'stackable', e.target.checked)
+                          }
+                          name={`stackable_${selectedPackageIndex}`}
+                          color='primary'
+                        />
+                      }
+                      label='Stackable'
+                    />
+                  </Grid>
+                )}
+
                 <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
                   <FormControlLabel
                     sx={{ mt: 1 }}
@@ -1741,7 +1848,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               )}
             </React.Fragment>
           </Box>
-
+          {/*
           <TextField
             select
             label='Shipping Service'
@@ -1759,6 +1866,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               </MenuItem>
             ))}
           </TextField>
+          */}
         </Box>
 
         <Box
