@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
@@ -33,11 +33,22 @@ import {
   InputLabel,
   Autocomplete,
   InputAdornment,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import { Add as AddIcon, Delete as DeleteIcon, Edit, EditOff } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Edit,
+  EditOff,
+  ArrowDropDown as ArrowDropDownIcon,
+  ArrowDropUp as ArrowDropUpIcon,
+} from '@mui/icons-material';
 import EntitySelector from '../entityComponent/EntitySelector';
 
 const shippingServices = [
@@ -104,12 +115,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [message, setMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const [recipientEntitiesData, setRecipientEntitiesData] = useState([]);
-  const [senderEntitiesData, setSenderEntitiesData] = useState([]);
+  const [compactShippingInfo, setCompactShippingInfo] = useState(true);
 
-  const [senderCreated, setSenderCreated] = useState(false);
-  const [recipientCreated, setRecipientCreated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
@@ -121,11 +129,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   const [showSSCC, setShowSSCC] = useState(false);
 
-  const [showCBM, setShowCBM] = useState(true);
-  const [showLDM, setShowLDM] = useState(true);
-  const [activeCBM, setActiveCBM] = useState(false);
   const [activeLDM, setActiveLDM] = useState(false);
-  const [showDimensions, setShowDimensions] = useState(true);
+  const [showDimensions, setShowDimensions] = useState(false);
 
   const [selectedPackageIndex, setSelectedPackageIndex] = useState(0);
 
@@ -133,43 +138,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const { totalQuantity, totalWeight } = calculateShippingFormTotals(shippingFormData.packages);
     return { totalWeight, totalQuantity };
   });
-
-  useEffect(() => {
-    async function fetchSenderEntitiesData() {
-      try {
-        const response = await api.post(`/shipping-form/get-entities`, { isSender: true });
-        if (response?.data?.entities?.data) {
-          setSenderEntitiesData(response.data.entities.data);
-          setLoading(false);
-          setSenderCreated(false);
-        }
-      } catch (error) {
-        console.error('Error fetching sender entities:', error);
-        setErrorMessage('Failed to load sender data.');
-        setLoading(false);
-        setSenderCreated(false);
-      }
-    }
-
-    async function fetchRecipientEntitiesData() {
-      try {
-        const response = await api.post(`/shipping-form/get-entities`, { isRecipient: true });
-        if (response?.data?.entities?.data) {
-          setRecipientEntitiesData(response.data.entities.data);
-          setLoading(false);
-          setRecipientCreated(false);
-        }
-      } catch (error) {
-        console.error('Error fetching sender entities:', error);
-        setErrorMessage('Failed to load sender data.');
-        setLoading(false);
-        setRecipientCreated(false);
-      }
-    }
-
-    fetchSenderEntitiesData();
-    fetchRecipientEntitiesData();
-  }, [senderCreated, recipientCreated]);
 
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
@@ -297,7 +265,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       extNumber: object.external_ref,
       senderTaxId: object.VAT,
     });
-    setSenderCreated(true);
   };
 
   const handleRecipientEntityCreated = (object) => {
@@ -316,7 +283,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       recipientExtNumber: object.external_ref,
       recipientTaxId: object.VAT,
     });
-    setRecipientCreated(true);
   };
 
   const handlePackageClearDimensions = (index) => {
@@ -330,6 +296,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       ['packageHeight']: '',
       ['packageLength']: '',
       ['packageWidth']: '',
+      ['LDM']: '',
     };
 
     const updatedFormData = {
@@ -351,6 +318,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       ['packageHeight']: '',
       ['packageLength']: '',
       ['packageWidth']: '',
+      ['CBM']: '',
       ['stackable']: false,
     };
 
@@ -505,7 +473,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   //if (loadingShippingForm) return <CircularProgress />;
   //
-  if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
+  //if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   return (
     <React.Fragment>
@@ -710,230 +678,391 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
         <Box display='flex' gap={4} flexWrap='wrap' sx={{ mb: 4 }}>
           {/* Sender Info */}
-          <Box flex={1} minWidth={300}>
-            <Typography variant='h6'>Sender Information</Typography>
-            <Divider sx={{ mb: 2 }} />
-
-            <EntitySelector
-              selectedEntityName={shippingFormData.senderName}
-              handleEntityChange={handleSenderEntityChange}
-              onEntityCreated={(newEntityData) => {
-                setSenderCreated(true);
-                handleSenderEntityCreated(newEntityData);
-              }}
-              isSender={true}
-            />
-            <TextField
-              label='Name'
-              name='senderName'
-              value={shippingFormData.senderName || ''}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
+          <Box
+            flex={1}
+            minWidth={300}
+            sx={{
+              mb: 3,
+              p: 2,
+              border: '1px solid linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)', // darker tone for structure
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)', // soft shadow for depth
+              color: '#003D2C',
+              '& .MuiInputBase-root': {
+                color: '#003D2C',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: 1,
+                px: 1,
+              },
+              '& .MuiInputLabel-root': {
+                color: '#003D2C',
+              },
+              '& .MuiInputLabel-shrink': {
+                color: '#003D2C',
+              },
+              '& .MuiCheckbox-root': {
+                color: '#003D2C',
+              },
+              '& .MuiFormControlLabel-label': {
+                color: '#003D2C',
+              },
+              '& .MuiSvgIcon-root': {
+                color: '#003D2C',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#ffc928',
+              },
+              '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#ffc928',
+              },
+            }}
+          >
+            {compactShippingInfo ? (
+              <React.Fragment>
+                <Typography variant='h6'>Sender Information</Typography>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label='Name'
+                      name='senderName'
+                      value={shippingFormData.senderName || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='ZIP'
+                      name='senderZip'
+                      value={shippingFormData.senderZip || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography onClick={() => setCompactShippingInfo(false)}>
+                      <ArrowDropDownIcon />
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Typography variant='h6'>Sender Information</Typography>
+                <Typography onClick={() => setCompactShippingInfo(true)}>
+                  <ArrowDropUpIcon />
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <EntitySelector
+                  selectedEntityName={shippingFormData.senderName}
+                  handleEntityChange={handleSenderEntityChange}
+                  onEntityCreated={(newEntityData) => {
+                    handleSenderEntityCreated(newEntityData);
+                  }}
+                  isSender={true}
+                />
                 <TextField
-                  label='Email'
-                  name='senderEmail'
-                  type='email'
-                  value={shippingFormData.senderEmail || ''}
+                  label='Name'
+                  name='senderName'
+                  value={shippingFormData.senderName || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
                   margin='dense'
                   required
                 />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label='Email'
+                      name='senderEmail'
+                      type='email'
+                      value={shippingFormData.senderEmail || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label='Phone'
+                      name='senderPhone'
+                      type='tel'
+                      value={shippingFormData.senderPhone || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                </Grid>
                 <TextField
-                  label='Phone'
-                  name='senderPhone'
-                  type='tel'
-                  value={shippingFormData.senderPhone || ''}
+                  label='Street'
+                  name='senderStreet'
+                  value={shippingFormData.senderStreet || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
                   margin='dense'
                   required
                 />
-              </Grid>
-            </Grid>
-            <TextField
-              label='Street'
-              name='senderStreet'
-              value={shippingFormData.senderStreet || ''}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='City'
-                  name='senderCity'
-                  value={shippingFormData.senderCity || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='State'
-                  name='senderState'
-                  value={shippingFormData.senderState || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='ZIP'
-                  name='senderZip'
-                  value={shippingFormData.senderZip || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='Country'
-                  name='senderCountry'
-                  value={shippingFormData.senderCountry || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-            </Grid>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='City'
+                      name='senderCity'
+                      value={shippingFormData.senderCity || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='State'
+                      name='senderState'
+                      value={shippingFormData.senderState || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='ZIP'
+                      name='senderZip'
+                      value={shippingFormData.senderZip || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='Country'
+                      name='senderCountry'
+                      value={shippingFormData.senderCountry || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                </Grid>
+              </React.Fragment>
+            )}
           </Box>
 
           {/* Recipient Info */}
-          <Box flex={1} minWidth={300}>
-            <Typography variant='h6'>Recipient Information</Typography>
-            <Divider sx={{ mb: 2 }} />
-            <EntitySelector
-              selectedEntityName={shippingFormData.recipientName}
-              handleEntityChange={handleRecipientEntityChange}
-              onEntityCreated={(newEntityData) => {
-                setRecipientCreated(true);
-                handleRecipientEntityCreated(newEntityData);
-              }}
-              isRecipient={true}
-            />
-            <TextField
-              label='Name'
-              name='recipientName'
-              value={shippingFormData.recipientName || ''}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
+          <Box
+            flex={1}
+            minWidth={300}
+            sx={{
+              mb: 3,
+              p: 2,
+              border: '1px solid linear-gradient(135deg, #eaf4f0 0%, #fff7e0 100%)', // darker tone for structure
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #eaf4f0 0%, #fff7e0 100%)',
+
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)', // soft shadow for depth
+              color: '#003D2C',
+              '& .MuiInputBase-root': {
+                color: '#003D2C',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: 1,
+                px: 1,
+              },
+              '& .MuiInputLabel-root': {
+                color: '#003D2C',
+              },
+              '& .MuiInputLabel-shrink': {
+                color: '#003D2C',
+              },
+              '& .MuiCheckbox-root': {
+                color: '#003D2C',
+              },
+              '& .MuiFormControlLabel-label': {
+                color: '#003D2C',
+              },
+              '& .MuiSvgIcon-root': {
+                color: '#003D2C',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#ffc928',
+              },
+              '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#ffc928',
+              },
+            }}
+          >
+            {compactShippingInfo ? (
+              <React.Fragment>
+                <Typography variant='h6'>Recipient Information</Typography>
+
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label='Name'
+                      name='recipientName'
+                      value={shippingFormData.recipientName || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='ZIP'
+                      name='recipientZip'
+                      value={shippingFormData.recipientZip || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography onClick={() => setCompactShippingInfo(false)}>
+                      <ArrowDropDownIcon />
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Typography variant='h6'>Recipient Information</Typography>
+                <Typography onClick={() => setCompactShippingInfo(true)}>
+                  <ArrowDropUpIcon />
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <EntitySelector
+                  selectedEntityName={shippingFormData.recipientName}
+                  handleEntityChange={handleRecipientEntityChange}
+                  onEntityCreated={(newEntityData) => {
+                    handleRecipientEntityCreated(newEntityData);
+                  }}
+                  isRecipient={true}
+                />
                 <TextField
-                  label='Email'
-                  name='recipientEmail'
-                  type='email'
-                  value={shippingFormData.recipientEmail || ''}
+                  label='Name'
+                  name='recipientName'
+                  value={shippingFormData.recipientName || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
                   margin='dense'
                   required
                 />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label='Email'
+                      name='recipientEmail'
+                      type='email'
+                      value={shippingFormData.recipientEmail || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label='Phone'
+                      name='recipientPhone'
+                      type='tel'
+                      value={shippingFormData.recipientPhone || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                </Grid>
                 <TextField
-                  label='Phone'
-                  name='recipientPhone'
-                  type='tel'
-                  value={shippingFormData.recipientPhone || ''}
+                  label='Street'
+                  name='recipientStreet'
+                  value={shippingFormData.recipientStreet || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
                   margin='dense'
                   required
                 />
-              </Grid>
-            </Grid>
-            <TextField
-              label='Street'
-              name='recipientStreet'
-              value={shippingFormData.recipientStreet || ''}
-              onChange={handleChange}
-              fullWidth
-              size='small'
-              margin='dense'
-              required
-            />
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='City'
-                  name='recipientCity'
-                  value={shippingFormData.recipientCity || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='State'
-                  name='recipientState'
-                  value={shippingFormData.recipientState || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='ZIP'
-                  name='recipientZip'
-                  value={shippingFormData.recipientZip || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  label='Country'
-                  name='recipientCountry'
-                  value={shippingFormData.recipientCountry || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-              </Grid>
-            </Grid>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='City'
+                      name='recipientCity'
+                      value={shippingFormData.recipientCity || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='State'
+                      name='recipientState'
+                      value={shippingFormData.recipientState || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='ZIP'
+                      name='recipientZip'
+                      value={shippingFormData.recipientZip || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <TextField
+                      label='Country'
+                      name='recipientCountry'
+                      value={shippingFormData.recipientCountry || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                </Grid>
+              </React.Fragment>
+            )}
           </Box>
         </Box>
 
@@ -1229,7 +1358,41 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               // hide rowsPerPage selector by providing only one option
             />
           </Paper>
-          <Box sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+          <Box
+            sx={{
+              mb: 3,
+              p: 2,
+              border: '1px solid linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)', // darker tone for structure
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)', // soft shadow for depth
+              color: '#003D2C',
+              '& .MuiInputBase-root': {
+                color: '#003D2C',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: 1,
+                px: 1,
+              },
+              '& .MuiInputLabel-root': {
+                color: '#003D2C',
+              },
+              '& .MuiInputLabel-shrink': {
+                color: '#003D2C',
+              },
+              '& .MuiCheckbox-root': {
+                color: '#003D2C',
+              },
+              '& .MuiFormControlLabel-label': {
+                color: '#003D2C',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#ffc928',
+              },
+              '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#ffc928',
+              },
+            }}
+          >
             <Tooltip
               title={
                 <Box sx={{ p: 1 }}>
@@ -1350,143 +1513,155 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     # {selectedPackageIndex + 1}
                   </Box>
                 </Typography>
-
-                {/* Center: Inputs Grouped */}
-                {showDimensions && (
-                  <Grid
-                    container
-                    spacing={1}
-                    justifyContent='center'
-                    alignItems='center'
-                    sx={{ flexGrow: 1, maxWidth: '100%' }}
+                <React.Fragment>
+                  <Dialog
+                    open={showDimensions}
+                    onClose={() => setShowDimensions(false)}
+                    fullWidth
+                    maxWidth='sm'
                   >
-                    <Grid size={{ xs: 6, sm: 4, md: 2, lg: 1 }}>
-                      <Tooltip
-                        title='Setting this value will automatically calculate CBM'
-                        placement='top'
-                        arrow
+                    <DialogTitle>Dimensions</DialogTitle>
+                    <DialogContent>
+                      <Grid
+                        container
+                        spacing={1}
+                        justifyContent='center'
+                        alignItems='center'
+                        sx={{ flexGrow: 1, maxWidth: '100%' }}
                       >
-                        <TextField
-                          label='Length (cm)'
-                          name={`packageLength_${selectedPackageIndex}`}
-                          type='number'
-                          value={
-                            shippingFormData.packages[selectedPackageIndex]?.packageLength || ''
-                          }
-                          onChange={(e) =>
-                            handlePackageChange(
-                              selectedPackageIndex,
-                              'packageLength',
-                              e.target.value,
-                            )
-                          }
-                          fullWidth
-                          size='small'
-                          margin='dense'
-                          slotProps={{ htmlInput: { min: 0 } }}
-                          sx={{
-                            '& .MuiInputBase-root': {
-                              fontSize: '0.75rem',
-                              padding: '2px 8px',
-                              height: '32px',
-                            },
-                            '& .MuiInputLabel-root': {
-                              fontSize: '0.75rem',
-                              top: '-4px',
-                            },
-                            '& .MuiInputLabel-shrink': {
-                              top: 0,
-                            },
-                          }}
-                        />
-                      </Tooltip>
-                    </Grid>
+                        <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
+                          <Tooltip
+                            title='Setting this value will automatically calculate CBM'
+                            placement='top'
+                            arrow
+                          >
+                            <TextField
+                              label='Length (cm)'
+                              name={`packageLength_${selectedPackageIndex}`}
+                              type='number'
+                              value={
+                                shippingFormData.packages[selectedPackageIndex]?.packageLength || ''
+                              }
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  selectedPackageIndex,
+                                  'packageLength',
+                                  e.target.value,
+                                )
+                              }
+                              fullWidth
+                              size='small'
+                              margin='dense'
+                              slotProps={{ htmlInput: { min: 0 } }}
+                              sx={{
+                                '& .MuiInputBase-root': {
+                                  fontSize: '0.75rem',
+                                  padding: '2px 8px',
+                                  height: '48px',
+                                },
+                                '& .MuiInputLabel-root': {
+                                  fontSize: '0.75rem',
+                                  top: '-4px',
+                                },
+                                '& .MuiInputLabel-shrink': {
+                                  top: 0,
+                                },
+                              }}
+                            />
+                          </Tooltip>
+                        </Grid>
 
-                    <Grid size={{ xs: 6, sm: 4, md: 2, lg: 1 }}>
-                      <Tooltip
-                        title='Setting this value will automatically calculate CBM'
-                        placement='top'
-                        arrow
-                      >
-                        <TextField
-                          label='Width (cm)'
-                          name={`packageWidth_${selectedPackageIndex}`}
-                          type='number'
-                          value={
-                            shippingFormData.packages[selectedPackageIndex]?.packageWidth || ''
-                          }
-                          onChange={(e) =>
-                            handlePackageChange(
-                              selectedPackageIndex,
-                              'packageWidth',
-                              e.target.value,
-                            )
-                          }
-                          fullWidth
-                          size='small'
-                          margin='dense'
-                          slotProps={{ htmlInput: { min: 0 } }}
-                          sx={{
-                            '& .MuiInputBase-root': {
-                              fontSize: '0.75rem',
-                              padding: '2px 8px',
-                              height: '32px',
-                            },
-                            '& .MuiInputLabel-root': {
-                              fontSize: '0.75rem',
-                              top: '-4px',
-                            },
-                            '& .MuiInputLabel-shrink': {
-                              top: 0,
-                            },
-                          }}
-                        />
-                      </Tooltip>
-                    </Grid>
+                        <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
+                          <Tooltip
+                            title='Setting this value will automatically calculate CBM'
+                            placement='top'
+                            arrow
+                          >
+                            <TextField
+                              label='Width (cm)'
+                              name={`packageWidth_${selectedPackageIndex}`}
+                              type='number'
+                              value={
+                                shippingFormData.packages[selectedPackageIndex]?.packageWidth || ''
+                              }
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  selectedPackageIndex,
+                                  'packageWidth',
+                                  e.target.value,
+                                )
+                              }
+                              fullWidth
+                              size='small'
+                              margin='dense'
+                              slotProps={{ htmlInput: { min: 0 } }}
+                              sx={{
+                                '& .MuiInputBase-root': {
+                                  fontSize: '0.75rem',
+                                  padding: '2px 8px',
+                                  height: '48px',
+                                },
+                                '& .MuiInputLabel-root': {
+                                  fontSize: '0.75rem',
+                                  top: '-4px',
+                                },
+                                '& .MuiInputLabel-shrink': {
+                                  top: 0,
+                                },
+                              }}
+                            />
+                          </Tooltip>
+                        </Grid>
 
-                    <Grid size={{ xs: 6, sm: 4, md: 2, lg: 1 }}>
-                      <Tooltip
-                        title='Setting this value will automatically calculate CBM'
-                        placement='top'
-                        arrow
-                      >
-                        <TextField
-                          label='Height (cm)'
-                          name={`packageHeight_${selectedPackageIndex}`}
-                          type='number'
-                          value={
-                            shippingFormData.packages[selectedPackageIndex]?.packageHeight || ''
-                          }
-                          onChange={(e) =>
-                            handlePackageChange(
-                              selectedPackageIndex,
-                              'packageHeight',
-                              e.target.value,
-                            )
-                          }
-                          fullWidth
-                          size='small'
-                          margin='dense'
-                          slotProps={{ htmlInput: { min: 0 } }}
-                          sx={{
-                            '& .MuiInputBase-root': {
-                              fontSize: '0.75rem',
-                              padding: '2px 8px',
-                              height: '32px',
-                            },
-                            '& .MuiInputLabel-root': {
-                              fontSize: '0.75rem',
-                              top: '-4px',
-                            },
-                            '& .MuiInputLabel-shrink': {
-                              top: 0,
-                            },
-                          }}
-                        />
-                      </Tooltip>
-                    </Grid>
-                  </Grid>
-                )}
+                        <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
+                          <Tooltip
+                            title='Setting this value will automatically calculate CBM'
+                            placement='top'
+                            arrow
+                          >
+                            <TextField
+                              label='Height (cm)'
+                              name={`packageHeight_${selectedPackageIndex}`}
+                              type='number'
+                              value={
+                                shippingFormData.packages[selectedPackageIndex]?.packageHeight || ''
+                              }
+                              onChange={(e) =>
+                                handlePackageChange(
+                                  selectedPackageIndex,
+                                  'packageHeight',
+                                  e.target.value,
+                                )
+                              }
+                              fullWidth
+                              size='small'
+                              margin='dense'
+                              slotProps={{ htmlInput: { min: 0 } }}
+                              sx={{
+                                '& .MuiInputBase-root': {
+                                  fontSize: '0.75rem',
+                                  padding: '2px 8px',
+                                  height: '48px',
+                                },
+                                '& .MuiInputLabel-root': {
+                                  fontSize: '0.75rem',
+                                  top: '-4px',
+                                },
+                                '& .MuiInputLabel-shrink': {
+                                  top: 0,
+                                },
+                              }}
+                            />
+                          </Tooltip>
+                        </Grid>
+                      </Grid>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setShowDimensions(false)}>Close</Button>
+                    </DialogActions>
+                  </Dialog>
+                </React.Fragment>
+                {/* Center: Inputs Grouped */}
 
                 {/* Right: Delete Button */}
                 {shippingFormData.packages.length > 1 && (
@@ -1595,10 +1770,26 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     slotProps={{ htmlInput: { min: 0 } }}
                   />
                 </Grid>
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                  <Button
+                    onClick={() => setShowDimensions(true)}
+                    variant='outlined'
+                    startIcon={<Edit fontSize='small' />}
+                    sx={{
+                      height: '40px',
+                      mt: '8px',
+                      textTransform: 'none',
+                      justifyContent: 'flex-start',
+                      pl: 1.5,
+                    }}
+                    fullWidth
+                  >
+                    Dimensions
+                  </Button>
+                </Grid>
 
-                {showCBM && (
-                  <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                    <TextField
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                  {/*<TextField
                       label='CBM'
                       name={`CBM_${selectedPackageIndex}`}
                       type='number'
@@ -1638,13 +1829,32 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           ),
                         },
                       }}
-                    />
-                  </Grid>
-                )}
-
-                {showLDM && (
-                  <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                    />*/}
+                  <Tooltip
+                    title='Setting this value will automatically clear dimensions.'
+                    placement='top'
+                    arrow
+                  >
                     <TextField
+                      label='CBM'
+                      name={`CBM_${selectedPackageIndex}`}
+                      type='number'
+                      value={shippingFormData.packages[selectedPackageIndex]?.CBM}
+                      onChange={(e) =>
+                        handlePackageChange(selectedPackageIndex, 'CBM', e.target.value)
+                      }
+                      fullWidth
+                      size='small'
+                      onClick={() => {
+                        handlePackageClearDimensions(selectedPackageIndex);
+                      }}
+                      margin='dense'
+                    />
+                  </Tooltip>
+                </Grid>
+
+                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                  {/*<TextField
                       label='LDM'
                       name={`LDM_${selectedPackageIndex}`}
                       type='number'
@@ -1667,7 +1877,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                     const next = !activeLDM;
                                     setActiveLDM(next);
                                     setShowCBM(!next);
-                                    setShowDimensions(!next);
+                                    setShowDimensions(true);
                                     clearPackageDimensionsAndUnsetStackable(selectedPackageIndex);
                                   }}
                                   edge='end'
@@ -1684,26 +1894,67 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           ),
                         },
                       }}
+                    />*/}
+                  <Tooltip
+                    title='Setting this value will automatically clear dimensions.'
+                    placement='top'
+                    arrow
+                  >
+                    <TextField
+                      label='LDM'
+                      name={`LDM_${selectedPackageIndex}`}
+                      type='number'
+                      value={shippingFormData.packages[selectedPackageIndex]?.LDM}
+                      onChange={(e) =>
+                        handlePackageChange(selectedPackageIndex, 'LDM', e.target.value)
+                      }
+                      fullWidth
+                      size='small'
+                      onFocus={() => {
+                        clearPackageDimensionsAndUnsetStackable(selectedPackageIndex);
+                      }}
+                      margin='dense'
                     />
-                  </Grid>
-                )}
+                  </Tooltip>
+                </Grid>
+
                 <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                   <Paper
                     elevation={2}
                     sx={{
-                      p: 1,
-                      minHeight: '56px', // matches MUI TextField height (dense size)
+                      p: 1.5,
+                      minHeight: '56px',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'center',
-                      borderRadius: 1.5,
-                      backgroundColor: '#f5f5f5',
+                      alignItems: 'flex-start',
+                      borderRadius: 2,
+                      backgroundColor: 'rgba(0, 0, 0, 0.35)', // translucent dark overlay
+                      backdropFilter: 'blur(4px)', // soft blur effect
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
+                      color: 'white',
                     }}
                   >
-                    <Typography variant='caption' color='text.secondary'>
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{
+                        color: 'rgba(255, 255, 255, 0.75)',
+                        textTransform: 'uppercase',
+                      }}
+                    >
                       Taxable Weight
                     </Typography>
-                    <Typography variant='body2' fontWeight='bold'>
+                    <Typography
+                      variant='body2'
+                      fontWeight='bold'
+                      sx={{
+                        color: 'white',
+                        fontSize: '0.95rem',
+                        mt: 0.5,
+                      }}
+                    >
                       {shippingFormData.packages[selectedPackageIndex]?.TaxableWeight ?? '—'} Kg
                     </Typography>
                   </Paper>

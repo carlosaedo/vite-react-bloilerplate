@@ -40,6 +40,9 @@ const theme = createTheme({
           },
         },
       },
+      defaultProps: {
+        notched: true,
+      },
     },
     MuiInputLabel: {
       styleOverrides: {
@@ -49,7 +52,11 @@ const theme = createTheme({
           },
         },
       },
+      defaultProps: {
+        shrink: true, // Always float the label
+      },
     },
+
     MuiSelect: {
       styleOverrides: {
         icon: {
