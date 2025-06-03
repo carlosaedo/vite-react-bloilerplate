@@ -490,7 +490,48 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         </Alert>
       )}
 
-      <Paper sx={{ p: 2, width: '98%', margin: 'auto', mt: 5 }}>
+      <Paper
+        sx={{
+          p: 2,
+          width: '98%',
+          margin: 'auto',
+          mt: 5,
+          color: '#003D2C',
+          '& .MuiInputBase-root': {
+            color: '#003D2C',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: 1,
+            px: 1,
+          },
+          '& .MuiInputLabel-root': {
+            color: '#003D2C',
+          },
+          '& .MuiInputLabel-shrink': {
+            color: '#003D2C',
+          },
+          '& .MuiCheckbox-root': {
+            color: '#003D2C',
+          },
+          '& .MuiFormControlLabel-label': {
+            color: '#003D2C',
+          },
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#ffc928',
+          },
+          '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#ffc928',
+          },
+          '& .MuiTableCell-root': {
+            color: '#003D2C',
+          },
+          '& .MuiTypography-h6': {
+            color: '#003D2C',
+          },
+          '& .MuiTablePagination-displayedRows': {
+            color: '#003D2C ',
+          },
+        }}
+      >
         <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
           <Typography
             variant='h5'
@@ -1162,6 +1203,15 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TableCell>
                       <strong>Value (€)</strong>
                     </TableCell>
+                    <TableCell>
+                      <strong>S</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>DG</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>C</strong>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -1322,6 +1372,33 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               }}
                             >
                               {pkg?.insured ? pkg?.valueOfGoods || '-' : 'NOT INSURED'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              <Tooltip title='Stackable' arrow>
+                                {pkg?.stackable ? 'Yes' : 'No'}
+                              </Tooltip>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              <Tooltip title='Dangerous Goods' arrow>
+                                {pkg?.dangerousGoods ? 'Yes' : 'No'}
+                              </Tooltip>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              <Tooltip title='Customs' arrow>
+                                {pkg?.customs ? 'Yes' : 'No'}
+                              </Tooltip>
                             </TableCell>
                           </TableRow>
                         </Tooltip>
@@ -1920,38 +1997,36 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
                 <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
                   <Paper
-                    elevation={2}
+                    elevation={1}
                     sx={{
-                      p: 1.5,
-                      minHeight: '56px',
+                      p: 1,
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'center',
                       alignItems: 'flex-start',
-                      borderRadius: 2,
-                      backgroundColor: 'rgba(0, 0, 0, 0.35)', // translucent dark overlay
-                      backdropFilter: 'blur(4px)', // soft blur effect
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
+                      borderRadius: 3,
+                      background:
+                        'linear-gradient(145deg, rgba(0, 61, 44, 0.75), rgba(0, 0, 0, 0.3))',
                       color: 'white',
                     }}
                   >
                     <Typography
                       variant='caption'
-                      color='text.secondary'
                       sx={{
-                        color: 'rgba(255, 255, 255, 0.75)',
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        fontWeight: 500,
+                        letterSpacing: '0.05em',
                         textTransform: 'uppercase',
                       }}
                     >
                       Taxable Weight
                     </Typography>
                     <Typography
-                      variant='body2'
+                      variant='body1'
                       fontWeight='bold'
                       sx={{
-                        color: 'white',
-                        fontSize: '0.95rem',
+                        color: '#fff',
+                        fontSize: '1rem',
                         mt: 0.5,
                       }}
                     >
