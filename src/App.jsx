@@ -32,7 +32,7 @@ import './App.css';
 
 const App = () => {
   let params = useParams();
-  const { isLoggedIn } = useAuth();
+  //const { isLoggedIn } = useAuth();
   const [sidebarWidth, setSidebarWidth] = useState(250); // default expanded
   console.log(`
 ▗▄▄▄▖▗▄▖ ▗▄▄▖ ▗▄▄▖ ▗▄▄▄▖ ▗▄▄▖▗▄▄▄▖▗▄▄▄▖▗▄▄▖
@@ -46,7 +46,7 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <ConnectionBanner />
+      {/*<ConnectionBanner />
       <Sidebar onToggle={setSidebarWidth} />
       <div
         className='main-app-content'
@@ -61,7 +61,8 @@ const App = () => {
           <Routes>
             {isLoggedIn ? (
               <React.Fragment>
-                {/* Admin-only routes */}
+                {/* Admin-only routes */}{' '}
+      {/*}
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/test-type-00' element={<TestType00 />} />
                 </Route>
@@ -104,7 +105,10 @@ const App = () => {
           </Routes>
           <Footer />
         </div>
-      </div>
+      </div>*/}
+      <Routes>
+        <Route path='/shipping-form' element={<ShippingForm sidebarWidth={65} />} />
+      </Routes>
     </React.Fragment>
   );
 };

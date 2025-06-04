@@ -9,9 +9,10 @@ import { useAuth } from '../context/AuthContext';
 
 function ShippingFormParent({ sidebarWidth }) {
   const navigateTo = useNavigate();
-  const { checkLoginStatusAuth, loadingAuth } = useAuth();
+  // const { checkLoginStatusAuth, loadingAuth } = useAuth();
   const [loading, setLoading] = useState(true);
   const [shippingFormTypeSinglePage, setShippingFormTypeSinglePage] = useState(null);
+  const loadingAuth = false;
 
   useEffect(() => {
     async function checkLoginStatus() {
@@ -26,7 +27,7 @@ function ShippingFormParent({ sidebarWidth }) {
         navigateTo('/login');
       }
     }
-    checkLoginStatus();
+    //checkLoginStatus();
     const storedData = localStorage.getItem('formTypeSinglePage');
     setShippingFormTypeSinglePage(storedData === 'true'); // Ensure boolean
     setLoading(false);
@@ -46,14 +47,18 @@ function ShippingFormParent({ sidebarWidth }) {
   return (
     <React.Fragment>
       <ShippingFormProvider>
-        {shippingFormTypeSinglePage ? (
+        <ShippingFormSinglePage
+          handleChangeFormType={handleChangeFormType}
+          sidebarWidth={sidebarWidth}
+        />
+        {/*shippingFormTypeSinglePage ? (
           <ShippingFormSinglePage
             handleChangeFormType={handleChangeFormType}
             sidebarWidth={sidebarWidth}
           />
         ) : (
           <ShippingForm handleChangeFormType={handleChangeFormType} sidebarWidth={sidebarWidth} />
-        )}
+        )}*/}
       </ShippingFormProvider>
     </React.Fragment>
   );

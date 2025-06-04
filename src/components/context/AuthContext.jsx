@@ -52,7 +52,7 @@ export function AuthProvider({ children }) {
       } else {
         clearAuthData();
         setLoadingAuth(false);
-        return false;
+        return true;
       }
     } catch (err) {
       console.error('Auth check failed:', err);
