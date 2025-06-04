@@ -5,6 +5,8 @@ import { useShippingFormContext } from '../context/ShippingFormContext';
 import * as stringUtils from '../../utils/stringOperations.js';
 import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
+
+import ShippingFormInputs from '../ShippingFormInputs/ShippingFormInputs';
 import {
   Grid,
   Box,
@@ -144,6 +146,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setMessage(null);
     setSelectedPackageIndex(index);
+  };
+
+  const handleShippingDimensionsAndDataChange = ({ inputs, calculated }, index) => {
+    console.log('Inputs:', inputs);
+    console.log('Calculated:', calculated);
+    console.log('Index:', index);
   };
 
   const handleChange = (event) => {
@@ -366,7 +374,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       packages: [emptyPackage],
     };
 
-    setInfoValues({ totalWeight: 0, totalPackages: 0 });
+    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+      calculateShippingFormTotals(updatedFormData.packages);
+
+    setInfoValues({
+      totalQuantity,
+      totalWeight,
+      totalCBM,
+      totalLDM,
+      totalTaxableWeight,
+      quantityByType,
+    });
 
     setShippingFormData(updatedFormData);
     setSelectedPackageIndex(0);
@@ -382,9 +400,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         packages: updatedPackages,
       };
 
-      const { totalPackages, totalWeight } = calculateShippingFormTotals(updatedPackages);
+      const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+        calculateShippingFormTotals(updatedPackages);
 
-      setInfoValues({ totalWeight, totalPackages });
+      setInfoValues({
+        totalQuantity,
+        totalWeight,
+        totalCBM,
+        totalLDM,
+        totalTaxableWeight,
+        quantityByType,
+      });
 
       setShippingFormData(updatedFormData);
       if (selectedPackageIndex === index) {
@@ -1645,6 +1671,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     # {selectedPackageIndex + 1}
                   </Box>
                 </Typography>
+                <ShippingFormInputs
+                  onChange={() => handleShippingDimensionsAndDataChange(selectedPackageIndex)}
+                />
                 <React.Fragment>
                   <Dialog
                     open={showDimensions}
