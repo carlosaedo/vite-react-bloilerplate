@@ -1217,8 +1217,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
         {/* Package Info - Multiple Packages */}
         <Box sx={{ mb: 4, width: '100%' }}>
-          <Typography variant='h6'>Package Details</Typography>
-
           <Divider sx={{ mb: 2 }} />
           <Paper elevation={2} sx={{ mt: 2, p: 2, mb: 2 }}>
             <Typography variant='h6' gutterBottom>
@@ -1341,6 +1339,13 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             onClick={() => handleJumpToPackage(globalIndex)}
                             sx={{
                               cursor: 'pointer',
+                              background:
+                                selectedPackageIndex === globalIndex
+                                  ? 'linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)'
+                                  : 'transparent',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)',
+                              },
                             }}
                           >
                             <TableCell
@@ -1484,6 +1489,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               // hide rowsPerPage selector by providing only one option
             />
           </Paper>
+          <Typography variant='h6'>Package Details</Typography>
           <Box
             sx={{
               mb: 3,
