@@ -135,8 +135,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [selectedPackageIndex, setSelectedPackageIndex] = useState(0);
 
   const [infoValues, setInfoValues] = useState(() => {
-    const { totalQuantity, totalWeight } = calculateShippingFormTotals(shippingFormData.packages);
-    return { totalWeight, totalQuantity };
+    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+      calculateShippingFormTotals(shippingFormData.packages);
+    return { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType };
   });
 
   const handleJumpToPackage = (index) => {
@@ -204,9 +205,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       packages: updatedPackages,
     };
 
-    const { totalPackages, totalWeight } = calculateShippingFormTotals(updatedPackages);
+    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+      calculateShippingFormTotals(updatedPackages);
 
-    setInfoValues({ totalWeight, totalPackages });
+    setInfoValues({
+      totalQuantity,
+      totalWeight,
+      totalCBM,
+      totalLDM,
+      totalTaxableWeight,
+      quantityByType,
+    });
 
     setShippingFormData(updatedFormData);
   };
@@ -789,7 +798,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography onClick={() => setCompactShippingInfo(false)}>
-                      <ArrowDropDownIcon />
+                      <ArrowDropDownIcon
+                        sx={{
+                          height: '48px',
+                          width: '48px',
+                          color: 'white',
+                          transition: 'transform 0.2s ease-in-out',
+                          '&:hover': {
+                            transform: 'scale(1.2)',
+                          },
+                        }}
+                      />
                     </Typography>
                   </Grid>
                 </Grid>
@@ -798,7 +817,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               <React.Fragment>
                 <Typography variant='h6'>Sender Information</Typography>
                 <Typography onClick={() => setCompactShippingInfo(true)}>
-                  <ArrowDropUpIcon />
+                  <ArrowDropUpIcon
+                    sx={{
+                      height: '48px',
+                      width: '48px',
+                      color: 'white',
+                      transition: 'transform 0.2s ease-in-out',
+                      '&:hover': {
+                        transform: 'scale(1.2)',
+                      },
+                    }}
+                  />
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
                 <EntitySelector
@@ -984,7 +1013,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography onClick={() => setCompactShippingInfo(false)}>
-                      <ArrowDropDownIcon />
+                      <ArrowDropDownIcon
+                        sx={{
+                          height: '48px',
+                          width: '48px',
+                          color: 'white',
+                          transition: 'transform 0.2s ease-in-out',
+                          '&:hover': {
+                            transform: 'scale(1.2)',
+                          },
+                        }}
+                      />
                     </Typography>
                   </Grid>
                 </Grid>
@@ -993,7 +1032,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               <React.Fragment>
                 <Typography variant='h6'>Recipient Information</Typography>
                 <Typography onClick={() => setCompactShippingInfo(true)}>
-                  <ArrowDropUpIcon />
+                  <ArrowDropUpIcon
+                    sx={{
+                      height: '48px',
+                      width: '48px',
+                      color: 'white',
+                      transition: 'transform 0.2s ease-in-out',
+                      '&:hover': {
+                        transform: 'scale(1.2)',
+                      },
+                    }}
+                  />
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
                 <EntitySelector
@@ -1917,14 +1966,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       name={`CBM_${selectedPackageIndex}`}
                       type='number'
                       value={shippingFormData.packages[selectedPackageIndex]?.CBM}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'CBM', e.target.value)
-                      }
+                      onChange={(e) => {
+                        handlePackageClearDimensions(selectedPackageIndex);
+                        handlePackageChange(selectedPackageIndex, 'CBM', e.target.value);
+                      }}
                       fullWidth
                       size='small'
-                      onClick={() => {
-                        handlePackageClearDimensions(selectedPackageIndex);
-                      }}
                       margin='dense'
                     />
                   </Tooltip>
@@ -1982,14 +2029,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       name={`LDM_${selectedPackageIndex}`}
                       type='number'
                       value={shippingFormData.packages[selectedPackageIndex]?.LDM}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'LDM', e.target.value)
-                      }
+                      onChange={(e) => {
+                        clearPackageDimensionsAndUnsetStackable(selectedPackageIndex);
+                        handlePackageChange(selectedPackageIndex, 'LDM', e.target.value);
+                      }}
                       fullWidth
                       size='small'
-                      onFocus={() => {
-                        clearPackageDimensionsAndUnsetStackable(selectedPackageIndex);
-                      }}
                       margin='dense'
                     />
                   </Tooltip>
@@ -2203,7 +2248,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           width={{ xs: `calc(100% - ${sidebarWidth}px)`, sm: `calc(100% - ${sidebarWidth}px)` }}
           sx={{
             transition: 'left 0.3s ease, width 0.3s ease',
-            bgcolor: '#fff',
+            background: 'linear-gradient(135deg, #ffffff 0%, #eaf4f0 100%)',
             boxShadow: 3,
             p: { xs: 1, sm: 2 }, // less padding on mobile
             textAlign: 'right',
@@ -2222,7 +2267,27 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             flexWrap='wrap'
           >
             <Typography>
-              Total Weight: <strong>{infoValues.totalWeight} kg</strong>
+              Total Weight: <strong>{infoValues.totalWeight || 0} kg</strong>
+            </Typography>
+
+            <Typography>
+              Total CBM: <strong>{infoValues.totalCBM || 0}</strong>
+            </Typography>
+
+            <Typography>
+              Total LDM: <strong>{infoValues.totalLDM || 0}</strong>
+            </Typography>
+
+            <Typography>
+              Total Taxable Weight: <strong>{infoValues.totalTaxableWeight || 0} kg</strong>
+            </Typography>
+
+            <Typography>
+              Total Volumes: <strong>{infoValues.quantityByType.volume || 0}</strong>
+            </Typography>
+
+            <Typography>
+              Total Palets: <strong>{infoValues.quantityByType.palete || 0}</strong>
             </Typography>
             <Button
               sx={{ marginRight: 1 }}

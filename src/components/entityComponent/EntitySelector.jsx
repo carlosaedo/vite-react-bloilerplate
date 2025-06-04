@@ -191,6 +191,7 @@ const EntitySelector = ({
             {Object.keys(defaultNewEntity).map((key) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
                 <TextField
+                  key={key}
                   label={key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                   fullWidth
                   value={newEntityData[key] ?? ''}
