@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
@@ -2031,30 +2031,52 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       background:
                         'linear-gradient(145deg, rgba(0, 61, 44, 0.75), rgba(0, 0, 0, 0.3))',
                       color: 'white',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 0.5,
                     }}
                   >
-                    <Typography variant='caption' sx={{ opacity: 0.7, fontSize: '0.65rem' }}>
-                      Taxable Wt.
-                    </Typography>
-                    <Typography variant='body2' sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                      {shippingFormData.packages[selectedPackageIndex]?.TaxableWeight ?? '—'} kg
-                    </Typography>
-
-                    {shippingFormData.packages[selectedPackageIndex]?.CBM && (
-                      <>
+                    {shippingFormData.packages[selectedPackageIndex]?.CBM ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          gap: 2,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant='caption' sx={{ opacity: 0.7, fontSize: '0.65rem' }}>
+                            Taxable Wt.
+                          </Typography>
+                          <Typography
+                            variant='body2'
+                            sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}
+                          >
+                            {shippingFormData.packages[selectedPackageIndex]?.TaxableWeight ?? '—'}{' '}
+                            kg
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant='caption' sx={{ opacity: 0.7, fontSize: '0.65rem' }}>
+                            CBM
+                          </Typography>
+                          <Typography
+                            variant='body2'
+                            sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}
+                          >
+                            {shippingFormData.packages[selectedPackageIndex]?.CBM}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Box>
                         <Typography variant='caption' sx={{ opacity: 0.7, fontSize: '0.65rem' }}>
-                          CBM
+                          Taxable Wt.
                         </Typography>
                         <Typography
                           variant='body2'
                           sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}
                         >
-                          {shippingFormData.packages[selectedPackageIndex]?.CBM}
+                          {shippingFormData.packages[selectedPackageIndex]?.TaxableWeight ?? '—'} kg
                         </Typography>
-                      </>
+                      </Box>
                     )}
                   </Paper>
                 </Grid>
