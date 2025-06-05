@@ -5,14 +5,14 @@ import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSi
 
 import sanitizeDecimalInput from '../../utils/sanitizeDecimalInput';
 
-const ShippingFormInputs = ({ onChange }) => {
+const ShippingFormInputs = ({ onChange, packageIndex }) => {
   const [inputs, setInputs] = useState({
-    weightKg: '',
-    lengthCm: '',
-    widthCm: '',
-    heightCm: '',
-    cbm: '',
-    ldm: '',
+    packageWeight: '',
+    packageLength: '',
+    packageWidth: '',
+    packageHeight: '',
+    CBM: '',
+    LDM: '',
   });
 
   const [calculated, setCalculated] = useState({
@@ -26,23 +26,34 @@ const ShippingFormInputs = ({ onChange }) => {
   };
 
   useEffect(() => {
-    const weight = parseNumber(inputs.weightKg);
-    const cbmManual = inputs.cbm !== '';
-    const ldmManual = inputs.ldm !== '';
+    const weight = parseNumber(inputs.packageWeight);
+    const cbmManual = inputs.CBM !== '';
+    const ldmManual = inputs.LDM !== '';
 
-    const length = parseNumber(inputs.lengthCm);
-    const width = parseNumber(inputs.widthCm);
-    const height = parseNumber(inputs.heightCm);
+    const length = parseNumber(inputs.packageLength);
+    const width = parseNumber(inputs.packageWidth);
+    const height = parseNumber(inputs.packageHeight);
 
     let newCalculated = { CBM: '', TaxableWeight: '' };
 
     if (!isNaN(weight)) {
       if (cbmManual) {
-        const cbm = parseNumber(inputs.cbm);
-        if (!isNaN(cbm)) {
-          newCalculated = calculateShippingFormSizeValues({ weightKg: weight, cbm });
+        const CBM = parseNumber(inputs.CBM);
+        if (!isNaN(CBM)) {
+          newCalculated = calculateShippingFormSizeValues({ weightKg: weight, cbm: CBM });
         }
       } else if (!isNaN(length) && !isNaN(width) && !isNaN(height)) {
+        console.log(
+          'Calculating dimensions',
+          'W: ',
+          weight,
+          'L: ',
+          length,
+          'W: ',
+          width,
+          'H: ',
+          height,
+        );
         newCalculated = calculateShippingFormSizeValues({
           weightKg: weight,
           lengthCm: length,
@@ -50,9 +61,9 @@ const ShippingFormInputs = ({ onChange }) => {
           heightCm: height,
         });
       } else if (ldmManual) {
-        const ldm = parseNumber(inputs.ldm);
-        if (!isNaN(ldm)) {
-          const volumetricWeight = ldm * 333;
+        const LDM = parseNumber(inputs.LDM);
+        if (!isNaN(LDM)) {
+          const volumetricWeight = LDM * 333;
           newCalculated = { TaxableWeight: Number(Math.max(weight, volumetricWeight).toFixed(2)) };
         }
       }
@@ -74,26 +85,26 @@ const ShippingFormInputs = ({ onChange }) => {
     setInputs((prev) => {
       const newInputs = { ...prev, [field]: value };
 
-      if (field === 'cbm' && value !== '') {
+      if (field === 'CBM' && value !== '') {
         // Manual CBM entered → clear dimensions and LDM
-        newInputs.lengthCm = '';
-        newInputs.widthCm = '';
-        newInputs.heightCm = '';
-        newInputs.ldm = '';
+        newInputs.packageLength = '';
+        newInputs.packageWidth = '';
+        newInputs.packageHeight = '';
+        newInputs.LDM = '';
       }
 
-      if (field === 'ldm' && value !== '') {
+      if (field === 'LDM' && value !== '') {
         // Manual LDM entered → clear dimensions and CBM
-        newInputs.lengthCm = '';
-        newInputs.widthCm = '';
-        newInputs.heightCm = '';
-        newInputs.cbm = '';
+        newInputs.packageLength = '';
+        newInputs.packageWidth = '';
+        newInputs.packageHeight = '';
+        newInputs.CBM = '';
       }
 
       // If a dimension is entered → clear CBM and LDM
-      if (['heightCm', 'widthCm', 'lengthCm'].includes(field) && value !== '') {
-        newInputs.cbm = '';
-        newInputs.ldm = '';
+      if (['packageHeight', 'packageWidth', 'packageLength'].includes(field) && value !== '') {
+        newInputs.CBM = '';
+        newInputs.LDM = '';
       }
 
       return newInputs;
@@ -113,9 +124,9 @@ const ShippingFormInputs = ({ onChange }) => {
         <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
           <TextField
             label='Weight (kg)'
-            value={inputs.weightKg}
-            onChange={handleChange('weightKg')}
-            onKeyDown={handleKeyDown('weightKg')}
+            value={inputs.packageWeight}
+            onChange={handleChange('packageWeight')}
+            onKeyDown={handleKeyDown('packageWeight')}
             fullWidth
             slotProps={{ htmlInput: { inputMode: 'decimal' } }}
           />
@@ -124,9 +135,9 @@ const ShippingFormInputs = ({ onChange }) => {
         <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
           <TextField
             label='Height (cm)'
-            value={inputs.heightCm}
-            onChange={handleChange('heightCm')}
-            onKeyDown={handleKeyDown('heightCm')}
+            value={inputs.packageHeight}
+            onChange={handleChange('packageHeight')}
+            onKeyDown={handleKeyDown('packageHeight')}
             fullWidth
             slotProps={{ htmlInput: { inputMode: 'decimal' } }}
           />
@@ -134,9 +145,9 @@ const ShippingFormInputs = ({ onChange }) => {
         <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
           <TextField
             label='Width (cm)'
-            value={inputs.widthCm}
-            onChange={handleChange('widthCm')}
-            onKeyDown={handleKeyDown('widthCm')}
+            value={inputs.packageWidth}
+            onChange={handleChange('packageWidth')}
+            onKeyDown={handleKeyDown('packageWidth')}
             fullWidth
             slotProps={{ htmlInput: { inputMode: 'decimal' } }}
           />
@@ -144,9 +155,9 @@ const ShippingFormInputs = ({ onChange }) => {
         <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
           <TextField
             label='Length (cm)'
-            value={inputs.lengthCm}
-            onChange={handleChange('lengthCm')}
-            onKeyDown={handleKeyDown('lengthCm')}
+            value={inputs.packageLength}
+            onChange={handleChange('packageLength')}
+            onKeyDown={handleKeyDown('packageLength')}
             fullWidth
             slotProps={{ htmlInput: { inputMode: 'decimal' } }}
           />
@@ -155,9 +166,9 @@ const ShippingFormInputs = ({ onChange }) => {
         <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
           <TextField
             label='CBM (manual)'
-            value={inputs.cbm}
-            onChange={handleChange('cbm')}
-            onKeyDown={handleKeyDown('cbm')}
+            value={inputs.CBM}
+            onChange={handleChange('CBM')}
+            onKeyDown={handleKeyDown('CBM')}
             fullWidth
             slotProps={{ htmlInput: { inputMode: 'decimal' } }}
           />
@@ -165,9 +176,9 @@ const ShippingFormInputs = ({ onChange }) => {
         <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
           <TextField
             label='LDM (manual)'
-            value={inputs.ldm}
-            onChange={handleChange('ldm')}
-            onKeyDown={handleKeyDown('ldm')}
+            value={inputs.LDM}
+            onChange={handleChange('LDM')}
+            onKeyDown={handleKeyDown('LDM')}
             fullWidth
             slotProps={{ htmlInput: { inputMode: 'decimal' } }}
           />

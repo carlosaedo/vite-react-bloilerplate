@@ -3,10 +3,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../api/api';
 import { useShippingFormContext } from '../context/ShippingFormContext';
 import * as stringUtils from '../../utils/stringOperations.js';
-import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
+import {
+  calculateShippingFormSizeValues,
+  calculateShippingFormSizeValuesLDM,
+} from '../../utils/calculateShippingFormSizeShippingForm';
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
 
-import ShippingFormInputs from '../ShippingFormInputs/ShippingFormInputs';
+import sanitizeDecimalInput from '../../utils/sanitizeDecimalInput';
+
 import {
   Grid,
   Box,
@@ -131,7 +135,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   const [showSSCC, setShowSSCC] = useState(false);
 
-  const [activeLDM, setActiveLDM] = useState(false);
   const [showDimensions, setShowDimensions] = useState(false);
 
   const [selectedPackageIndex, setSelectedPackageIndex] = useState(0);
@@ -148,12 +151,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setSelectedPackageIndex(index);
   };
 
-  const handleShippingDimensionsAndDataChange = ({ inputs, calculated }, index) => {
-    console.log('Inputs:', inputs);
-    console.log('Calculated:', calculated);
-    console.log('Index:', index);
-  };
-
   const handleChange = (event) => {
     setMessage(null);
     setErrorMessage(null);
@@ -164,6 +161,43 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   };
 
   const handlePackageChange = (index, field, value) => {
+    console.log('handlePackageChange triggered with', { index, field, value });
+
+    if (
+      ['packageWeight', 'packageHeight', 'packageWidth', 'packageLength', 'LDM', 'CBM'].includes(
+        field,
+      ) &&
+      value !== ''
+    ) {
+      console.log('lol');
+      value = sanitizeDecimalInput(value);
+    }
+
+    const newInputs = { ...shippingFormData.packages[index], [field]: value };
+
+    if (field === 'CBM' && value !== '') {
+      // Manual CBM entered → clear dimensions and LDM
+      newInputs.packageLength = '';
+      newInputs.packageWidth = '';
+      newInputs.packageHeight = '';
+      newInputs.LDM = '';
+    }
+
+    if (field === 'LDM' && value !== '') {
+      // Manual LDM entered → clear dimensions and CBM
+      newInputs.packageLength = '';
+      newInputs.packageWidth = '';
+      newInputs.packageHeight = '';
+      newInputs.CBM = '';
+      newInputs.stackable = false;
+    }
+
+    // If a dimension is entered → clear CBM and LDM
+    if (['packageHeight', 'packageWidth', 'packageLength'].includes(field) && value !== '') {
+      newInputs.CBM = '';
+      newInputs.LDM = '';
+    }
+
     setErrorMessage(null);
     setMessage(null);
     let newCalculationsForPackage = null;
@@ -172,7 +206,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const currentPackage = shippingFormData.packages[index];
     const updatedPackage = {
       ...currentPackage,
-      [field]: value, // Use the NEW value
+      ...newInputs,
     };
 
     // Now use the updated package for calculations
@@ -196,6 +230,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         {
           weightKg: parseFloat(updatedPackage.packageWeight) || 0,
           cbm: parseFloat(updatedPackage.CBM) || 0,
+        },
+        333,
+      );
+    } else if (updatedPackage.packageWeight && updatedPackage.LDM) {
+      newCalculationsForPackage = calculateShippingFormSizeValuesLDM(
+        {
+          weightKg: parseFloat(updatedPackage.packageWeight) || 0,
+          ldm: parseFloat(updatedPackage.LDM) || 0,
         },
         333,
       );
@@ -332,10 +374,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const updatedPackages = [...shippingFormData.packages];
     updatedPackages[index] = {
       ...updatedPackages[index],
-      ['packageHeight']: '',
-      ['packageLength']: '',
-      ['packageWidth']: '',
-      ['CBM']: '',
       ['stackable']: false,
     };
 
@@ -1671,9 +1709,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     # {selectedPackageIndex + 1}
                   </Box>
                 </Typography>
-                <ShippingFormInputs
-                  onChange={() => handleShippingDimensionsAndDataChange(selectedPackageIndex)}
-                />
                 <React.Fragment>
                   <Dialog
                     open={showDimensions}
@@ -1699,7 +1734,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             <TextField
                               label='Length (cm)'
                               name={`packageLength_${selectedPackageIndex}`}
-                              type='number'
                               value={
                                 shippingFormData.packages[selectedPackageIndex]?.packageLength || ''
                               }
@@ -1713,7 +1747,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               fullWidth
                               size='small'
                               margin='dense'
-                              slotProps={{ htmlInput: { min: 0 } }}
+                              slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                               sx={{
                                 '& .MuiInputBase-root': {
                                   fontSize: '0.75rem',
@@ -1741,7 +1775,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             <TextField
                               label='Width (cm)'
                               name={`packageWidth_${selectedPackageIndex}`}
-                              type='number'
                               value={
                                 shippingFormData.packages[selectedPackageIndex]?.packageWidth || ''
                               }
@@ -1755,7 +1788,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               fullWidth
                               size='small'
                               margin='dense'
-                              slotProps={{ htmlInput: { min: 0 } }}
+                              slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                               sx={{
                                 '& .MuiInputBase-root': {
                                   fontSize: '0.75rem',
@@ -1783,7 +1816,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             <TextField
                               label='Height (cm)'
                               name={`packageHeight_${selectedPackageIndex}`}
-                              type='number'
                               value={
                                 shippingFormData.packages[selectedPackageIndex]?.packageHeight || ''
                               }
@@ -1797,7 +1829,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               fullWidth
                               size='small'
                               margin='dense'
-                              slotProps={{ htmlInput: { min: 0 } }}
+                              slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                               sx={{
                                 '& .MuiInputBase-root': {
                                   fontSize: '0.75rem',
@@ -1919,7 +1951,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   <TextField
                     label='Weight (kg)'
                     name={`packageWeight_${selectedPackageIndex}`}
-                    type='number'
                     value={shippingFormData.packages[selectedPackageIndex]?.packageWeight}
                     onChange={(e) =>
                       handlePackageChange(selectedPackageIndex, 'packageWeight', e.target.value)
@@ -1928,7 +1959,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     size='small'
                     margin='dense'
                     required
-                    slotProps={{ htmlInput: { min: 0 } }}
+                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                   />
                 </Grid>
                 <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
@@ -1950,47 +1981,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 </Grid>
 
                 <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                  {/*<TextField
-                      label='CBM'
-                      name={`CBM_${selectedPackageIndex}`}
-                      type='number'
-                      value={shippingFormData.packages[selectedPackageIndex]?.CBM}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'CBM', e.target.value)
-                      }
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      disabled={!activeCBM}
-                      slotProps={{
-                        htmlInput: { min: 0 },
-                        input: {
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <Tooltip title='Enable/Disable CBM editing - This will clear your package dimensions'>
-                                <IconButton
-                                  onClick={() => {
-                                    const next = !activeCBM;
-                                    setActiveCBM(next);
-                                    setShowLDM(!next);
-                                    setShowDimensions(!next);
-                                    handlePackageClearDimensions(selectedPackageIndex);
-                                  }}
-                                  edge='end'
-                                  size='small'
-                                >
-                                  {activeCBM ? (
-                                    <EditOff fontSize='small' />
-                                  ) : (
-                                    <Edit fontSize='small' />
-                                  )}
-                                </IconButton>
-                              </Tooltip>
-                            </InputAdornment>
-                          ),
-                        },
-                      }}
-                    />*/}
                   <Tooltip
                     title='Setting this value will automatically clear dimensions.'
                     placement='top'
@@ -1999,61 +1989,19 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TextField
                       label='CBM'
                       name={`CBM_${selectedPackageIndex}`}
-                      type='number'
                       value={shippingFormData.packages[selectedPackageIndex]?.CBM}
                       onChange={(e) => {
-                        handlePackageClearDimensions(selectedPackageIndex);
                         handlePackageChange(selectedPackageIndex, 'CBM', e.target.value);
                       }}
                       fullWidth
                       size='small'
                       margin='dense'
+                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                     />
                   </Tooltip>
                 </Grid>
 
                 <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                  {/*<TextField
-                      label='LDM'
-                      name={`LDM_${selectedPackageIndex}`}
-                      type='number'
-                      value={shippingFormData.packages[selectedPackageIndex]?.LDM}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'LDM', e.target.value)
-                      }
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      disabled={!activeLDM}
-                      slotProps={{
-                        htmlInput: { min: 0 },
-                        input: {
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <Tooltip title='Enable/Disable LDM editing - This will clear your package dimensions'>
-                                <IconButton
-                                  onClick={() => {
-                                    const next = !activeLDM;
-                                    setActiveLDM(next);
-                                    setShowCBM(!next);
-                                    setShowDimensions(true);
-                                    clearPackageDimensionsAndUnsetStackable(selectedPackageIndex);
-                                  }}
-                                  edge='end'
-                                  size='small'
-                                >
-                                  {activeLDM ? (
-                                    <EditOff fontSize='small' />
-                                  ) : (
-                                    <Edit fontSize='small' />
-                                  )}
-                                </IconButton>
-                              </Tooltip>
-                            </InputAdornment>
-                          ),
-                        },
-                      }}
-                    />*/}
                   <Tooltip
                     title='Setting this value will automatically clear dimensions.'
                     placement='top'
@@ -2062,15 +2010,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TextField
                       label='LDM'
                       name={`LDM_${selectedPackageIndex}`}
-                      type='number'
                       value={shippingFormData.packages[selectedPackageIndex]?.LDM}
                       onChange={(e) => {
-                        clearPackageDimensionsAndUnsetStackable(selectedPackageIndex);
                         handlePackageChange(selectedPackageIndex, 'LDM', e.target.value);
                       }}
                       fullWidth
                       size='small'
                       margin='dense'
+                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                     />
                   </Tooltip>
                 </Grid>
@@ -2080,38 +2027,35 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     elevation={1}
                     sx={{
                       p: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      borderRadius: 3,
+                      borderRadius: 2,
                       background:
                         'linear-gradient(145deg, rgba(0, 61, 44, 0.75), rgba(0, 0, 0, 0.3))',
                       color: 'white',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.5,
                     }}
                   >
-                    <Typography
-                      variant='caption'
-                      sx={{
-                        color: 'rgba(255, 255, 255, 0.8)',
-                        fontWeight: 500,
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Taxable Weight
+                    <Typography variant='caption' sx={{ opacity: 0.7, fontSize: '0.65rem' }}>
+                      Taxable Wt.
                     </Typography>
-                    <Typography
-                      variant='body1'
-                      fontWeight='bold'
-                      sx={{
-                        color: '#fff',
-                        fontSize: '1rem',
-                        mt: 0.5,
-                      }}
-                    >
-                      {shippingFormData.packages[selectedPackageIndex]?.TaxableWeight ?? '—'} Kg
+                    <Typography variant='body2' sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+                      {shippingFormData.packages[selectedPackageIndex]?.TaxableWeight ?? '—'} kg
                     </Typography>
+
+                    {shippingFormData.packages[selectedPackageIndex]?.CBM && (
+                      <>
+                        <Typography variant='caption' sx={{ opacity: 0.7, fontSize: '0.65rem' }}>
+                          CBM
+                        </Typography>
+                        <Typography
+                          variant='body2'
+                          sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}
+                        >
+                          {shippingFormData.packages[selectedPackageIndex]?.CBM}
+                        </Typography>
+                      </>
+                    )}
                   </Paper>
                 </Grid>
               </Grid>
@@ -2180,26 +2124,25 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Insured'
                   />
                 </Grid>
-                {!activeLDM && (
-                  <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
-                    <FormControlLabel
-                      sx={{ mt: 1 }}
-                      control={
-                        <Checkbox
-                          checked={
-                            shippingFormData.packages[selectedPackageIndex]?.stackable || false
-                          }
-                          onChange={(e) =>
-                            handlePackageChange(selectedPackageIndex, 'stackable', e.target.checked)
-                          }
-                          name={`stackable_${selectedPackageIndex}`}
-                          color='primary'
-                        />
-                      }
-                      label='Stackable'
-                    />
-                  </Grid>
-                )}
+
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+                  <FormControlLabel
+                    sx={{ mt: 1 }}
+                    control={
+                      <Checkbox
+                        checked={
+                          shippingFormData.packages[selectedPackageIndex]?.stackable || false
+                        }
+                        onChange={(e) =>
+                          handlePackageChange(selectedPackageIndex, 'stackable', e.target.checked)
+                        }
+                        name={`stackable_${selectedPackageIndex}`}
+                        color='primary'
+                      />
+                    }
+                    label='Stackable'
+                  />
+                </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
                   <FormControlLabel

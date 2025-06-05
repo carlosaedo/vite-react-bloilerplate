@@ -5,10 +5,10 @@ function calculateShippingFormSizeValues(
   let calculatedCBM = cbm;
 
   if ((lengthCm || lengthCm === 0) && (widthCm || widthCm === 0) && (heightCm || heightCm === 0)) {
-    console.log('Dimensions:', { lengthCm, widthCm, heightCm }); // Add this
-    console.log('Types:', typeof lengthCm, typeof widthCm, typeof heightCm); // Add this
+    console.log('Dimensions:', { lengthCm, widthCm, heightCm });
+    console.log('Types:', typeof lengthCm, typeof widthCm, typeof heightCm);
     calculatedCBM = (lengthCm * widthCm * heightCm) / 1_000_000;
-    console.log('Raw CBM:', calculatedCBM); // Add this
+    console.log('Raw CBM:', calculatedCBM);
   }
 
   const volumetricWeight = calculatedCBM * volumetricRatio;
@@ -20,4 +20,13 @@ function calculateShippingFormSizeValues(
   };
 }
 
-export default calculateShippingFormSizeValues;
+function calculateShippingFormSizeValuesLDM({ weightKg, ldm }, volumetricRatio = 333) {
+  const volumetricWeight = ldm * volumetricRatio;
+  const taxableWeight = Math.max(weightKg, volumetricWeight);
+
+  return {
+    TaxableWeight: Number(taxableWeight.toFixed(2)),
+  };
+}
+
+export { calculateShippingFormSizeValues, calculateShippingFormSizeValuesLDM };

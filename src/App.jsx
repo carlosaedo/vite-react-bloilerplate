@@ -22,7 +22,6 @@ import TrackingSearch from './components/pages/TrackingSearch';
 import Tracking from './components/pages/Tracking';
 import TestType00 from './components/pages/TestType-00';
 import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
-import MockCalculationsKeyboard from './components/pages/MockCalculationsKeyboard';
 
 import ShippingForm from './components/pages/ShippingFormParent';
 
@@ -73,9 +72,6 @@ const App = () => {
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/client-new' element={<ClientNew />} />
-                </Route>
-                <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-                  <Route path='/mock' element={<MockCalculationsKeyboard />} />
                 </Route>
               </React.Fragment>
             ) : (

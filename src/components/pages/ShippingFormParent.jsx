@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ShippingForm from './ShippingForm';
-import ShippingFormSinglePage from './ShippingFormSinglePage'; // Fixed incorrect import
+import ShippingFormSinglePage from './ShippingFormSinglePage';
 import { CircularProgress } from '@mui/material';
 import { ShippingFormProvider } from '../context/ShippingFormContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,24 +11,24 @@ function ShippingFormParent({ sidebarWidth }) {
   const navigateTo = useNavigate();
   const { checkLoginStatusAuth, loadingAuth } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [shippingFormTypeSinglePage, setShippingFormTypeSinglePage] = useState(null);
+  const [shippingFormTypeSinglePage, setShippingFormTypeSinglePage] = useState(true); // default = true
 
   useEffect(() => {
     async function checkLoginStatus() {
       try {
         const loginStatus = await checkLoginStatusAuth();
-
-        if (!loginStatus) {
-          navigateTo('/login');
-        }
+        if (!loginStatus) navigateTo('/login');
       } catch (err) {
         console.error('Auth check failed:', err);
         navigateTo('/login');
       }
     }
+
     checkLoginStatus();
+
     const storedData = localStorage.getItem('formTypeSinglePage');
-    setShippingFormTypeSinglePage(storedData === 'true'); // Ensure boolean
+    // default to true if nothing is stored
+    setShippingFormTypeSinglePage(storedData === null ? true : storedData === 'true');
     setLoading(false);
   }, []);
 
@@ -37,25 +37,23 @@ function ShippingFormParent({ sidebarWidth }) {
     if (singlePage) {
       localStorage.setItem('formTypeSinglePage', 'true');
     } else {
-      localStorage.removeItem('formTypeSinglePage');
+      localStorage.setItem('formTypeSinglePage', 'false');
     }
   };
 
   if (loading || loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
 
   return (
-    <React.Fragment>
-      <ShippingFormProvider>
-        {shippingFormTypeSinglePage ? (
-          <ShippingFormSinglePage
-            handleChangeFormType={handleChangeFormType}
-            sidebarWidth={sidebarWidth}
-          />
-        ) : (
-          <ShippingForm handleChangeFormType={handleChangeFormType} sidebarWidth={sidebarWidth} />
-        )}
-      </ShippingFormProvider>
-    </React.Fragment>
+    <ShippingFormProvider>
+      {shippingFormTypeSinglePage ? (
+        <ShippingFormSinglePage
+          handleChangeFormType={handleChangeFormType}
+          sidebarWidth={sidebarWidth}
+        />
+      ) : (
+        <ShippingForm handleChangeFormType={handleChangeFormType} sidebarWidth={sidebarWidth} />
+      )}
+    </ShippingFormProvider>
   );
 }
 

@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../api/api';
 import * as stringUtils from '../../utils/stringOperations.js';
 import { useShippingFormContext } from '../context/ShippingFormContext';
-import calculateShippingFormSizeValues from '../../utils/calculateShippingFormSizeShippingForm';
+import {
+  calculateShippingFormSizeValues,
+  calculateShippingFormSizeValuesLDM,
+} from '../../utils/calculateShippingFormSizeShippingForm';
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
 import {
   Box,
