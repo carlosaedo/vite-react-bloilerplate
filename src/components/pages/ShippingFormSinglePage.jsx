@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import api from '../api/api';
+import torrestirApi from '../api/torrestirApi';
 import { useShippingFormContext } from '../context/ShippingFormContext';
 import * as stringUtils from '../../utils/stringOperations.js';
 import {
@@ -10,7 +11,7 @@ import {
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
 
 import sanitizeDecimalInput from '../../utils/sanitizeDecimalInput';
-
+import { useAuth } from '../context/AuthContext';
 import {
   Grid,
   Box,
@@ -111,6 +112,7 @@ const shippingPaymentTo = [
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { token } = useAuth();
   const {
     shippingFormData,
     setShippingFormData,
@@ -145,18 +147,105 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     return { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType };
   });
 
+  const [shippingSenderRouting, setShippingSenderRouting] = useState({});
+  const [shippingRecipientRouting, setShippingRecipientRouting] = useState({});
+
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
     setMessage(null);
     setSelectedPackageIndex(index);
   };
 
+  useEffect(() => {
+    const getShippingSenderRouting = async () => {
+      try {
+        if (
+          shippingFormData?.deliveryDate &&
+          shippingFormData?.senderZip &&
+          shippingFormData?.senderCountry
+        ) {
+          console.log('Get sender routing');
+          const response = await torrestirApi.get(
+            `/Routing/zipcode-lookup?country=${shippingFormData?.senderCountry.toUpperCase()}&zipcode=${shippingFormData?.senderZip
+              .replace(/-/g, '')
+              .trim()}&type=Pickup&shippingDate=${shippingFormData?.deliveryDate}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          if (response?.data?.isSuccess) {
+            setShippingSenderRouting(response.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching shipping sender routing:', error);
+      }
+    };
+
+    const getShippingRecipientRouting = async () => {
+      try {
+        if (
+          shippingFormData?.deliveryDate &&
+          shippingFormData?.recipientZip &&
+          shippingFormData?.recipientCountry
+        ) {
+          console.log(
+            `/Routing/zipcode-lookup?country=${shippingFormData.recipientCountry.toUpperCase()}&zipcode=${shippingFormData.recipientZip
+              .replace(/-/g, '')
+              .trim()}&type=Delivery&shippingDate=${shippingFormData.deliveryDate}`,
+          );
+          const response = await torrestirApi.get(
+            `/Routing/zipcode-lookup?country=${shippingFormData.recipientCountry.toUpperCase()}&zipcode=${shippingFormData.recipientZip
+              .replace(/-/g, '')
+              .trim()}&type=Delivery&shippingDate=${shippingFormData.deliveryDate}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          if (response?.data?.isSuccess) {
+            setShippingRecipientRouting(response?.data);
+          }
+          console.log(response);
+        }
+      } catch (error) {
+        console.error('Error fetching shipping sender routing:', error);
+      }
+    };
+    getShippingSenderRouting();
+    getShippingRecipientRouting();
+  }, [
+    shippingFormData?.senderZip,
+    shippingFormData.recipientZip,
+    shippingFormData.deliveryDate,
+    shippingFormData?.senderCountry,
+    shippingFormData.recipientCountry,
+    token,
+  ]);
+
   const handleChange = (event) => {
+    const { name, type, checked } = event.target;
+    let value = event.target.value;
+
+    if (['valueOfGoods'].includes(name) && value !== '') {
+      value = sanitizeDecimalInput(value);
+    }
+
+    let updatedShippingFormData = { ...shippingFormData };
+
+    if (name === 'insured' && checked === false) {
+      updatedShippingFormData['valueOfGoods'] = '';
+    }
+
     setMessage(null);
     setErrorMessage(null);
     setShippingFormData({
-      ...shippingFormData,
-      [event.target.name]: event.target.value,
+      ...updatedShippingFormData,
+      //[event.target.name]: event.target.value,
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -165,7 +254,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
     if (
       [
-        'valueOfGoods',
+        'tempControlledMaxTemp',
+        'tempControlledMinTemp',
         'packageWeight',
         'packageHeight',
         'packageWidth',
@@ -175,7 +265,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       ].includes(field) &&
       value !== ''
     ) {
-      console.log('lol');
       value = sanitizeDecimalInput(value);
     }
 
@@ -202,6 +291,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     if (['packageHeight', 'packageWidth', 'packageLength'].includes(field) && value !== '') {
       newInputs.CBM = '';
       newInputs.LDM = '';
+    }
+
+    if (field === 'tempControlled' && value === false) {
+      newInputs.tempControlledMaxTemp = '';
+      newInputs.tempControlledMinTemp = '';
     }
 
     setErrorMessage(null);
@@ -672,19 +766,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           <Divider sx={{ mb: 2 }} />
 
           <Grid container spacing={2}>
-            <Grid size={{ sm: 2, xs: 6 }}>
-              <TextField
-                label='Year'
-                name='year'
-                value={shippingFormData.year}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
               <TextField
                 label='Date'
                 name='date'
@@ -698,7 +780,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
               <TextField
                 label='Delivery Date'
                 name='deliveryDate'
@@ -712,7 +794,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 slotProps={{ inputLabel: { shrink: true } }} // <- fixes the label overlapping issue
               />
             </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
               <TextField
                 label='Hour'
                 name='hour'
@@ -727,7 +809,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               />
             </Grid>
 
-            <Grid size={{ sm: 2, xs: 6 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 3, lg: 3 }}>
               <TextField
                 label='Shipper Reference'
                 name='shipperRef'
@@ -740,7 +822,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 3, lg: 3 }}>
               <TextField
                 label='Consignee Reference'
                 name='consigneeRef'
@@ -753,9 +835,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 3, lg: 3 }}>
               <TextField
-                label='Waybill Reference'
+                label='Tracking Reference'
                 name='trackingRef'
                 type='text'
                 value={shippingFormData.trackingRef}
@@ -765,32 +847,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 margin='dense'
                 required
                 disabled
-              />
-            </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
-              <TextField
-                label='Ext. Number'
-                name='extNumber'
-                type='text'
-                value={shippingFormData.extNumber}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid size={{ sm: 2, xs: 6 }}>
-              <TextField
-                label='Ext. Number 2'
-                name='extNumber2'
-                type='text'
-                value={shippingFormData.extNumber2}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
               />
             </Grid>
           </Grid>
@@ -882,6 +938,86 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     </Typography>
                   </Grid>
                 </Grid>
+                {shippingSenderRouting?.data !== null && (
+                  <Grid container spacing={1} sx={{ ml: 2 }}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Agent Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.agentName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.routeName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Service Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.serviceName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.routeAbbreviation2 ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                )}
               </React.Fragment>
             ) : (
               <React.Fragment>
@@ -1012,6 +1148,86 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     />
                   </Grid>
                 </Grid>
+                {shippingSenderRouting?.data !== null && (
+                  <Grid container spacing={1} sx={{ ml: 2 }}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Agent Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.agentName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.routeName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Service Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.serviceName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingSenderRouting?.data?.routeAbbreviation2 ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                )}
               </React.Fragment>
             )}
           </Box>
@@ -1103,6 +1319,86 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     </Typography>
                   </Grid>
                 </Grid>
+                {shippingRecipientRouting?.data !== null && (
+                  <Grid container spacing={1} sx={{ ml: 2 }}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Agent Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.agentName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.routeName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Service Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.serviceName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.routeAbbreviation2 ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                )}
               </React.Fragment>
             ) : (
               <React.Fragment>
@@ -1227,6 +1523,86 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     />
                   </Grid>
                 </Grid>
+                {shippingRecipientRouting?.data !== null && (
+                  <Grid container spacing={1} sx={{ ml: 2 }}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Agent Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.agentName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.routeName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Service Name' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.serviceName ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
+                      <Tooltip title='Route' placement='bottom' arrow>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            backgroundColor: 'white',
+                            color: '#003D2C',
+                            fontSize: '0.8rem',
+                            fontWeight: 400,
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {shippingRecipientRouting?.data?.routeAbbreviation2 ?? '—'}
+                        </Typography>
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                )}
               </React.Fragment>
             )}
           </Box>
@@ -1323,9 +1699,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TableCell>
                       <strong>Note</strong>
                     </TableCell>
-                    <TableCell>
-                      <strong>Value (€)</strong>
-                    </TableCell>
+
                     <TableCell>
                       <strong>S</strong>
                     </TableCell>
@@ -1333,7 +1707,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       <strong>DG</strong>
                     </TableCell>
                     <TableCell>
-                      <strong>C</strong>
+                      <strong>TC</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>MAX / MIN</strong>
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -1496,13 +1873,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             >
                               {pkg?.packageNote || '-'}
                             </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
-                              {pkg?.insured ? pkg?.valueOfGoods || '-' : 'NOT INSURED'}
-                            </TableCell>
+
                             <TableCell
                               sx={{
                                 borderBottom: showSSCC ? 'none !important' : undefined,
@@ -1526,9 +1897,24 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                 borderBottom: showSSCC ? 'none !important' : undefined,
                               }}
                             >
-                              <Tooltip title='Customs' arrow>
-                                {pkg?.customs ? 'Yes' : 'No'}
+                              <Tooltip title='Temperature Controlled' arrow>
+                                {pkg?.tempControlled ? 'Yes' : 'No'}
                               </Tooltip>
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.tempControlled
+                                ? '+' +
+                                    pkg?.tempControlledMinTemp +
+                                    'ºC' +
+                                    ' / ' +
+                                    '-' +
+                                    pkg?.tempControlledMaxTemp +
+                                    'ºC' || '-'
+                                : 'NOT SET'}
                             </TableCell>
                           </TableRow>
                         </Tooltip>
@@ -2122,42 +2508,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   />
                 </Grid>
 
-                {shippingFormData.packages[selectedPackageIndex]?.insured && (
-                  <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                    <TextField
-                      label='Value of Goods (€)'
-                      name={`packageValue_${selectedPackageIndex}`}
-                      value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'valueOfGoods', e.target.value)
-                      }
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required={shippingFormData.packages[selectedPackageIndex]?.insured || false}
-                      sx={{ minWidth: 180 }}
-                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-                    />
-                  </Grid>
-                )}
-
-                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
-                  <FormControlLabel
-                    sx={{ mt: 1 }}
-                    control={
-                      <Checkbox
-                        checked={shippingFormData.packages[selectedPackageIndex]?.insured || false}
-                        onChange={(e) =>
-                          handlePackageChange(selectedPackageIndex, 'insured', e.target.checked)
-                        }
-                        name={`insured_${selectedPackageIndex}`}
-                        color='primary'
-                      />
-                    }
-                    label='Insured'
-                  />
-                </Grid>
-
                 <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
                   <FormControlLabel
                     sx={{ mt: 1 }}
@@ -2199,22 +2549,99 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Dangerous Goods'
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+
+                {shippingFormData.packages[selectedPackageIndex]?.insured && (
+                  <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                    <TextField
+                      label='Value of Goods (€)'
+                      name={`packageValue_${selectedPackageIndex}`}
+                      value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods}
+                      onChange={(e) =>
+                        handlePackageChange(selectedPackageIndex, 'valueOfGoods', e.target.value)
+                      }
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required={shippingFormData.packages[selectedPackageIndex]?.insured || false}
+                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    />
+                  </Grid>
+                )}
+
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
                       <Checkbox
-                        checked={shippingFormData.packages[selectedPackageIndex]?.customs || false}
-                        onChange={(e) =>
-                          handlePackageChange(selectedPackageIndex, 'customs', e.target.checked)
+                        checked={
+                          shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
                         }
-                        name={`customs_${selectedPackageIndex}`}
+                        onChange={(e) =>
+                          handlePackageChange(
+                            selectedPackageIndex,
+                            'tempControlled',
+                            e.target.checked,
+                          )
+                        }
+                        name={`tempControlled_${selectedPackageIndex}`}
                         color='primary'
                       />
                     }
-                    label='Customs'
+                    label='Temperature Controlled'
                   />
                 </Grid>
+
+                {shippingFormData.packages[selectedPackageIndex]?.tempControlled && (
+                  <React.Fragment>
+                    <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+                      <TextField
+                        label='MIN'
+                        name={`tempControlledMinTemp_${selectedPackageIndex}`}
+                        value={
+                          shippingFormData?.packages[selectedPackageIndex]?.tempControlledMinTemp
+                        }
+                        onChange={(e) =>
+                          handlePackageChange(
+                            selectedPackageIndex,
+                            'tempControlledMinTemp',
+                            e.target.value,
+                          )
+                        }
+                        fullWidth
+                        size='small'
+                        margin='dense'
+                        required={
+                          shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
+                        }
+                        slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+                      <TextField
+                        label='MAX'
+                        name={`tempControlledMaxTemp_${selectedPackageIndex}`}
+                        value={
+                          shippingFormData?.packages[selectedPackageIndex]?.tempControlledMaxTemp
+                        }
+                        onChange={(e) =>
+                          handlePackageChange(
+                            selectedPackageIndex,
+                            'tempControlledMaxTemp',
+                            e.target.value,
+                          )
+                        }
+                        fullWidth
+                        size='small'
+                        margin='dense'
+                        required={
+                          shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
+                        }
+                        slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                      />
+                    </Grid>
+                  </React.Fragment>
+                )}
               </Grid>
               {showSSCC && (
                 <TextField
@@ -2249,6 +2676,92 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             ))}
           </TextField>
           */}
+          <Grid container spacing={2}>
+            {shippingFormData?.insured && (
+              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                <TextField
+                  label='Value of Goods (€)'
+                  name='valueOfGoods'
+                  value={shippingFormData?.valueOfGoods}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required={shippingFormData?.insured || false}
+                  slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                />
+              </Grid>
+            )}
+
+            <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+              <FormControlLabel
+                sx={{ mt: 1 }}
+                control={
+                  <Checkbox
+                    checked={shippingFormData?.insured || false}
+                    onChange={handleChange}
+                    name='insured'
+                    color='primary'
+                  />
+                }
+                label='Insured'
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+              <FormControlLabel
+                sx={{ mt: 1 }}
+                control={
+                  <Checkbox
+                    checked={shippingFormData?.customs || false}
+                    onChange={handleChange}
+                    name='customs'
+                    color='primary'
+                  />
+                }
+                label='Customs'
+              />
+            </Grid>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 4,
+                md: shippingFormData?.insured ? 4 : 5,
+                lg: shippingFormData?.insured ? 4 : 5,
+              }}
+            >
+              <TextField
+                label='Shipper Instructions'
+                name='shipperInstructions'
+                type='text'
+                value={shippingFormData.shipperInstructions}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 4,
+                md: shippingFormData?.insured ? 4 : 5,
+                lg: shippingFormData?.insured ? 4 : 5,
+              }}
+            >
+              <TextField
+                label='Consignee Instructions'
+                name='consigneeInstructions'
+                type='text'
+                value={shippingFormData.consigneeInstructions}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+              />
+            </Grid>
+          </Grid>
         </Box>
 
         <Box
