@@ -164,9 +164,15 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     console.log('handlePackageChange triggered with', { index, field, value });
 
     if (
-      ['packageWeight', 'packageHeight', 'packageWidth', 'packageLength', 'LDM', 'CBM'].includes(
-        field,
-      ) &&
+      [
+        'valueOfGoods',
+        'packageWeight',
+        'packageHeight',
+        'packageWidth',
+        'packageLength',
+        'LDM',
+        'CBM',
+      ].includes(field) &&
       value !== ''
     ) {
       console.log('lol');
@@ -644,7 +650,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               </Typography>
             )}
           </Typography>
-
+          {/*
           <Tooltip title='Multi tab form' placement='top' arrow>
             <Button
               onClick={handleChangeFormTypeToParent}
@@ -657,7 +663,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             >
               <LiaWpforms />
             </Button>
-          </Tooltip>
+          </Tooltip>*/}
         </Box>
 
         {/* Guia*/}
@@ -911,6 +917,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   size='small'
                   margin='dense'
                   required
+                  disabled
                 />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -949,6 +956,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   size='small'
                   margin='dense'
                   required
+                  disabled
                 />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6, sm: 3 }}>
@@ -961,6 +969,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       size='small'
                       margin='dense'
                       required
+                      disabled
                     />
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }}>
@@ -973,6 +982,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       size='small'
                       margin='dense'
                       required
+                      disabled
                     />
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }}>
@@ -985,6 +995,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       size='small'
                       margin='dense'
                       required
+                      disabled
                     />
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }}>
@@ -997,6 +1008,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       size='small'
                       margin='dense'
                       required
+                      disabled
                     />
                   </Grid>
                 </Grid>
@@ -2115,7 +2127,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TextField
                       label='Value of Goods (€)'
                       name={`packageValue_${selectedPackageIndex}`}
-                      type='number'
                       value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods}
                       onChange={(e) =>
                         handlePackageChange(selectedPackageIndex, 'valueOfGoods', e.target.value)
@@ -2125,7 +2136,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       margin='dense'
                       required={shippingFormData.packages[selectedPackageIndex]?.insured || false}
                       sx={{ minWidth: 180 }}
-                      slotProps={{ htmlInput: { min: 0 } }}
+                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                     />
                   </Grid>
                 )}
