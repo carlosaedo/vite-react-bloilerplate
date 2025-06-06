@@ -9,7 +9,6 @@ import {
   calculateShippingFormSizeValuesLDM,
 } from '../../utils/calculateShippingFormSizeShippingForm';
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
-import { BsInfoCircleFill } from 'react-icons/bs';
 
 import { sanitizeDecimalInput, sanitizeDecimalInputTemp } from '../../utils/sanitizeDecimalInput';
 import { useAuth } from '../context/AuthContext';
@@ -48,6 +47,8 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
+import { BsInfoCircleFill } from 'react-icons/bs';
+import { FaClone } from 'react-icons/fa';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import {
   Add as AddIcon,
@@ -177,6 +178,22 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setMessage(null);
     setSelectedPackageIndex(index);
+  };
+
+  const handlePackageDuplication = (index) => {
+    const packageToClone = shippingFormData.packages[index];
+    const newPackage = {
+      ...defaultPackageValues,
+      ...packageToClone,
+    };
+
+    const updatedFormData = {
+      ...shippingFormData,
+      packages: [...shippingFormData.packages, newPackage],
+    };
+
+    setShippingFormData(updatedFormData);
+    setSelectedPackageIndex(updatedFormData.packages.length - 1);
   };
 
   useEffect(() => {
@@ -2491,10 +2508,19 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Dialog>
                 </React.Fragment>
                 {/* Center: Inputs Grouped */}
+                <Box sx={{ ml: 'auto' }}>
+                  <Tooltip title='Duplicate Package' direction='top' arrow>
+                    <IconButton
+                      onClick={() => handlePackageDuplication(selectedPackageIndex)}
+                      size='small'
+                      sx={{ color: '#003D2C' }}
+                    >
+                      <FaClone />
+                    </IconButton>
+                  </Tooltip>
 
-                {/* Right: Delete Button */}
-                {shippingFormData.packages.length > 1 && (
-                  <Box sx={{ ml: 'auto' }}>
+                  {/* Right: Delete Button */}
+                  {shippingFormData.packages.length > 1 && (
                     <IconButton
                       onClick={() => removePackage(selectedPackageIndex)}
                       color='error'
@@ -2502,8 +2528,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     >
                       <DeleteIcon />
                     </IconButton>
-                  </Box>
-                )}
+                  )}
+                </Box>
               </Box>
             </Tooltip>
 
@@ -3168,7 +3194,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     arrow
                     placement='top-start'
                   >
-                    <span>Package: {index + 1}</span>
+                    <span>{index + 1}</span>
                   </Tooltip>
                 </MenuItem>
               ))}
