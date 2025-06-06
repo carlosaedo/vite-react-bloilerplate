@@ -24,6 +24,8 @@ import {
   FaChevronRight,
   FaChevronDown,
   FaChevronRight as FaChevronUp,
+  FaThList,
+  FaListAlt,
 } from 'react-icons/fa';
 
 import { GrUserNew } from 'react-icons/gr';
@@ -137,10 +139,23 @@ const Sidebar = ({ onToggle }) => {
       ],
     },
     {
-      label: 'Shipping Form',
-      icon: <RiPagesLine />,
-      path: '/shipping-form',
+      label: 'Shipping Forms',
+      icon: <FaListAlt />,
       roles: ['user', 'admin', 'client'],
+      children: [
+        {
+          label: 'Create Shipping Form',
+          icon: <RiPagesLine />,
+          path: '/shipping-form',
+          roles: ['user', 'admin', 'client'],
+        },
+        {
+          label: 'Shipping Forms',
+          icon: <FaThList />,
+          path: '/shipping-forms',
+          roles: ['user', 'admin', 'client'],
+        },
+      ],
     },
     {
       label: 'Tracking',

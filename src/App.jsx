@@ -24,6 +24,7 @@ import TestType00 from './components/pages/TestType-00';
 import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
 
 import ShippingForm from './components/pages/ShippingFormParent';
+import ShippingForms from './components/pages/ShippingForms';
 
 import ClientDetails from './components/pages/ClientDetails';
 import ClientNew from './components/pages/ClientNew';
@@ -73,6 +74,16 @@ const App = () => {
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/client-new' element={<ClientNew />} />
                 </Route>
+
+                <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                  <Route
+                    path='/shipping-form'
+                    element={<ShippingForm sidebarWidth={sidebarWidth} />}
+                  />
+                </Route>
+                <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                  <Route path='/shipping-forms' element={<ShippingForms />} />
+                </Route>
               </React.Fragment>
             ) : (
               <Route path='*' element={<Navigate to='/login' replace />} />
@@ -96,7 +107,6 @@ const App = () => {
             <Route path='/404' element={<Page404 />} />
             <Route path='/tracking' element={<TrackingSearch />} />
             <Route path='/tracking/:trackingNumber' element={<Tracking />} />
-            <Route path='/shipping-form' element={<ShippingForm sidebarWidth={sidebarWidth} />} />
           </Routes>
           <Footer />
         </div>
