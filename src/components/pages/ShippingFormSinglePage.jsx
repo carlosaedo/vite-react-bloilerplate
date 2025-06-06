@@ -9,6 +9,7 @@ import {
   calculateShippingFormSizeValuesLDM,
 } from '../../utils/calculateShippingFormSizeShippingForm';
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
+import { BsInfoCircleFill } from 'react-icons/bs';
 
 import { sanitizeDecimalInput, sanitizeDecimalInputTemp } from '../../utils/sanitizeDecimalInput';
 import { useAuth } from '../context/AuthContext';
@@ -180,31 +181,47 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === 'ArrowUp') {
-        console.log('Ctrl + ArrowUp pressed');
-        console.log(selectedPackageIndex);
+      const totalPackages = shippingFormData.packages.length;
+      const maxPage = Math.ceil(totalPackages / rowsPerPage) - 1;
 
-        if (selectedPackageIndex > 0) {
-          handleJumpToPackage(selectedPackageIndex - 1);
-        }
+      // Ctrl + ArrowUp: Previous package (or wrap to last)
+      if (e.ctrlKey && e.key === 'ArrowUp') {
+        const newIndex = selectedPackageIndex > 0 ? selectedPackageIndex - 1 : totalPackages - 1;
+
+        handleJumpToPackage(newIndex);
+        setPage(Math.floor(newIndex / rowsPerPage));
       }
 
+      // Ctrl + ArrowDown: Next package (or wrap to first)
       if (e.ctrlKey && e.key === 'ArrowDown') {
-        console.log('Ctrl + ArrowDown pressed');
-        console.log(selectedPackageIndex);
+        const newIndex = selectedPackageIndex < totalPackages - 1 ? selectedPackageIndex + 1 : 0;
 
-        if (selectedPackageIndex < shippingFormData.packages.length - 1) {
-          handleJumpToPackage(selectedPackageIndex + 1);
-        }
+        handleJumpToPackage(newIndex);
+        setPage(Math.floor(newIndex / rowsPerPage));
+      }
+
+      // Ctrl + ArrowRight: Next page (or wrap to first)
+      if (e.ctrlKey && e.key === 'ArrowRight') {
+        const newPage = page < maxPage ? page + 1 : 0;
+        setPage(newPage);
+
+        const newSelectedIndex = newPage * rowsPerPage;
+        handleJumpToPackage(newSelectedIndex);
+      }
+
+      // Ctrl + ArrowLeft: Previous page (or wrap to last)
+      if (e.ctrlKey && e.key === 'ArrowLeft') {
+        const newPage = page > 0 ? page - 1 : maxPage;
+        setPage(newPage);
+
+        const newSelectedIndex = newPage * rowsPerPage;
+        handleJumpToPackage(newSelectedIndex);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [selectedPackageIndex, shippingFormData]); // <-- Add them here
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPackageIndex, shippingFormData, page]);
 
   useEffect(() => {
     const getShippingSenderRouting = async () => {
@@ -1862,6 +1879,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <Typography variant='h6' gutterBottom>
               Package Table
             </Typography>
+
             <Box sx={{ width: '100%', overflowX: 'auto' }}>
               <Table size='small'>
                 <TableHead>
@@ -2144,15 +2162,32 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 </TableBody>
               </Table>
             </Box>
-            <TablePagination
-              component='div'
-              count={shippingFormData?.packages?.length}
-              page={page}
-              onPageChange={(event, newPage) => setPage(newPage)}
-              rowsPerPage={rowsPerPage}
-              rowsPerPageOptions={[10]}
-              // hide rowsPerPage selector by providing only one option
-            />
+            <Grid
+              container
+              spacing={1}
+              alignItems='center'
+              justifyContent='flex-end'
+              sx={{ mt: 2 }}
+            >
+              {/* Info Icon aligned to center */}
+              <Grid>
+                <Tooltip title='Navigate the table using the Ctrl + Arrow Up / Down and Ctrl + Arrow Left / Right'>
+                  <BsInfoCircleFill style={{ verticalAlign: 'middle', fontSize: 20 }} />
+                </Tooltip>
+              </Grid>
+
+              {/* Pagination aligned to right */}
+              <Grid>
+                <TablePagination
+                  component='div'
+                  count={shippingFormData?.packages?.length || 0}
+                  page={page}
+                  onPageChange={(event, newPage) => setPage(newPage)}
+                  rowsPerPage={rowsPerPage}
+                  rowsPerPageOptions={[10]} // Hides rowsPerPage selector
+                />
+              </Grid>
+            </Grid>
           </Paper>
           <Typography variant='h6'>Package Details</Typography>
           <Box
