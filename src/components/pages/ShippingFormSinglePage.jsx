@@ -64,6 +64,16 @@ const shippingServices = [
   { value: 'overnight', label: 'Overnight' },
 ];
 
+const customsClearedByOptions = [
+  { value: 'torresAduana', label: 'TorresAduana' },
+  { value: 'client', label: 'Client' },
+];
+
+const insuredByOptions = [
+  { value: 'torrestir', label: 'Torrestir' },
+  { value: 'client', label: 'Client' },
+];
+
 const typeOfGoodsOptions = [{ value: 'general_goods', label: 'General Goods' }];
 
 function generateMockSSCC() {
@@ -81,7 +91,6 @@ const defaultPackageValues = {
   packageWidth: '',
   packageHeight: '',
   packageNote: '',
-  valueOfGoods: '',
   packageType: 'volume',
   sscc: generateMockSSCC(),
   CBM: '',
@@ -89,9 +98,11 @@ const defaultPackageValues = {
   TaxableWeight: '',
   stackable: false,
   dangerousGoods: false,
-  customs: false,
   marksAndNumbers: '',
   typeOfGoods: 'general_goods',
+  tempControlled: false,
+  tempControlledMinTemp: '',
+  tempControlledMaxTemp: '',
 };
 
 const packageType = [
@@ -111,12 +122,13 @@ const shippingPaymentTo = [
 
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [errorMessage, setErrorMessage] = useState(null);
+  const [errorClient, setErrorClient] = useState(null);
   const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
   const [clientId, setClientId] = useState(() => {
     if (clientIdFromStorage?.clientId) {
       return clientIdFromStorage.clientId;
     } else {
-      setErrorMessage('No client selected. Cannot show shipping form. Please select a client.');
+      setErrorClient('No client selected. Cannot show shipping form. Please select a client.');
 
       return null;
     }
@@ -385,8 +397,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
+      recipientId: object.id,
       recipientName: object.Name,
       recipientStreet: object.Add1,
+      recipientStreet2: object.Add2,
       recipientCity: object.city,
       recipientState: object.state,
       recipientZip: object.zip_code,
@@ -404,8 +418,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
+      senderId: object.id,
       senderName: object.Name,
       senderStreet: object.Add1,
+      senderStreet2: object.Add2,
       senderCity: object.city,
       senderState: object.state,
       senderZip: object.zip_code,
@@ -422,8 +438,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
+      senderId: object.id,
       senderName: object.Name,
       senderStreet: object.Add1,
+      senderStreet2: object.Add2,
       senderCity: object.city,
       senderState: object.state,
       senderZip: object.zip_code,
@@ -440,13 +458,15 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setShippingFormData({
       ...shippingFormData,
+      recipientId: object.id,
       recipientName: object.Name,
       recipientStreet: object.Add1,
+      recipientStreet2: object.Add2,
       recipientCity: object.city,
       recipientState: object.state,
       recipientZip: object.zip_code,
       recipientCountry: object.country,
-      recipientExtNumber: object.external_ref,
+      extNumber: object.external_ref,
       recipientTaxId: object.VAT,
     });
   };
@@ -613,8 +633,76 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       setErrorMessage('Please fill in all required fields.');
       return;
     }
+
+    const formDataToBackendPayload = (formData) => {
+      return {
+        trackingNumber: formData.trackingRef,
+        shippingPayment: formData.shippingPayment,
+        shippingPaymentTo: formData.shippingPaymentTo,
+        deliveryDate: formData.date,
+        deliveryDateHour: formData.hour,
+        shipperReference: formData.shipperRef,
+        consigneeReference: formData.consigneeRef,
+
+        shipperId: formData.senderId,
+        shipperName: formData.senderName,
+        shipperEmail: formData.senderEmail,
+        shipperPhone: formData.senderPhone,
+        shipperAdd1: formData.senderStreet,
+        shipperAdd2: formData.senderStreet2,
+        shipperCity: formData.senderCity,
+        shipperZip: formData.senderZip,
+        shipperCountry: formData.senderCountry,
+        shipperVAT: formData.senderTaxId,
+
+        consigneeId: formData.recipientId,
+        consigneeName: formData.recipientName,
+        consigneeEmail: formData.recipientEmail,
+        consigneePhone: formData.recipientPhone,
+        consigneeAdd1: formData.recipientStreet,
+        consigneeAdd2: formData.recipientStreet2,
+        consigneeCity: formData.recipientCity,
+        consigneeZip: formData.recipientZip,
+        consigneeCountry: formData.recipientCountry,
+        consigneeVAT: formData.recipientTaxId,
+
+        packages: formData.packages.map((pkg) => ({
+          packageQuantity: pkg.packageQuantity,
+          packageWeight: pkg.packageWeight,
+          packageLength: pkg.packageLength,
+          packageWidth: pkg.packageWidth,
+          packageHeight: pkg.packageHeight,
+          packageNote: pkg.packageNote,
+          packageType: pkg.packageType,
+          sscc: pkg.sscc,
+          cbm: pkg.CBM,
+          ldm: pkg.LDM,
+          taxableWeight: pkg.TaxableWeight,
+          stackable: pkg.stackable,
+          dangerousGoods: pkg.dangerousGoods,
+          marksAndNumbers: pkg.marksAndNumbers,
+          typeOfGoods: pkg.typeOfGoods,
+          tempControlled: pkg.tempControlled,
+          tempControlledMinTemp: pkg.tempControlledMinTemp,
+          tempControlledMaxTemp: pkg.tempControlledMaxTemp,
+        })),
+
+        valueOfGoods: formData.valueOfGoods,
+        insured: formData.insured,
+        customs: formData.customs,
+        shippingService: formData.shippingService,
+        shipperInstructions: formData.shipperInstructions,
+        consigneeInstructions: formData.consigneeInstructions,
+      };
+    };
+
     try {
-      const response = await api.post(`/shipping-form`, { formData: shippingFormData });
+      const payload = formDataToBackendPayload(shippingFormData);
+      const response = await torrestirApi.post(`/api/bookings/external`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log('Form submitted successfully:', response.data);
       if (response?.status === 200) {
         setMessage('Form submitted successfully!');
@@ -654,7 +742,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   //if (loadingShippingForm) return <CircularProgress />;
   //
   //if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
-  if (errorMessage) return <Alert severity='error'>{errorMessage}</Alert>;
+  if (errorClient) return <Alert severity='error'>{errorClient}</Alert>;
 
   return (
     <React.Fragment>
@@ -1080,9 +1168,20 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Grid>
                 </Grid>
                 <TextField
-                  label='Street'
+                  label='Address'
                   name='senderStreet'
                   value={shippingFormData.senderStreet || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                  disabled
+                />
+                <TextField
+                  label='Address 2'
+                  name='senderStreet2'
+                  value={shippingFormData.senderStreet2 || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -1460,9 +1559,19 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Grid>
                 </Grid>
                 <TextField
-                  label='Street'
+                  label='Address'
                   name='recipientStreet'
                   value={shippingFormData.recipientStreet || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                />
+                <TextField
+                  label='Address 2'
+                  name='recipientStreet2'
+                  value={shippingFormData.recipientStreet2 || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -1650,7 +1759,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           <Typography variant='h6'>Payment Information</Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
-            <Grid size={{ xs: 4 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
               <TextField
                 select
                 label='Shipping Payment'
@@ -1669,7 +1778,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 ))}
               </TextField>
             </Grid>
-            <Grid size={{ xs: 4 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
               <TextField
                 select
                 label='Payment'
@@ -1688,9 +1797,23 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 ))}
               </TextField>
             </Grid>
-            <Grid size={{ xs: 4 }}>
+            <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
               <TextField
-                label='NIF Destinatário'
+                label='VAT Shipper'
+                name='senderTaxId'
+                type='text'
+                value={shippingFormData.senderTaxId}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required
+                disabled
+              />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 4, md: 2, lg: 2 }}>
+              <TextField
+                label='VAT Consignee'
                 name='recipientTaxId'
                 type='text'
                 value={shippingFormData.recipientTaxId}
@@ -2734,19 +2857,40 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           */}
           <Grid container spacing={2}>
             {shippingFormData?.insured && (
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                <TextField
-                  label='Value of Goods (€)'
-                  name='valueOfGoods'
-                  value={shippingFormData?.valueOfGoods}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required={shippingFormData?.insured || false}
-                  slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-                />
-              </Grid>
+              <React.Fragment>
+                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                  <TextField
+                    label='Value of Goods (€)'
+                    name='valueOfGoods'
+                    value={shippingFormData?.valueOfGoods}
+                    onChange={handleChange}
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required={shippingFormData?.insured || false}
+                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                  <TextField
+                    select
+                    label='Insured'
+                    name={'insuredBy'}
+                    value={shippingFormData.insuredBy}
+                    onChange={handleChange}
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    required
+                  >
+                    {insuredByOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </React.Fragment>
             )}
 
             <Grid>
@@ -2763,6 +2907,27 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='Insured'
               />
             </Grid>
+            {shippingFormData?.customs && (
+              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                <TextField
+                  select
+                  label='Customs clear'
+                  name={'customsClearedBy'}
+                  value={shippingFormData.customsClearedBy}
+                  onChange={handleChange}
+                  fullWidth
+                  size='small'
+                  margin='dense'
+                  required
+                >
+                  {customsClearedByOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            )}
             <Grid>
               <FormControlLabel
                 sx={{ mt: 1 }}

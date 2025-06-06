@@ -1,2 +1,2 @@
-export const appBuildVersion = '06.06.2025.11.34.59';
+export const appBuildVersion = '06.06.2025.12.50.32';
 export const appVersion = '1.0.0';
