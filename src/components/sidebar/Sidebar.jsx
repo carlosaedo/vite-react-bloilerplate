@@ -28,6 +28,8 @@ import {
   FaListAlt,
 } from 'react-icons/fa';
 
+import { FaUsers } from 'react-icons/fa6';
+
 import { GrUserNew } from 'react-icons/gr';
 
 import { MdSupervisorAccount } from 'react-icons/md';
@@ -121,7 +123,7 @@ const Sidebar = ({ onToggle }) => {
     { label: 'Home', icon: <FaHome />, path: '/', roles: ['user', 'admin', 'client'] },
     {
       label: 'Clients',
-      icon: <MdSupervisorAccount />,
+      icon: <FaUsers />,
       roles: ['user', 'admin', 'client'],
       children: [
         {

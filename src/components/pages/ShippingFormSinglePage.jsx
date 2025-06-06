@@ -144,6 +144,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     resetShippingFormData,
     trackingNumberShippingForm,
     retryFetchTrackingNumber,
+    loadingShippingForm,
   } = useShippingFormContext();
   const [message, setMessage] = useState(null);
 
@@ -801,7 +802,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     handleChangeFormType(false);
   };
 
-  //if (loadingShippingForm) return <CircularProgress />;
+  if (loadingShippingForm) return <CircularProgress />;
   //
   //if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
   if (errorClient) return <Alert severity='error'>{errorClient}</Alert>;
