@@ -179,6 +179,34 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   };
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === 'ArrowUp') {
+        console.log('Ctrl + ArrowUp pressed');
+        console.log(selectedPackageIndex);
+
+        if (selectedPackageIndex > 0) {
+          handleJumpToPackage(selectedPackageIndex - 1);
+        }
+      }
+
+      if (e.ctrlKey && e.key === 'ArrowDown') {
+        console.log('Ctrl + ArrowDown pressed');
+        console.log(selectedPackageIndex);
+
+        if (selectedPackageIndex < shippingFormData.packages.length - 1) {
+          handleJumpToPackage(selectedPackageIndex + 1);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedPackageIndex, shippingFormData]); // <-- Add them here
+
+  useEffect(() => {
     const getShippingSenderRouting = async () => {
       try {
         if (
