@@ -10,7 +10,7 @@ import {
 } from '../../utils/calculateShippingFormSizeShippingForm';
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
 
-import sanitizeDecimalInput from '../../utils/sanitizeDecimalInput';
+import { sanitizeDecimalInput, sanitizeDecimalInputTemp } from '../../utils/sanitizeDecimalInput';
 import { useAuth } from '../context/AuthContext';
 import {
   Grid,
@@ -253,19 +253,16 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     console.log('handlePackageChange triggered with', { index, field, value });
 
     if (
-      [
-        'tempControlledMaxTemp',
-        'tempControlledMinTemp',
-        'packageWeight',
-        'packageHeight',
-        'packageWidth',
-        'packageLength',
-        'LDM',
-        'CBM',
-      ].includes(field) &&
+      ['packageWeight', 'packageHeight', 'packageWidth', 'packageLength', 'LDM', 'CBM'].includes(
+        field,
+      ) &&
       value !== ''
     ) {
       value = sanitizeDecimalInput(value);
+    }
+
+    if (['tempControlledMaxTemp', 'tempControlledMinTemp'].includes(field) && value !== '') {
+      value = sanitizeDecimalInputTemp(value);
     }
 
     const newInputs = { ...shippingFormData.packages[index], [field]: value };
@@ -835,20 +832,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 required
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 4, md: 3, lg: 3 }}>
-              <TextField
-                label='Tracking Reference'
-                name='trackingRef'
-                type='text'
-                value={shippingFormData.trackingRef}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-                disabled
-              />
-            </Grid>
           </Grid>
         </Box>
 
@@ -896,7 +879,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           >
             {compactShippingInfo ? (
               <React.Fragment>
-                <Typography variant='h6'>Sender Information</Typography>
+                <Typography variant='h6'>Shipper Information</Typography>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
@@ -908,6 +891,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       size='small'
                       margin='dense'
                       required
+                      disabled
                     />
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }}>
@@ -920,6 +904,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       size='small'
                       margin='dense'
                       required
+                      disabled
                     />
                   </Grid>
                   <Grid size={{ xs: 6, sm: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -1276,7 +1261,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           >
             {compactShippingInfo ? (
               <React.Fragment>
-                <Typography variant='h6'>Recipient Information</Typography>
+                <Typography variant='h6'>Consignee Information</Typography>
 
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -1607,7 +1592,48 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             )}
           </Box>
         </Box>
-
+        <Grid container spacing={2}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 6,
+              lg: 6,
+            }}
+          >
+            <TextField
+              label='Shipper Instructions'
+              name='shipperInstructions'
+              type='text'
+              value={shippingFormData.shipperInstructions}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 6,
+              lg: 6,
+            }}
+          >
+            <TextField
+              label='Consignee Instructions'
+              name='consigneeInstructions'
+              type='text'
+              value={shippingFormData.consigneeInstructions}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            />
+          </Grid>
+        </Grid>
         {/* Additional Info */}
         <Box sx={{ mb: 4 }}>
           <Typography variant='h6'>Payment Information</Typography>
@@ -1710,7 +1736,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       <strong>TC</strong>
                     </TableCell>
                     <TableCell>
-                      <strong>MAX / MIN</strong>
+                      <strong>MIN / MAX</strong>
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -1907,14 +1933,18 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               }}
                             >
                               {pkg?.tempControlled
-                                ? '+' +
-                                    pkg?.tempControlledMinTemp +
-                                    'ºC' +
-                                    ' / ' +
-                                    '-' +
-                                    pkg?.tempControlledMaxTemp +
-                                    'ºC' || '-'
-                                : 'NOT SET'}
+                                ? pkg?.tempControlledMinTemp || pkg?.tempControlledMaxTemp
+                                  ? `${
+                                      pkg?.tempControlledMinTemp
+                                        ? pkg.tempControlledMinTemp + 'ºC'
+                                        : 'Not Set'
+                                    } / ${
+                                      pkg?.tempControlledMaxTemp
+                                        ? pkg.tempControlledMaxTemp + 'ºC'
+                                        : 'Not Set'
+                                    }`
+                                  : 'Not Set'
+                                : 'Not Set'}
                             </TableCell>
                           </TableRow>
                         </Tooltip>
@@ -2594,51 +2624,55 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 {shippingFormData.packages[selectedPackageIndex]?.tempControlled && (
                   <React.Fragment>
                     <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
-                      <TextField
-                        label='MIN'
-                        name={`tempControlledMinTemp_${selectedPackageIndex}`}
-                        value={
-                          shippingFormData?.packages[selectedPackageIndex]?.tempControlledMinTemp
-                        }
-                        onChange={(e) =>
-                          handlePackageChange(
-                            selectedPackageIndex,
-                            'tempControlledMinTemp',
-                            e.target.value,
-                          )
-                        }
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        required={
-                          shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
-                        }
-                        slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-                      />
+                      <Tooltip title='Temperature range from -30ºC to 30ºC' direction='top' arrow>
+                        <TextField
+                          label='MIN'
+                          name={`tempControlledMinTemp_${selectedPackageIndex}`}
+                          value={
+                            shippingFormData?.packages[selectedPackageIndex]?.tempControlledMinTemp
+                          }
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedPackageIndex,
+                              'tempControlledMinTemp',
+                              e.target.value,
+                            )
+                          }
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required={
+                            shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
+                          }
+                          slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                        />
+                      </Tooltip>
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
-                      <TextField
-                        label='MAX'
-                        name={`tempControlledMaxTemp_${selectedPackageIndex}`}
-                        value={
-                          shippingFormData?.packages[selectedPackageIndex]?.tempControlledMaxTemp
-                        }
-                        onChange={(e) =>
-                          handlePackageChange(
-                            selectedPackageIndex,
-                            'tempControlledMaxTemp',
-                            e.target.value,
-                          )
-                        }
-                        fullWidth
-                        size='small'
-                        margin='dense'
-                        required={
-                          shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
-                        }
-                        slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-                      />
+                      <Tooltip title='Temperature range from -30ºC to 30ºC' direction='top' arrow>
+                        <TextField
+                          label='MAX'
+                          name={`tempControlledMaxTemp_${selectedPackageIndex}`}
+                          value={
+                            shippingFormData?.packages[selectedPackageIndex]?.tempControlledMaxTemp
+                          }
+                          onChange={(e) =>
+                            handlePackageChange(
+                              selectedPackageIndex,
+                              'tempControlledMaxTemp',
+                              e.target.value,
+                            )
+                          }
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required={
+                            shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
+                          }
+                          slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                        />
+                      </Tooltip>
                     </Grid>
                   </React.Fragment>
                 )}
@@ -2719,46 +2753,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   />
                 }
                 label='Customs'
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 4,
-                md: shippingFormData?.insured ? 4 : 5,
-                lg: shippingFormData?.insured ? 4 : 5,
-              }}
-            >
-              <TextField
-                label='Shipper Instructions'
-                name='shipperInstructions'
-                type='text'
-                value={shippingFormData.shipperInstructions}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 4,
-                md: shippingFormData?.insured ? 4 : 5,
-                lg: shippingFormData?.insured ? 4 : 5,
-              }}
-            >
-              <TextField
-                label='Consignee Instructions'
-                name='consigneeInstructions'
-                type='text'
-                value={shippingFormData.consigneeInstructions}
-                onChange={handleChange}
-                fullWidth
-                size='small'
-                margin='dense'
-                required
               />
             </Grid>
           </Grid>
