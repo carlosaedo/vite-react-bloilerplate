@@ -36,7 +36,7 @@ const ClientDetails = () => {
   const navigate = useNavigate();
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: '', vat: '', country: '' });
 
@@ -62,7 +62,7 @@ const ClientDetails = () => {
     // If no clientId, set loading false and show error, then exit early
     if (!clientId) {
       setLoading(false);
-      setError('No client selected. Cannot show client details.');
+      setErrorMessage('No client selected. Cannot show client details.');
       setClient(null);
       setFormData(null);
       return;
@@ -70,7 +70,7 @@ const ClientDetails = () => {
 
     // Reset states for new fetch
     setLoading(true);
-    setError(null);
+    setErrorMessage(null);
 
     const fetchClient = async () => {
       try {
@@ -87,7 +87,7 @@ const ClientDetails = () => {
           isDeleted: response.data.isDeleted,
         });
       } catch (error) {
-        setError('Failed to fetch client data.');
+        setErrorMessage('Failed to fetch client data.');
         setClient(null);
         setFormData(null);
       } finally {
@@ -115,7 +115,7 @@ const ClientDetails = () => {
       setClient((prev) => ({ ...prev, ...formData }));
       setEditMode(false);
     } catch (error) {
-      setError('Failed to update client');
+      setErrorMessage('Failed to update client');
     }
   };
 
@@ -132,7 +132,7 @@ const ClientDetails = () => {
       setFormData(updatedData);
       setEditMode(false);
     } catch (error) {
-      setError('Failed to delete client');
+      setErrorMessage('Failed to delete client');
     }
   };
 
@@ -154,7 +154,7 @@ const ClientDetails = () => {
       setFormData(updatedData);
       setEditMode(false);
     } catch (error) {
-      setError('Failed to restore client');
+      setErrorMessage('Failed to restore client');
     }
   };
 
@@ -172,7 +172,7 @@ const ClientDetails = () => {
       setFormData(updatedData);
       setEditMode(false);
     } catch (error) {
-      setError('Failed to restore client');
+      setErrorMessage('Failed to restore client');
     }
   };
 
@@ -190,11 +190,11 @@ const ClientDetails = () => {
       setFormData(updatedData);
       setEditMode(false);
     } catch (error) {
-      setError('Failed to restore client');
+      setErrorMessage('Failed to restore client');
     }
   };
   if (loading || loadingAuth) return <CircularProgress sx={{ marginTop: 4 }} />;
-  if (error) return <Alert severity='error'>{error}</Alert>;
+  if (errorMessage) return <Alert severity='error'>{errorMessage}</Alert>;
 
   return (
     <Box

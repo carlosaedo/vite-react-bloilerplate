@@ -110,6 +110,17 @@ const shippingPaymentTo = [
 ];
 
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
+  const [errorMessage, setErrorMessage] = useState(null);
+  const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
+  const [clientId, setClientId] = useState(() => {
+    if (clientIdFromStorage?.clientId) {
+      return clientIdFromStorage.clientId;
+    } else {
+      setErrorMessage('No client selected. Cannot show shipping form. Please select a client.');
+
+      return null;
+    }
+  });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { token } = useAuth();
@@ -121,7 +132,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     retryFetchTrackingNumber,
   } = useShippingFormContext();
   const [message, setMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
 
   const [compactShippingInfo, setCompactShippingInfo] = useState(true);
 
@@ -644,6 +654,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   //if (loadingShippingForm) return <CircularProgress />;
   //
   //if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
+  if (errorMessage) return <Alert severity='error'>{errorMessage}</Alert>;
 
   return (
     <React.Fragment>
@@ -1708,10 +1719,13 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       <strong>#</strong>
                     </TableCell>
                     <TableCell>
-                      <strong>Weight (kg)</strong>
+                      <strong>Quantity</strong>
                     </TableCell>
                     <TableCell>
                       <strong>Type</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Weight (kg)</strong>
                     </TableCell>
                     <TableCell>
                       <strong>CBM</strong>
@@ -1861,8 +1875,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                 borderBottom: showSSCC ? 'none !important' : undefined,
                               }}
                             >
-                              {pkg?.packageWeight || '-'}
+                              {pkg?.packageQuantity || '-'}
                             </TableCell>
+
                             <TableCell
                               sx={{
                                 borderBottom: showSSCC ? 'none !important' : undefined,
@@ -1870,6 +1885,13 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             >
                               {pkg?.packageType?.charAt(0).toUpperCase() +
                                 pkg?.packageType?.slice(1) || '-'}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                borderBottom: showSSCC ? 'none !important' : undefined,
+                              }}
+                            >
+                              {pkg?.packageWeight || '-'}
                             </TableCell>
                             <TableCell
                               sx={{
@@ -2390,7 +2412,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                   />
                 </Grid>
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                <Grid>
                   <Button
                     onClick={() => setShowDimensions(true)}
                     variant='outlined'
@@ -2450,7 +2472,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Tooltip>
                 </Grid>
 
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
+                <Grid>
                   <Paper
                     elevation={1}
                     sx={{
@@ -2538,7 +2560,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   />
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+                <Grid>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
@@ -2557,7 +2579,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   />
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
+                <Grid>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
@@ -2598,7 +2620,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </Grid>
                 )}
 
-                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 2 }}>
+                <Grid>
                   <FormControlLabel
                     sx={{ mt: 1 }}
                     control={
@@ -2727,7 +2749,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               </Grid>
             )}
 
-            <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+            <Grid>
               <FormControlLabel
                 sx={{ mt: 1 }}
                 control={
@@ -2741,7 +2763,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='Insured'
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+            <Grid>
               <FormControlLabel
                 sx={{ mt: 1 }}
                 control={
