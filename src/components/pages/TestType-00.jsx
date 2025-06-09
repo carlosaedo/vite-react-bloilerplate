@@ -37,6 +37,7 @@ import getLastFridayOfPreviousWeek from '../../utils/getTheFridayDayFromLastWeek
 import { Visibility } from '@mui/icons-material';
 
 import { MdOutlineTextIncrease, MdOutlineTextDecrease } from 'react-icons/md';
+import { FaArrowCircleUp, FaArrowCircleDown } from 'react-icons/fa';
 
 import api from '../api/api';
 
@@ -430,6 +431,7 @@ const TestType = () => {
                         fontWeight: 'bold',
                         backgroundColor: '#fff', // important for sticky visibility
                         position: 'sticky',
+                        color: '#003D2C',
                         top: 0,
                         zIndex: 1,
                         fontSize: `${tableFontSize}px`,
@@ -437,7 +439,13 @@ const TestType = () => {
                     >
                       {header.toUpperCase()}
                       {sortConfig.key === header && (
-                        <span>{sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽'}</span>
+                        <span>
+                          {sortConfig.direction === 'asc' ? (
+                            <FaArrowCircleUp style={{ marginLeft: '5px' }} />
+                          ) : (
+                            <FaArrowCircleDown style={{ marginLeft: '5px' }} />
+                          )}
+                        </span>
                       )}
                     </TableCell>
                   ))}
