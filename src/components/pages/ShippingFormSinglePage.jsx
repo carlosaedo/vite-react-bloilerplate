@@ -1966,7 +1966,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TableCell>
                       <strong>Note</strong>
                     </TableCell>
-
                     <TableCell>
                       <strong>S</strong>
                     </TableCell>
@@ -2199,15 +2198,16 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         </Tooltip>
                         {showSSCC && (
                           <TableRow>
-                            <TableCell colSpan={8}>
+                            <TableCell colSpan={12}>
                               <Typography
                                 variant='body2'
                                 sx={{
+                                  fontFamily: 'monospace',
                                   pl: 5,
                                   color: 'text.secondary',
                                   fontSize: '0.75rem',
+                                  fontStyle: 'italic !important',
                                 }}
-                                style={{ fontStyle: 'italic !important' }} // inline style with !important
                               >
                                 <strong>SSCC:</strong> {pkg?.sscc}
                               </Typography>
