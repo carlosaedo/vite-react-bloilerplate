@@ -167,7 +167,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [shippingSenderRouting, setShippingSenderRouting] = useState({});
   const [shippingRecipientRouting, setShippingRecipientRouting] = useState({});
 
-  const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient')) || null;
+  const clientFromStorage = JSON.parse(localStorage.getItem('selectedClient')) || null;
 
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
@@ -306,10 +306,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   ]);
 
   useEffect(() => {
-    if (!loadingShippingForm && !shippingFormData?.clientId) {
+    if (!loadingShippingForm && !clientFromStorage?.clientId) {
       setErrorClient('No client selected. Cannot show shipping form. Please select a client.');
     }
-  }, [loadingShippingForm, shippingFormData?.clientId]);
+  }, [loadingShippingForm, clientFromStorage?.clientId]);
 
   const handleChange = (event) => {
     const { name, type, checked } = event.target;
@@ -699,7 +699,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
     const formDataToBackendPayload = (formData) => {
       return {
-        clientId: formData.clientId,
+        clientId: clientFromStorage?.clientId,
         trackingNumber: formData.trackingRef,
         shippingPayment: formData.shippingPayment,
         shippingPaymentTo: formData.shippingPaymentTo,
@@ -957,7 +957,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               fontWeight: 400,
             }}
           >
-            <FaUserTie /> {clientIdFromStorage?.name}
+            <FaUserTie /> {clientFromStorage?.name}
           </Typography>
         </Box>
 
