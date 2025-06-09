@@ -73,10 +73,36 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const packageRefs = useRef([]);
+  const {
+    shippingFormData,
+    setShippingFormData,
+    resetShippingFormData,
+    trackingNumberShippingForm,
+    retryFetchTrackingNumber,
+  } = useShippingFormContext();
+
   const [selectedPackageIndex, setSelectedPackageIndex] = useState('');
   const [entitiesData, setEntitiesData] = useState([]);
   const [selectedEntityIndex, setSelectedEntityIndex] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [step, setStep] = useState(0);
+
+  const [showSSCC, setShowSSCC] = useState(false);
+
+  const [showCBM, setShowCBM] = useState(true);
+  const [hideLDM, setShowLDM] = useState(true);
+  const [activeCBM, setActiveCBM] = useState(false);
+  const [activeLDM, setActiveLDM] = useState(false);
+  const [showDimensions, setShowDimensions] = useState(true);
+
+  const [showPackageDetails, setShowPackageDetails] = useState(true);
+  const [infoValues, setInfoValues] = useState(() => {
+    const { totalQuantity, totalWeight } = calculateShippingFormTotals(shippingFormData.packages);
+    return { totalWeight, totalQuantity };
+  });
+  const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   /*const handleJumpToPackage = (index) => {
       packageRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };*/
@@ -110,32 +136,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     // Reset dropdown after scroll
     setSelectedPackageIndex('');
   };
-
-  const {
-    shippingFormData,
-    setShippingFormData,
-    resetShippingFormData,
-    trackingNumberShippingForm,
-    retryFetchTrackingNumber,
-  } = useShippingFormContext();
-
-  const [step, setStep] = useState(0);
-
-  const [showSSCC, setShowSSCC] = useState(false);
-
-  const [showCBM, setShowCBM] = useState(true);
-  const [hideLDM, setShowLDM] = useState(true);
-  const [activeCBM, setActiveCBM] = useState(false);
-  const [activeLDM, setActiveLDM] = useState(false);
-  const [showDimensions, setShowDimensions] = useState(true);
-
-  const [showPackageDetails, setShowPackageDetails] = useState(true);
-  const [infoValues, setInfoValues] = useState(() => {
-    const { totalQuantity, totalWeight } = calculateShippingFormTotals(shippingFormData.packages);
-    return { totalWeight, totalQuantity };
-  });
-  const [message, setMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleStepChange = (event, newValue) => {
     setMessage(null);

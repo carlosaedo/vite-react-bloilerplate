@@ -313,6 +313,8 @@ const ShippingForms = () => {
                           color: '#ffffff',
                           fontWeight: 900,
                           fontSize: '0.75rem',
+                          border: '1px solid rgb(255, 255, 255)',
+                          boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
                         }}
                       />
                     </Box>
@@ -408,6 +410,7 @@ const ShippingForms = () => {
                           fontWeight: 600,
                           fontSize: '0.75rem',
                           border: '1px solid #eaf4f0',
+                          boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
                         }}
                       />
 
@@ -421,7 +424,8 @@ const ShippingForms = () => {
                             py: 0.5,
                             backgroundColor: '#adb8b4',
                             borderRadius: 1,
-                            border: '1px solid #003D2C',
+                            border: '1px solid rgb(255, 255, 255)',
+                            boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
                           }}
                         >
                           <MdShield style={{ color: '#003D2C', fontSize: '12px' }} />
@@ -446,7 +450,8 @@ const ShippingForms = () => {
                             py: 0.5,
                             backgroundColor: '#adb8b4',
                             borderRadius: 1,
-                            border: '1px solid #003D2C',
+                            border: '1px solid rgb(255, 255, 255)',
+                            boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
                           }}
                         >
                           <Typography
