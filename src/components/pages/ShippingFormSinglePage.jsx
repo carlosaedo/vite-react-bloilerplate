@@ -47,6 +47,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
+import { FaUserTie } from 'react-icons/fa';
 import { BsInfoCircleFill } from 'react-icons/bs';
 import { FaClone } from 'react-icons/fa';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -125,16 +126,7 @@ const shippingPaymentTo = [
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [errorMessage, setErrorMessage] = useState(null);
   const [errorClient, setErrorClient] = useState(null);
-  const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
-  const [clientId, setClientId] = useState(() => {
-    if (clientIdFromStorage?.clientId) {
-      return clientIdFromStorage.clientId;
-    } else {
-      setErrorClient('No client selected. Cannot show shipping form. Please select a client.');
 
-      return null;
-    }
-  });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { token } = useAuth();
@@ -174,6 +166,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   const [shippingSenderRouting, setShippingSenderRouting] = useState({});
   const [shippingRecipientRouting, setShippingRecipientRouting] = useState({});
+
+  const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient')) || null;
 
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
@@ -310,6 +304,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     shippingFormData.recipientCountry,
     token,
   ]);
+
+  useEffect(() => {
+    if (!loadingShippingForm && !shippingFormData?.clientId) {
+      setErrorClient('No client selected. Cannot show shipping form. Please select a client.');
+    }
+  }, [loadingShippingForm, shippingFormData?.clientId]);
 
   const handleChange = (event) => {
     const { name, type, checked } = event.target;
@@ -699,6 +699,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
     const formDataToBackendPayload = (formData) => {
       return {
+        clientId: formData.clientId,
         trackingNumber: formData.trackingRef,
         shippingPayment: formData.shippingPayment,
         shippingPaymentTo: formData.shippingPaymentTo,
@@ -864,59 +865,100 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           },
         }}
       >
-        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
-          <Typography
-            variant='h5'
-            sx={{ fontWeight: 700, color: '#003e2d', display: 'flex', alignItems: 'baseline' }}
-          >
-            Shipping Form
-            {shippingFormData.trackingRef ? (
-              <Box
-                component='span'
-                sx={{
-                  ml: 2,
-                  px: 1.5,
-                  py: 0.3,
-                  bgcolor: '#ffc928',
-                  color: '#003e2d',
-                  borderRadius: 1,
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                  userSelect: 'none',
-                }}
-              >
-                Tracking: {shippingFormData.trackingRef}
-              </Box>
-            ) : (
-              <Typography
-                component='span'
-                variant='subtitle1'
-                sx={{
-                  ml: 2,
-                  fontStyle: 'italic',
-                  color: 'text.secondary',
-                  fontWeight: 400,
-                }}
-              >
-                New Booking Information
-              </Typography>
-            )}
-          </Typography>
-          {/*
-          <Tooltip title='Multi tab form' placement='top' arrow>
-            <Button
-              onClick={handleChangeFormTypeToParent}
-              variant='contained'
-              color='primary'
+        <Box
+          sx={{
+            p: 3,
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            justifyContent: 'space-between',
+            gap: { xs: 2, sm: 0 },
+          }}
+        >
+          {/* Left side */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <Typography
+              variant='h5'
               sx={{
-                marginLeft: 'auto',
-                fontSize: '30px',
+                fontWeight: 700,
+                color: '#003e2d',
+                display: 'flex',
+                alignItems: 'baseline',
+                flexWrap: 'wrap',
               }}
             >
-              <LiaWpforms />
-            </Button>
-          </Tooltip>*/}
+              Shipping Form
+              {shippingFormData.trackingRef ? (
+                <Box
+                  component='span'
+                  sx={{
+                    ml: 2,
+                    mt: { xs: 1, sm: 0 },
+                    px: 1.5,
+                    py: 0.3,
+                    bgcolor: '#ffc928',
+                    color: '#003e2d',
+                    borderRadius: 1,
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                    userSelect: 'none',
+                  }}
+                >
+                  Tracking: {shippingFormData.trackingRef}
+                </Box>
+              ) : (
+                <Typography
+                  component='span'
+                  variant='subtitle1'
+                  sx={{
+                    ml: 2,
+                    mt: { xs: 1, sm: 0 },
+                    fontStyle: 'italic',
+                    color: 'text.secondary',
+                    fontWeight: 400,
+                  }}
+                >
+                  New Booking Information
+                </Typography>
+              )}
+            </Typography>
+
+            {/* Optional button (still commented out) */}
+            {/*
+    <Tooltip title='Multi tab form' placement='top' arrow>
+      <Button
+        onClick={handleChangeFormTypeToParent}
+        variant='contained'
+        color='primary'
+        sx={{
+          marginLeft: 'auto',
+          fontSize: '30px',
+        }}
+      >
+        <LiaWpforms />
+      </Button>
+    </Tooltip>
+    */}
+          </Box>
+
+          {/* Right side */}
+          <Typography
+            component='span'
+            variant='subtitle1'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+              alignSelf: { xs: 'flex-start', sm: 'center' },
+              width: { xs: '100%', sm: 'auto' },
+              gap: 1,
+              color: 'text.secondary',
+              fontWeight: 400,
+            }}
+          >
+            <FaUserTie /> {clientIdFromStorage?.name}
+          </Typography>
         </Box>
 
         {/* Guia*/}
@@ -1249,7 +1291,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   fullWidth
                   size='small'
                   margin='dense'
-                  required
                   disabled
                 />
                 <Grid container spacing={2}>
@@ -1639,7 +1680,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   fullWidth
                   size='small'
                   margin='dense'
-                  required
                 />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6, sm: 3 }}>

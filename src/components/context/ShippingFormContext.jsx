@@ -11,6 +11,12 @@ export const ShippingFormProvider = ({ children }) => {
   const [trackingNumberShippingForm, setTrackingNumberShippingForm] = useState(null);
   const { token } = useAuth();
 
+  const [clientId, setClientId] = useState(() => {
+    const stored = localStorage.getItem('selectedClient');
+    console.log('clientId', JSON.parse(stored)?.clientId);
+    return stored ? JSON.parse(stored)?.clientId || null : null;
+  });
+
   function generateMockSSCC() {
     let randomDigits = '';
     for (let i = 0; i < 16; i++) {
@@ -29,6 +35,7 @@ export const ShippingFormProvider = ({ children }) => {
 
   // Initialize form data with default values
   const getInitialFormData = (trackingRef = null) => ({
+    clientId: clientId,
     senderTaxId: '',
     recipientTaxId: '',
     shippingPayment: 'pronto',
@@ -109,7 +116,7 @@ export const ShippingFormProvider = ({ children }) => {
         }
         return parsedData;
       }
-
+      console.log(getInitialFormData(storedTrackingNumber));
       return getInitialFormData(storedTrackingNumber);
     } catch (error) {
       console.error('Error loading form data from localStorage:', error);
