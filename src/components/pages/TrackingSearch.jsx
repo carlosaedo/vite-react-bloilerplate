@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import './TrackingSearch.css';
+import { Box, Typography, TextField, Button, Container } from '@mui/material';
+import { Search as SearchIcon } from '@mui/icons-material';
 
 const TrackingSearch = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -13,23 +13,98 @@ const TrackingSearch = () => {
       navigate(`/tracking/${trackingNumber.trim()}`);
     }
   };
-  return (
-    <div className='tracking-search-container'>
-      <p>Search for your tracking information here.</p>
 
-      <div className='search-box'>
-        <input
-          className='trackingInput'
-          type='text'
-          placeholder='Enter tracking number'
-          value={trackingNumber}
-          onChange={(e) => setTrackingNumber(e.target.value)}
-        />
-        <button className='button' onClick={handleSearch} disabled={!trackingNumber.trim()}>
-          Search
-        </button>
-      </div>
-    </div>
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && trackingNumber.trim()) {
+      handleSearch();
+    }
+  };
+
+  return (
+    <Container maxWidth='md'>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '60vh',
+          textAlign: 'center',
+          px: 3,
+        }}
+      >
+        <Typography
+          variant='h6'
+          sx={{
+            fontWeight: 700,
+            mb: 6,
+            color: '#003D2C',
+            letterSpacing: '-0.025em',
+            maxWidth: '600px',
+          }}
+        >
+          Search for your tracking information here.
+        </Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            width: '100%',
+            maxWidth: '500px',
+            alignItems: 'stretch',
+            flexDirection: { xs: 'column', sm: 'row' },
+          }}
+        >
+          <TextField
+            fullWidth
+            variant='outlined'
+            placeholder='Enter tracking number'
+            value={trackingNumber}
+            onChange={(e) => setTrackingNumber(e.target.value)}
+            onKeyDown={handleKeyPress}
+          />
+
+          <Button
+            variant='contained'
+            onClick={handleSearch}
+            disabled={!trackingNumber.trim()}
+            startIcon={<SearchIcon />}
+            sx={{
+              backgroundColor: '#003D2C',
+              color: '#ffffff',
+              fontWeight: 600,
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              minWidth: '120px',
+              textTransform: 'none',
+              fontSize: '1rem',
+              '&:hover': {
+                backgroundColor: '#003D2C',
+              },
+              '&:disabled': {
+                backgroundColor: '#adb8b4',
+                color: '#ffffff',
+              },
+            }}
+          >
+            Search
+          </Button>
+        </Box>
+
+        <Typography
+          variant='body2'
+          sx={{
+            mt: 3,
+            maxWidth: '400px',
+          }}
+        >
+          Enter your tracking number to get real-time updates on your shipment status and delivery
+          information.
+        </Typography>
+      </Box>
+    </Container>
   );
 };
 

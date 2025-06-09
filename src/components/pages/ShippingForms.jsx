@@ -234,7 +234,7 @@ const ShippingForms = () => {
         sx={{
           fontWeight: 700,
           mb: 3,
-          color: '#1e293b',
+          color: '#003D2C',
           letterSpacing: '-0.025em',
         }}
       >
@@ -248,7 +248,7 @@ const ShippingForms = () => {
             sx={{
               mb: 1.5,
               borderRadius: 2,
-              border: '1px solid #e2e8f0',
+              border: '1px solid #eaf4f0',
               backgroundColor: '#ffffff',
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
@@ -295,7 +295,7 @@ const ShippingForms = () => {
                         variant='h6'
                         fontWeight={600}
                         sx={{
-                          color: '#1e293b',
+                          color: '#003D2C',
                           fontSize: '1rem',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -308,8 +308,8 @@ const ShippingForms = () => {
                         label={form.shippingService}
                         size='small'
                         sx={{
-                          backgroundColor: '#ffc928',
-                          color: '#003D2C',
+                          backgroundColor: '#003D2C',
+                          color: '#ffffff',
                           fontWeight: 900,
                           fontSize: '0.75rem',
                         }}
@@ -331,7 +331,7 @@ const ShippingForms = () => {
                         <Typography
                           variant='body2'
                           sx={{
-                            color: '#64748b',
+                            color: 'rgb(65, 87, 81)',
                             fontWeight: 500,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
@@ -350,7 +350,7 @@ const ShippingForms = () => {
                         <Typography
                           variant='body2'
                           sx={{
-                            color: '#64748b',
+                            color: 'rgb(65, 87, 81)',
                             fontWeight: 500,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
@@ -373,11 +373,11 @@ const ShippingForms = () => {
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <MdDateRange style={{ color: '#64748b', fontSize: '14px' }} />
+                        <MdDateRange style={{ color: 'rgb(65, 87, 81)', fontSize: '14px' }} />
                         <Typography
                           variant='body2'
                           sx={{
-                            color: '#64748b',
+                            color: 'rgb(65, 87, 81)',
                             fontWeight: 500,
                             whiteSpace: 'nowrap',
                           }}
@@ -390,11 +390,11 @@ const ShippingForms = () => {
                         label={`${form.shippingPayment} to ${form.shippingPaymentTo}`}
                         size='small'
                         sx={{
-                          backgroundColor: '#f1f5f9',
-                          color: '#475569',
-                          fontWeight: 500,
-                          fontSize: '0.7rem',
-                          border: '1px solid #e2e8f0',
+                          backgroundColor: '#ffc928',
+                          color: '#003D2C',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          border: '1px solid #eaf4f0',
                         }}
                       />
 

@@ -878,10 +878,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           {/* Left side */}
           <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <Typography
-              variant='h5'
+              variant='h6'
+              gutterBottom
               sx={{
                 fontWeight: 700,
-                color: '#003e2d',
+                mb: 3,
+                color: '#003D2C',
+                letterSpacing: '-0.025em',
+
                 display: 'flex',
                 alignItems: 'baseline',
                 flexWrap: 'wrap',

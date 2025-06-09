@@ -377,7 +377,17 @@ const TestType = () => {
           textAlign: isMobile ? 'center' : 'left',
         }}
       >
-        <Typography sx={{ marginRight: '50px' }} variant='h5' gutterBottom>
+        <Typography
+          variant='h6'
+          gutterBottom
+          sx={{
+            fontWeight: 700,
+            mb: 3,
+            marginRight: '50px',
+            color: '#003D2C',
+            letterSpacing: '-0.025em',
+          }}
+        >
           Titulo da página
         </Typography>
 

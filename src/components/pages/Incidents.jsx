@@ -19,7 +19,18 @@ const Incidents = () => {
 
   return (
     <Box sx={{ p: 4 }}>
-      <Typography variant='h5'>Incidents works</Typography>
+      <Typography
+        variant='h6'
+        gutterBottom
+        sx={{
+          fontWeight: 700,
+          mb: 3,
+          color: '#003D2C',
+          letterSpacing: '-0.025em',
+        }}
+      >
+        Incidents works
+      </Typography>
     </Box>
   );
 };

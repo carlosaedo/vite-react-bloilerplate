@@ -75,7 +75,16 @@ const ClientNew = () => {
       }}
     >
       <Box sx={{ width: '600px', margin: '0 auto' }}>
-        <Typography variant='h5' gutterBottom>
+        <Typography
+          variant='h6'
+          gutterBottom
+          sx={{
+            fontWeight: 700,
+            mb: 3,
+            color: '#003D2C',
+            letterSpacing: '-0.025em',
+          }}
+        >
           Create new client
         </Typography>
 
