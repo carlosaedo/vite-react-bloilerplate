@@ -62,7 +62,6 @@ const Login2FA = () => {
   return (
     <Box
       sx={{
-        height: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'top',

@@ -450,6 +450,11 @@ const TestType = () => {
                     hover
                     onDoubleClick={() => handleRowDoubleClick(row)}
                     onContextMenu={(e) => handleContextMenu(e, row)}
+                    sx={{
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)',
+                      },
+                    }}
                   >
                     {headers.map((header) => (
                       <TableCell key={header} sx={{ fontSize: `${tableFontSize}px` }}>
