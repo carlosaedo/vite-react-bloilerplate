@@ -59,7 +59,44 @@ const mockShippingForms = [
     valueOfGoods: 1200,
     insured: true,
     customs: 'Standard',
-    shippingService: 'Express',
+    shippingService: 'Standard',
+    shipperInstructions: 'Handle with care',
+    consigneeInstructions: 'Deliver before noon',
+    canEdit: true,
+  },
+  {
+    clientId: 'client001',
+    trackingNumber: 'TRK-1001',
+    shippingPayment: 'Pronto',
+    shippingPaymentTo: 'Expeditor',
+    deliveryDate: '2025-06-10',
+    deliveryDateHour: '10:30',
+    shipperReference: 'SHIP-001',
+    consigneeReference: 'CON-001',
+    shipperId: 's001',
+    shipperName: 'John Shipper',
+    shipperEmail: 'john@ship.com',
+    shipperPhone: '123456789',
+    shipperAdd1: '123 Main St',
+    shipperAdd2: '',
+    shipperCity: 'New York',
+    shipperZip: '10001',
+    shipperCountry: 'USA',
+    shipperVAT: 'VAT123',
+    consigneeId: 'c001',
+    consigneeName: 'Alice Consignee',
+    consigneeEmail: 'alice@con.com',
+    consigneePhone: '987654321',
+    consigneeAdd1: '456 Market Rd',
+    consigneeAdd2: '',
+    consigneeCity: 'Los Angeles',
+    consigneeZip: '90001',
+    consigneeCountry: 'USA',
+    consigneeVAT: 'VAT456',
+    valueOfGoods: 1200,
+    insured: true,
+    customs: 'Standard',
+    shippingService: 'Standard',
     shipperInstructions: 'Handle with care',
     consigneeInstructions: 'Deliver before noon',
   },
@@ -95,7 +132,7 @@ const mockShippingForms = [
     valueOfGoods: 1200,
     insured: true,
     customs: 'Standard',
-    shippingService: 'Express',
+    shippingService: 'Standard',
     shipperInstructions: 'Handle with care',
     consigneeInstructions: 'Deliver before noon',
   },
@@ -131,43 +168,7 @@ const mockShippingForms = [
     valueOfGoods: 1200,
     insured: true,
     customs: 'Standard',
-    shippingService: 'Express',
-    shipperInstructions: 'Handle with care',
-    consigneeInstructions: 'Deliver before noon',
-  },
-  {
-    clientId: 'client001',
-    trackingNumber: 'TRK-1001',
-    shippingPayment: 'Pronto',
-    shippingPaymentTo: 'Expeditor',
-    deliveryDate: '2025-06-10',
-    deliveryDateHour: '10:30',
-    shipperReference: 'SHIP-001',
-    consigneeReference: 'CON-001',
-    shipperId: 's001',
-    shipperName: 'John Shipper',
-    shipperEmail: 'john@ship.com',
-    shipperPhone: '123456789',
-    shipperAdd1: '123 Main St',
-    shipperAdd2: '',
-    shipperCity: 'New York',
-    shipperZip: '10001',
-    shipperCountry: 'USA',
-    shipperVAT: 'VAT123',
-    consigneeId: 'c001',
-    consigneeName: 'Alice Consignee',
-    consigneeEmail: 'alice@con.com',
-    consigneePhone: '987654321',
-    consigneeAdd1: '456 Market Rd',
-    consigneeAdd2: '',
-    consigneeCity: 'Los Angeles',
-    consigneeZip: '90001',
-    consigneeCountry: 'USA',
-    consigneeVAT: 'VAT456',
-    valueOfGoods: 1200,
-    insured: true,
-    customs: 'Standard',
-    shippingService: 'Express',
+    shippingService: 'Standard',
     shipperInstructions: 'Handle with care',
     consigneeInstructions: 'Deliver before noon',
   },
@@ -305,10 +306,10 @@ const ShippingForms = () => {
                         {form.trackingNumber}
                       </Typography>
                       <Chip
-                        label={form.shippingService}
+                        label={form.canEdit ? 'Edit' : 'View'}
                         size='small'
                         sx={{
-                          backgroundColor: '#003D2C',
+                          backgroundColor: form.canEdit ? '#003D2C' : '#adb8b4',
                           color: '#ffffff',
                           fontWeight: 900,
                           fontSize: '0.75rem',
@@ -342,7 +343,19 @@ const ShippingForms = () => {
                         </Typography>
                       </Box>
 
-                      <Box sx={{ color: '#003D2C', fontSize: '1rem', flexShrink: 0 }}>→</Box>
+                      <Box
+                        sx={{
+                          color: '#003D2C',
+                          fontSize: '2rem',
+                          flexShrink: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          lineHeight: 1,
+                          transform: 'translateY(-6px)', // this does the trick
+                        }}
+                      >
+                        →
+                      </Box>
 
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
                         <FaRegUser color='#003D2C' />
@@ -406,16 +419,16 @@ const ShippingForms = () => {
                             gap: 0.5,
                             px: 1,
                             py: 0.5,
-                            backgroundColor: '#dcfce7',
+                            backgroundColor: '#adb8b4',
                             borderRadius: 1,
-                            border: '1px solid #bbf7d0',
+                            border: '1px solid #003D2C',
                           }}
                         >
-                          <MdShield style={{ color: '#16a34a', fontSize: '12px' }} />
+                          <MdShield style={{ color: '#003D2C', fontSize: '12px' }} />
                           <Typography
                             variant='caption'
                             sx={{
-                              color: '#16a34a',
+                              color: '#003D2C',
                               fontWeight: 600,
                               fontSize: '0.7rem',
                             }}
@@ -431,16 +444,15 @@ const ShippingForms = () => {
                             gap: 0.5,
                             px: 1,
                             py: 0.5,
-                            backgroundColor: '#fef2f2',
+                            backgroundColor: '#adb8b4',
                             borderRadius: 1,
-                            border: '1px solid #fecaca',
+                            border: '1px solid #003D2C',
                           }}
                         >
-                          <MdShield style={{ color: '#dc2626', fontSize: '12px' }} />
                           <Typography
                             variant='caption'
                             sx={{
-                              color: '#dc2626',
+                              color: '#003D2C',
                               fontWeight: 600,
                               fontSize: '0.7rem',
                             }}
