@@ -164,8 +164,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     return { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType };
   });
 
-  const [shippingSenderRouting, setShippingSenderRouting] = useState({});
-  const [shippingRecipientRouting, setShippingRecipientRouting] = useState({});
+  const [shippingSenderRouting, setShippingSenderRouting] = useState(null);
+
+  const [shippingRecipientRouting, setShippingRecipientRouting] = useState(null);
 
   const clientFromStorage = JSON.parse(localStorage.getItem('selectedClient')) || null;
 
@@ -1256,7 +1257,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     </Grid>
                   </Grid>
 
-                  {shippingSenderRouting?.data !== null && (
+                  {shippingSenderRouting?.data && (
                     <Grid
                       container
                       spacing={1}
@@ -1358,6 +1359,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     onClick={() => setCompactShippingInfo(true)}
                     sx={{
                       cursor: 'pointer',
+                      height: '40px',
                       borderRadius: '50%',
                       p: 0.5,
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -1563,7 +1565,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     ))}
                   </Grid>
 
-                  {shippingSenderRouting?.data !== null && (
+                  {shippingSenderRouting?.data && (
                     <Grid
                       container
                       spacing={1}
@@ -1815,7 +1817,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     </Grid>
                   </Grid>
 
-                  {shippingRecipientRouting?.data !== null && (
+                  {shippingRecipientRouting?.data && (
                     <Grid
                       container
                       spacing={1}
@@ -1923,6 +1925,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     onClick={() => setCompactShippingInfo(true)}
                     sx={{
                       cursor: 'pointer',
+                      height: '40px',
                       borderRadius: '50%',
                       p: 0.5,
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -2124,7 +2127,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     ))}
                   </Grid>
 
-                  {shippingRecipientRouting?.data !== null && (
+                  {shippingRecipientRouting?.data && (
                     <Grid
                       container
                       spacing={1}
