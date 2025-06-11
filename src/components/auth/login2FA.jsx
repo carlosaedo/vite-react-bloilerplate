@@ -22,9 +22,13 @@ const Login2FA = () => {
 
   const [codeDigits, setCodeDigits] = useState(['', '', '', '', '', '']);
 
-  async function handleRequest() {
+  async function handleRequest(code = null) {
     try {
-      const response = await torrestirApi.post('/Auth/verify-2fa', formData);
+      const codeToUse = code || formData.code;
+      const response = await torrestirApi.post('/Auth/verify-2fa', {
+        ...formData,
+        code: codeToUse,
+      });
       if (response?.data?.token) {
         login(response?.data?.token);
         setTimeout(() => {
@@ -57,20 +61,16 @@ const Login2FA = () => {
     console.log('Submitted code:', code);
 
     setFormData({ ...formData, code });
-    await handleRequest();
+    await handleRequest(code);
     // Reset animation state after submission
     setTimeout(() => {
       setIsSubmitting(false);
     }, 2000); // Adjust timing as needed
   };
 
-  const handleAutoSubmit = async () => {
+  const handleAutoSubmit = async (code) => {
     setIsSubmitting(true);
-    const code = codeDigits.join('');
-    console.log('Submitted code:', code);
-
-    setFormData({ ...formData, code });
-    await handleRequest();
+    await handleRequest(code);
     // Reset animation state after submission
     setTimeout(() => {
       setIsSubmitting(false);
@@ -104,11 +104,12 @@ const Login2FA = () => {
     }
 
     // Update formData for compatibility with existing logic
-    setFormData({ ...formData, code: newDigits.join('') });
+    const newCode = newDigits.join('');
+    setFormData({ ...formData, code: newCode });
 
     // Auto-submit if all digits are filled
     if (newDigits.every((d) => d) && index === 5) {
-      handleAutoSubmit();
+      handleAutoSubmit(newCode);
     }
   };
 
@@ -139,11 +140,9 @@ const Login2FA = () => {
     const nextInput = document.getElementById(`digit-${nextIndex}`);
     if (nextInput) nextInput.focus();
 
-    const newDigitsArray = [...newDigits];
-
     // Auto-submit if all digits are filled
-    if (newDigitsArray.every((d) => d) && newDigitsArray.length === 6) {
-      handleAutoSubmit();
+    if (pastedData.length === 6) {
+      handleAutoSubmit(pastedData);
     }
   };
 
