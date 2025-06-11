@@ -180,12 +180,25 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const newPackage = {
       ...defaultPackageValues,
       ...packageToClone,
+      sscc: generateMockSSCC(),
     };
 
     const updatedFormData = {
       ...shippingFormData,
       packages: [...shippingFormData.packages, newPackage],
     };
+
+    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+      calculateShippingFormTotals([...shippingFormData.packages, newPackage]);
+
+    setInfoValues({
+      totalQuantity,
+      totalWeight,
+      totalCBM,
+      totalLDM,
+      totalTaxableWeight,
+      quantityByType,
+    });
 
     setShippingFormData(updatedFormData);
     setSelectedPackageIndex(updatedFormData.packages.length - 1);
