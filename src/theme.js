@@ -56,7 +56,29 @@ const theme = createTheme({
         shrink: true, // Always float the label
       },
     },
-
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          },
+          '&.Mui-focused': {
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            transform: 'scale(1.01)',
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputBase-root': {
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          },
+        },
+      },
+    },
     MuiSelect: {
       styleOverrides: {
         icon: {

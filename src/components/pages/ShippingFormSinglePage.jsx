@@ -1063,22 +1063,45 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             sx={{
               mb: 3,
               p: 2,
-              border: '1px solid linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)', // darker tone for structure
-              borderRadius: 2,
+              border: '1px solid rgba(255, 201, 40, 0.3)',
+              borderRadius: 3,
               background: 'linear-gradient(135deg, #fff7e0 0%, #eaf4f0 100%)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.3)', // soft shadow for depth
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)',
               color: '#003D2C',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                boxShadow: '0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)',
+                transform: 'translateY(-2px)',
+              },
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '3px',
+                background: 'linear-gradient(90deg, #003D2C, #ffc928, #003D2C)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 3s ease-in-out infinite',
+              },
+              '@keyframes shimmer': {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' },
+              },
               '& .MuiInputBase-root': {
                 color: '#003D2C',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: 1,
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 px: 1,
               },
               '& .MuiInputLabel-root': {
                 color: '#003D2C',
+                fontWeight: 500,
               },
               '& .MuiInputLabel-shrink': {
                 color: '#003D2C',
+                transform: 'translate(14px, -9px) scale(0.75) !important',
               },
               '& .MuiCheckbox-root': {
                 color: '#003D2C',
@@ -1090,18 +1113,308 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 color: '#003D2C',
               },
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#ffc928',
+                borderColor: 'rgba(255, 201, 40, 0.5)',
+                transition: 'border-color 0.2s ease',
               },
               '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#ffc928',
+                borderWidth: '2px',
+              },
+              '& .MuiTextField-root': {
+                '& .MuiInputBase-root': {
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                },
               },
             }}
           >
             {compactShippingInfo ? (
               <React.Fragment>
-                <Typography variant='h6'>Shipper Information</Typography>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 8, sm: 8, md: 10, lg: 10 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                    position: 'relative',
+                  }}
+                >
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      position: 'relative',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: -2,
+                        left: 0,
+                        width: '100%',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, #ffc928, transparent)',
+                        transform: 'scaleX(0)',
+                        transformOrigin: 'left',
+                        transition: 'transform 0.3s ease',
+                      },
+                      '&:hover::after': {
+                        transform: 'scaleX(1)',
+                      },
+                    }}
+                  >
+                    Shipper Information
+                  </Typography>
+                  <Box
+                    onClick={() => setCompactShippingInfo(false)}
+                    sx={{
+                      cursor: 'pointer',
+                      height: '40px',
+                      borderRadius: '50%',
+                      p: 0.5,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      background:
+                        'linear-gradient(135deg, rgba(255, 201, 40, 0.2), rgba(76, 175, 80, 0.2))',
+                      '&:hover': {
+                        background:
+                          'linear-gradient(135deg, rgba(255, 201, 40, 0.4), rgba(76, 175, 80, 0.4))',
+                        transform: 'scale(1.1) rotate(180deg)',
+                        boxShadow: '0 4px 12px rgba(255, 201, 40, 0.3)',
+                      },
+                    }}
+                  >
+                    <ArrowDropDownIcon
+                      sx={{
+                        height: '32px',
+                        width: '32px',
+                        color: '#003D2C',
+                        transition: 'all 0.3s ease',
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    overflow: 'hidden',
+                    animation: 'slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '@keyframes slideDown': {
+                      '0%': {
+                        maxHeight: '300px',
+                        opacity: 0,
+                        transform: 'translateY(-20px)',
+                      },
+                      '100%': {
+                        maxHeight: '1000px',
+                        opacity: 1,
+                        transform: 'translateY(0)',
+                      },
+                    },
+                  }}
+                >
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid size={{ xs: 12, sm: 8, md: 9, lg: 9 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both',
+                          },
+                        }}
+                      >
+                        <EntitySelector
+                          selectedEntityName={shippingFormData.senderName}
+                          handleEntityChange={handleSenderEntityChange}
+                          onEntityCreated={(newEntityData) => {
+                            handleSenderEntityCreated(newEntityData);
+                          }}
+                          isSender={true}
+                        />
+                      </Box>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 4, md: 3, ld: 3 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both',
+                          },
+                        }}
+                      >
+                        <TextField
+                          label='ZIP'
+                          name='senderZip'
+                          value={shippingFormData.senderZip || ''}
+                          onChange={handleChange}
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required
+                          disabled
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  {shippingSenderRouting?.data !== null && (
+                    <Grid
+                      container
+                      spacing={1}
+                      sx={{
+                        ml: 2,
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both',
+                        '@keyframes fadeInUp': {
+                          '0%': {
+                            opacity: 0,
+                            transform: 'translateY(20px)',
+                          },
+                          '100%': {
+                            opacity: 1,
+                            transform: 'translateY(0)',
+                          },
+                        },
+                      }}
+                    >
+                      {[
+                        { title: 'Agent Name', value: shippingSenderRouting?.data?.agentName },
+                        { title: 'Route Name', value: shippingSenderRouting?.data?.routeName },
+                        { title: 'Service Name', value: shippingSenderRouting?.data?.serviceName },
+                        { title: 'Route', value: shippingSenderRouting?.data?.routeAbbreviation2 },
+                      ].map((item, index) => (
+                        <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }} key={item.title}>
+                          <Tooltip title={item.title} placement='bottom' arrow>
+                            <Typography
+                              variant='body2'
+                              sx={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                color: '#003D2C',
+                                fontSize: '0.8rem',
+                                fontWeight: 500,
+                                borderRadius: 2,
+                                px: 1.5,
+                                py: 0.75,
+                                display: 'inline-block',
+                                border: '1px solid rgba(255, 201, 40, 0.3)',
+                                transition: 'all 0.2s ease',
+                                cursor: 'default',
+                                animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${
+                                  0.5 + index * 0.1
+                                }s both`,
+                                '&:hover': {
+                                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                },
+                              }}
+                            >
+                              {item.value ?? '—'}
+                            </Typography>
+                          </Tooltip>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </Box>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                  }}
+                >
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      position: 'relative',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: -2,
+                        left: 0,
+                        width: '100%',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, #ffc928, transparent)',
+                        transform: 'scaleX(0)',
+                        transformOrigin: 'left',
+                        transition: 'transform 0.3s ease',
+                      },
+                      '&:hover::after': {
+                        transform: 'scaleX(1)',
+                      },
+                    }}
+                  >
+                    Shipper Information
+                  </Typography>
+                  <Box
+                    onClick={() => setCompactShippingInfo(true)}
+                    sx={{
+                      cursor: 'pointer',
+                      borderRadius: '50%',
+                      p: 0.5,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      background:
+                        'linear-gradient(135deg, rgba(255, 201, 40, 0.2), rgba(76, 175, 80, 0.2))',
+                      '&:hover': {
+                        background:
+                          'linear-gradient(135deg, rgba(255, 201, 40, 0.4), rgba(76, 175, 80, 0.4))',
+                        transform: 'scale(1.1) rotate(-180deg)',
+                        boxShadow: '0 4px 12px rgba(255, 201, 40, 0.3)',
+                      },
+                    }}
+                  >
+                    <ArrowDropUpIcon
+                      sx={{
+                        height: '32px',
+                        width: '32px',
+                        color: '#003D2C',
+                        transition: 'all 0.3s ease',
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                <Divider
+                  sx={{
+                    mb: 2,
+                    background:
+                      'linear-gradient(90deg, transparent, rgba(255, 201, 40, 0.5), transparent)',
+                    height: '2px',
+                    border: 'none',
+                  }}
+                />
+
+                <Box
+                  sx={{
+                    animation: 'expandDown 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '@keyframes expandDown': {
+                      '0%': {
+                        maxHeight: '100px',
+                        opacity: 0,
+                      },
+                      '100%': {
+                        maxHeight: '2000px',
+                        opacity: 1,
+                      },
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both',
+                      },
+                    }}
+                  >
                     <EntitySelector
                       selectedEntityName={shippingFormData.senderName}
                       handleEntityChange={handleSenderEntityChange}
@@ -1110,25 +1423,16 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       }}
                       isSender={true}
                     />
-                  </Grid>
-                  <Grid>
-                    <Typography onClick={() => setCompactShippingInfo(false)}>
-                      <ArrowDropDownIcon
-                        sx={{
-                          height: '48px',
-                          width: '48px',
-                          color: 'white',
-                          transition: 'transform 0.2s ease-in-out',
-                          '&:hover': {
-                            transform: 'scale(1.2)',
-                          },
-                        }}
-                      />
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6, md: 8, ld: 8 }}>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both',
+                      },
+                    }}
+                  >
                     <TextField
                       label='Name'
                       name='senderName'
@@ -1140,193 +1444,65 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       required
                       disabled
                     />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 4, ld: 4 }}>
-                    <TextField
-                      label='ZIP'
-                      name='senderZip'
-                      value={shippingFormData.senderZip || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                      disabled
-                    />
-                  </Grid>
-                </Grid>
-                {shippingSenderRouting?.data !== null && (
-                  <Grid container spacing={1} sx={{ ml: 2 }}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Agent Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingSenderRouting?.data?.agentName ?? '—'}
-                        </Typography>
-                      </Tooltip>
+                  </Box>
+
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both',
+                          },
+                        }}
+                      >
+                        <TextField
+                          label='Email'
+                          name='senderEmail'
+                          type='email'
+                          value={shippingFormData.senderEmail || ''}
+                          onChange={handleChange}
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required
+                        />
+                      </Box>
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingSenderRouting?.data?.routeName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Service Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingSenderRouting?.data?.serviceName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingSenderRouting?.data?.routeAbbreviation2 ?? '—'}
-                        </Typography>
-                      </Tooltip>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both',
+                          },
+                        }}
+                      >
+                        <TextField
+                          label='Phone'
+                          name='senderPhone'
+                          type='tel'
+                          value={shippingFormData.senderPhone || ''}
+                          onChange={handleChange}
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required
+                        />
+                      </Box>
                     </Grid>
                   </Grid>
-                )}
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <Typography variant='h6'>Sender Information</Typography>
-                <Typography onClick={() => setCompactShippingInfo(true)}>
-                  <ArrowDropUpIcon
+
+                  <Box
                     sx={{
-                      height: '48px',
-                      width: '48px',
-                      color: 'white',
-                      transition: 'transform 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'scale(1.2)',
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both',
                       },
                     }}
-                  />
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <EntitySelector
-                  selectedEntityName={shippingFormData.senderName}
-                  handleEntityChange={handleSenderEntityChange}
-                  onEntityCreated={(newEntityData) => {
-                    handleSenderEntityCreated(newEntityData);
-                  }}
-                  isSender={true}
-                />
-                <TextField
-                  label='Name'
-                  name='senderName'
-                  value={shippingFormData.senderName || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                  disabled
-                />
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  >
                     <TextField
-                      label='Email'
-                      name='senderEmail'
-                      type='email'
-                      value={shippingFormData.senderEmail || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label='Phone'
-                      name='senderPhone'
-                      type='tel'
-                      value={shippingFormData.senderPhone || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                </Grid>
-                <TextField
-                  label='Address'
-                  name='senderStreet'
-                  value={shippingFormData.senderStreet || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                  disabled
-                />
-                <TextField
-                  label='Address 2'
-                  name='senderStreet2'
-                  value={shippingFormData.senderStreet2 || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  disabled
-                />
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='City'
-                      name='senderCity'
-                      value={shippingFormData.senderCity || ''}
+                      label='Address'
+                      name='senderStreet'
+                      value={shippingFormData.senderStreet || ''}
                       onChange={handleChange}
                       fullWidth
                       size='small'
@@ -1334,127 +1510,108 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       required
                       disabled
                     />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both',
+                      },
+                    }}
+                  >
                     <TextField
-                      label='State'
-                      name='senderState'
-                      value={shippingFormData.senderState || ''}
+                      label='Address 2'
+                      name='senderStreet2'
+                      value={shippingFormData.senderStreet2 || ''}
                       onChange={handleChange}
                       fullWidth
                       size='small'
                       margin='dense'
-                      required
                       disabled
                     />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='ZIP'
-                      name='senderZip'
-                      value={shippingFormData.senderZip || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                      disabled
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='Country'
-                      name='senderCountry'
-                      value={shippingFormData.senderCountry || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                      disabled
-                    />
-                  </Grid>
-                </Grid>
-                {shippingSenderRouting?.data !== null && (
-                  <Grid container spacing={1} sx={{ ml: 2 }}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Agent Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
+                  </Box>
+
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    {[
+                      { label: 'City', name: 'senderCity', delay: 0.7 },
+                      { label: 'State', name: 'senderState', delay: 0.8 },
+                      { label: 'ZIP', name: 'senderZip', delay: 0.9 },
+                      { label: 'Country', name: 'senderCountry', delay: 1.0 },
+                    ].map((field) => (
+                      <Grid size={{ xs: 6, sm: 3 }} key={field.name}>
+                        <Box
                           sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
+                            '& > *': {
+                              animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${field.delay}s both`,
+                            },
                           }}
                         >
-                          {shippingSenderRouting?.data?.agentName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingSenderRouting?.data?.routeName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Service Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingSenderRouting?.data?.serviceName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingSenderRouting?.data?.routeAbbreviation2 ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
+                          <TextField
+                            label={field.label}
+                            name={field.name}
+                            value={shippingFormData[field.name] || ''}
+                            onChange={handleChange}
+                            fullWidth
+                            size='small'
+                            margin='dense'
+                            required
+                            disabled
+                          />
+                        </Box>
+                      </Grid>
+                    ))}
                   </Grid>
-                )}
+
+                  {shippingSenderRouting?.data !== null && (
+                    <Grid
+                      container
+                      spacing={1}
+                      sx={{
+                        ml: 2,
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 1.1s both',
+                      }}
+                    >
+                      {[
+                        { title: 'Agent Name', value: shippingSenderRouting?.data?.agentName },
+                        { title: 'Route Name', value: shippingSenderRouting?.data?.routeName },
+                        { title: 'Service Name', value: shippingSenderRouting?.data?.serviceName },
+                        { title: 'Route', value: shippingSenderRouting?.data?.routeAbbreviation2 },
+                      ].map((item, index) => (
+                        <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }} key={item.title}>
+                          <Tooltip title={item.title} placement='bottom' arrow>
+                            <Typography
+                              variant='body2'
+                              sx={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                color: '#003D2C',
+                                fontSize: '0.8rem',
+                                fontWeight: 500,
+                                borderRadius: 2,
+                                px: 1.5,
+                                py: 0.75,
+                                display: 'inline-block',
+                                border: '1px solid rgba(255, 201, 40, 0.3)',
+                                transition: 'all 0.2s ease',
+                                cursor: 'default',
+                                animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${
+                                  1.2 + index * 0.1
+                                }s both`,
+                                '&:hover': {
+                                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                },
+                              }}
+                            >
+                              {item.value ?? '—'}
+                            </Typography>
+                          </Tooltip>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </Box>
               </React.Fragment>
             )}
           </Box>
@@ -1466,23 +1623,45 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             sx={{
               mb: 3,
               p: 2,
-              border: '1px solid linear-gradient(135deg, #eaf4f0 0%, #fff7e0 100%)', // darker tone for structure
-              borderRadius: 2,
+              border: '1px solid rgba(255, 201, 40, 0.3)',
+              borderRadius: 3,
               background: 'linear-gradient(135deg, #eaf4f0 0%, #fff7e0 100%)',
-
-              boxShadow: '0 4px 12px rgba(0,0,0,0.3)', // soft shadow for depth
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)',
               color: '#003D2C',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                boxShadow: '0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)',
+                transform: 'translateY(-2px)',
+              },
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '3px',
+                background: 'linear-gradient(90deg, #003D2C, #ffc928, #003D2C)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 3s ease-in-out infinite',
+              },
+              '@keyframes shimmer': {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' },
+              },
               '& .MuiInputBase-root': {
                 color: '#003D2C',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: 1,
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 px: 1,
               },
               '& .MuiInputLabel-root': {
                 color: '#003D2C',
+                fontWeight: 500,
               },
               '& .MuiInputLabel-shrink': {
                 color: '#003D2C',
+                transform: 'translate(14px, -9px) scale(0.75) !important',
               },
               '& .MuiCheckbox-root': {
                 color: '#003D2C',
@@ -1494,18 +1673,313 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 color: '#003D2C',
               },
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#ffc928',
+                borderColor: 'rgba(255, 201, 40, 0.5)',
+                transition: 'border-color 0.2s ease',
               },
               '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#ffc928',
+                borderWidth: '2px',
+              },
+              '& .MuiTextField-root': {
+                '& .MuiInputBase-root': {
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                },
               },
             }}
           >
             {compactShippingInfo ? (
               <React.Fragment>
-                <Typography variant='h6'>Consignee Information</Typography>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 8, sm: 8, md: 10, lg: 10 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                    position: 'relative',
+                  }}
+                >
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      position: 'relative',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: -2,
+                        left: 0,
+                        width: '100%',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, #ffc928, transparent)',
+                        transform: 'scaleX(0)',
+                        transformOrigin: 'left',
+                        transition: 'transform 0.3s ease',
+                      },
+                      '&:hover::after': {
+                        transform: 'scaleX(1)',
+                      },
+                    }}
+                  >
+                    Consignee Information
+                  </Typography>
+                  <Box
+                    onClick={() => setCompactShippingInfo(false)}
+                    sx={{
+                      cursor: 'pointer',
+                      height: '40px',
+                      borderRadius: '50%',
+                      p: 0.5,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      background:
+                        'linear-gradient(135deg, rgba(255, 201, 40, 0.2), rgba(76, 175, 80, 0.2))',
+                      '&:hover': {
+                        background:
+                          'linear-gradient(135deg, rgba(255, 201, 40, 0.4), rgba(76, 175, 80, 0.4))',
+                        transform: 'scale(1.1) rotate(180deg)',
+                        boxShadow: '0 4px 12px rgba(255, 201, 40, 0.3)',
+                      },
+                    }}
+                  >
+                    <ArrowDropDownIcon
+                      sx={{
+                        height: '32px',
+                        width: '32px',
+                        color: '#003D2C',
+                        transition: 'all 0.3s ease',
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    overflow: 'hidden',
+                    animation: 'slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '@keyframes slideDown': {
+                      '0%': {
+                        maxHeight: '300px',
+                        opacity: 0,
+                        transform: 'translateY(-20px)',
+                      },
+                      '100%': {
+                        maxHeight: '1000px',
+                        opacity: 1,
+                        transform: 'translateY(0)',
+                      },
+                    },
+                  }}
+                >
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid size={{ xs: 12, sm: 8, md: 9, lg: 9 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both',
+                          },
+                        }}
+                      >
+                        <EntitySelector
+                          selectedEntityName={shippingFormData.recipientName}
+                          handleEntityChange={handleRecipientEntityChange}
+                          onEntityCreated={(newEntityData) => {
+                            handleRecipientEntityCreated(newEntityData);
+                          }}
+                          isRecipient={true}
+                        />
+                      </Box>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 4, md: 3, ld: 3 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both',
+                          },
+                        }}
+                      >
+                        <TextField
+                          label='ZIP'
+                          name='recipientZip'
+                          value={shippingFormData.recipientZip || ''}
+                          onChange={handleChange}
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  {shippingRecipientRouting?.data !== null && (
+                    <Grid
+                      container
+                      spacing={1}
+                      sx={{
+                        ml: 2,
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both',
+                        '@keyframes fadeInUp': {
+                          '0%': {
+                            opacity: 0,
+                            transform: 'translateY(20px)',
+                          },
+                          '100%': {
+                            opacity: 1,
+                            transform: 'translateY(0)',
+                          },
+                        },
+                      }}
+                    >
+                      {[
+                        { title: 'Agent Name', value: shippingRecipientRouting?.data?.agentName },
+                        { title: 'Route Name', value: shippingRecipientRouting?.data?.routeName },
+                        {
+                          title: 'Service Name',
+                          value: shippingRecipientRouting?.data?.serviceName,
+                        },
+                        {
+                          title: 'Route',
+                          value: shippingRecipientRouting?.data?.routeAbbreviation2,
+                        },
+                      ].map((item, index) => (
+                        <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }} key={item.title}>
+                          <Tooltip title={item.title} placement='bottom' arrow>
+                            <Typography
+                              variant='body2'
+                              sx={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                color: '#003D2C',
+                                fontSize: '0.8rem',
+                                fontWeight: 500,
+                                borderRadius: 2,
+                                px: 1.5,
+                                py: 0.75,
+                                display: 'inline-block',
+                                border: '1px solid rgba(255, 201, 40, 0.3)',
+                                transition: 'all 0.2s ease',
+                                cursor: 'default',
+                                animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${
+                                  0.5 + index * 0.1
+                                }s both`,
+                                '&:hover': {
+                                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                },
+                              }}
+                            >
+                              {item.value ?? '—'}
+                            </Typography>
+                          </Tooltip>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </Box>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                  }}
+                >
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      position: 'relative',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: -2,
+                        left: 0,
+                        width: '100%',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, #ffc928, transparent)',
+                        transform: 'scaleX(0)',
+                        transformOrigin: 'left',
+                        transition: 'transform 0.3s ease',
+                      },
+                      '&:hover::after': {
+                        transform: 'scaleX(1)',
+                      },
+                    }}
+                  >
+                    Consignee Information
+                  </Typography>
+                  <Box
+                    onClick={() => setCompactShippingInfo(true)}
+                    sx={{
+                      cursor: 'pointer',
+                      borderRadius: '50%',
+                      p: 0.5,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      background:
+                        'linear-gradient(135deg, rgba(255, 201, 40, 0.2), rgba(76, 175, 80, 0.2))',
+                      '&:hover': {
+                        background:
+                          'linear-gradient(135deg, rgba(255, 201, 40, 0.4), rgba(76, 175, 80, 0.4))',
+                        transform: 'scale(1.1) rotate(-180deg)',
+                        boxShadow: '0 4px 12px rgba(255, 201, 40, 0.3)',
+                      },
+                    }}
+                  >
+                    <ArrowDropUpIcon
+                      sx={{
+                        height: '32px',
+                        width: '32px',
+                        color: '#003D2C',
+                        transition: 'all 0.3s ease',
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                <Divider
+                  sx={{
+                    mb: 2,
+                    background:
+                      'linear-gradient(90deg, transparent, rgba(255, 201, 40, 0.5), transparent)',
+                    height: '2px',
+                    border: 'none',
+                  }}
+                />
+
+                <Box
+                  sx={{
+                    animation: 'expandDown 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '@keyframes expandDown': {
+                      '0%': {
+                        maxHeight: '100px',
+                        opacity: 0,
+                      },
+                      '100%': {
+                        maxHeight: '2000px',
+                        opacity: 1,
+                      },
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both',
+                      },
+                    }}
+                  >
                     <EntitySelector
                       selectedEntityName={shippingFormData.recipientName}
                       handleEntityChange={handleRecipientEntityChange}
@@ -1514,25 +1988,16 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       }}
                       isRecipient={true}
                     />
-                  </Grid>
-                  <Grid>
-                    <Typography onClick={() => setCompactShippingInfo(false)}>
-                      <ArrowDropDownIcon
-                        sx={{
-                          height: '48px',
-                          width: '48px',
-                          color: 'white',
-                          transition: 'transform 0.2s ease-in-out',
-                          '&:hover': {
-                            transform: 'scale(1.2)',
-                          },
-                        }}
-                      />
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6, md: 8, ld: 8 }}>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both',
+                      },
+                    }}
+                  >
                     <TextField
                       label='Name'
                       name='recipientName'
@@ -1543,313 +2008,177 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       margin='dense'
                       required
                     />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6, md: 4, ld: 4 }}>
-                    <TextField
-                      label='ZIP'
-                      name='recipientZip'
-                      value={shippingFormData.recipientZip || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                </Grid>
-                {shippingRecipientRouting?.data !== null && (
-                  <Grid container spacing={1} sx={{ ml: 2 }}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Agent Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingRecipientRouting?.data?.agentName ?? '—'}
-                        </Typography>
-                      </Tooltip>
+                  </Box>
+
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both',
+                          },
+                        }}
+                      >
+                        <TextField
+                          label='Email'
+                          name='recipientEmail'
+                          type='email'
+                          value={shippingFormData.recipientEmail || ''}
+                          onChange={handleChange}
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required
+                        />
+                      </Box>
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingRecipientRouting?.data?.routeName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Service Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingRecipientRouting?.data?.serviceName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingRecipientRouting?.data?.routeAbbreviation2 ?? '—'}
-                        </Typography>
-                      </Tooltip>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Box
+                        sx={{
+                          '& > *': {
+                            animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both',
+                          },
+                        }}
+                      >
+                        <TextField
+                          label='Phone'
+                          name='recipientPhone'
+                          type='tel'
+                          value={shippingFormData.recipientPhone || ''}
+                          onChange={handleChange}
+                          fullWidth
+                          size='small'
+                          margin='dense'
+                          required
+                        />
+                      </Box>
                     </Grid>
                   </Grid>
-                )}
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <Typography variant='h6'>Recipient Information</Typography>
-                <Typography onClick={() => setCompactShippingInfo(true)}>
-                  <ArrowDropUpIcon
+
+                  <Box
                     sx={{
-                      height: '48px',
-                      width: '48px',
-                      color: 'white',
-                      transition: 'transform 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'scale(1.2)',
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both',
                       },
                     }}
-                  />
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <EntitySelector
-                  selectedEntityName={shippingFormData.recipientName}
-                  handleEntityChange={handleRecipientEntityChange}
-                  onEntityCreated={(newEntityData) => {
-                    handleRecipientEntityCreated(newEntityData);
-                  }}
-                  isRecipient={true}
-                />
-                <TextField
-                  label='Name'
-                  name='recipientName'
-                  value={shippingFormData.recipientName || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  >
                     <TextField
-                      label='Email'
-                      name='recipientEmail'
-                      type='email'
-                      value={shippingFormData.recipientEmail || ''}
+                      label='Address'
+                      name='recipientStreet'
+                      value={shippingFormData.recipientStreet || ''}
                       onChange={handleChange}
                       fullWidth
                       size='small'
                       margin='dense'
                       required
                     />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      mb: 2,
+                      '& > *': {
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both',
+                      },
+                    }}
+                  >
                     <TextField
-                      label='Phone'
-                      name='recipientPhone'
-                      type='tel'
-                      value={shippingFormData.recipientPhone || ''}
+                      label='Address 2'
+                      name='recipientStreet2'
+                      value={shippingFormData.recipientStreet2 || ''}
                       onChange={handleChange}
                       fullWidth
                       size='small'
                       margin='dense'
-                      required
                     />
-                  </Grid>
-                </Grid>
-                <TextField
-                  label='Address'
-                  name='recipientStreet'
-                  value={shippingFormData.recipientStreet || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  required
-                />
-                <TextField
-                  label='Address 2'
-                  name='recipientStreet2'
-                  value={shippingFormData.recipientStreet2 || ''}
-                  onChange={handleChange}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                />
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='City'
-                      name='recipientCity'
-                      value={shippingFormData.recipientCity || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='State'
-                      name='recipientState'
-                      value={shippingFormData.recipientState || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='ZIP'
-                      name='recipientZip'
-                      value={shippingFormData.recipientZip || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='Country'
-                      name='recipientCountry'
-                      value={shippingFormData.recipientCountry || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                </Grid>
-                {shippingRecipientRouting?.data !== null && (
-                  <Grid container spacing={1} sx={{ ml: 2 }}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Agent Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
+                  </Box>
+
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    {[
+                      { label: 'City', name: 'recipientCity', delay: 0.7 },
+                      { label: 'State', name: 'recipientState', delay: 0.8 },
+                      { label: 'ZIP', name: 'recipientZip', delay: 0.9 },
+                      { label: 'Country', name: 'recipientCountry', delay: 1.0 },
+                    ].map((field) => (
+                      <Grid size={{ xs: 6, sm: 3 }} key={field.name}>
+                        <Box
                           sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
+                            '& > *': {
+                              animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${field.delay}s both`,
+                            },
                           }}
                         >
-                          {shippingRecipientRouting?.data?.agentName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingRecipientRouting?.data?.routeName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Service Name' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingRecipientRouting?.data?.serviceName ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }}>
-                      <Tooltip title='Route' placement='bottom' arrow>
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            backgroundColor: 'white',
-                            color: '#003D2C',
-                            fontSize: '0.8rem',
-                            fontWeight: 400,
-                            borderRadius: 1,
-                            px: 1,
-                            py: 0.5,
-                            display: 'inline-block',
-                          }}
-                        >
-                          {shippingRecipientRouting?.data?.routeAbbreviation2 ?? '—'}
-                        </Typography>
-                      </Tooltip>
-                    </Grid>
+                          <TextField
+                            label={field.label}
+                            name={field.name}
+                            value={shippingFormData[field.name] || ''}
+                            onChange={handleChange}
+                            fullWidth
+                            size='small'
+                            margin='dense'
+                            required
+                          />
+                        </Box>
+                      </Grid>
+                    ))}
                   </Grid>
-                )}
+
+                  {shippingRecipientRouting?.data !== null && (
+                    <Grid
+                      container
+                      spacing={1}
+                      sx={{
+                        ml: 2,
+                        animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 1.1s both',
+                      }}
+                    >
+                      {[
+                        { title: 'Agent Name', value: shippingRecipientRouting?.data?.agentName },
+                        { title: 'Route Name', value: shippingRecipientRouting?.data?.routeName },
+                        {
+                          title: 'Service Name',
+                          value: shippingRecipientRouting?.data?.serviceName,
+                        },
+                        {
+                          title: 'Route',
+                          value: shippingRecipientRouting?.data?.routeAbbreviation2,
+                        },
+                      ].map((item, index) => (
+                        <Grid size={{ xs: 12, sm: 6, md: 3, ld: 3 }} key={item.title}>
+                          <Tooltip title={item.title} placement='bottom' arrow>
+                            <Typography
+                              variant='body2'
+                              sx={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                color: '#003D2C',
+                                fontSize: '0.8rem',
+                                fontWeight: 500,
+                                borderRadius: 2,
+                                px: 1.5,
+                                py: 0.75,
+                                display: 'inline-block',
+                                border: '1px solid rgba(255, 201, 40, 0.3)',
+                                transition: 'all 0.2s ease',
+                                cursor: 'default',
+                                animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${
+                                  1.2 + index * 0.1
+                                }s both`,
+                                '&:hover': {
+                                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                },
+                              }}
+                            >
+                              {item.value ?? '—'}
+                            </Typography>
+                          </Tooltip>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </Box>
               </React.Fragment>
             )}
           </Box>
