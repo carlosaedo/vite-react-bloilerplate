@@ -1101,33 +1101,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               <React.Fragment>
                 <Typography variant='h6'>Shipper Information</Typography>
                 <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label='Name'
-                      name='senderName'
-                      value={shippingFormData.senderName || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                      disabled
+                  <Grid size={{ xs: 8, sm: 8, md: 10, lg: 10 }}>
+                    <EntitySelector
+                      selectedEntityName={shippingFormData.senderName}
+                      handleEntityChange={handleSenderEntityChange}
+                      onEntityCreated={(newEntityData) => {
+                        handleSenderEntityCreated(newEntityData);
+                      }}
+                      isSender={true}
                     />
                   </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='ZIP'
-                      name='senderZip'
-                      value={shippingFormData.senderZip || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                      disabled
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Grid>
                     <Typography onClick={() => setCompactShippingInfo(false)}>
                       <ArrowDropDownIcon
                         sx={{
@@ -1141,6 +1125,34 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         }}
                       />
                     </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6, md: 8, ld: 8 }}>
+                    <TextField
+                      label='Name'
+                      name='senderName'
+                      value={shippingFormData.senderName || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                      disabled
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4, ld: 4 }}>
+                    <TextField
+                      label='ZIP'
+                      name='senderZip'
+                      value={shippingFormData.senderZip || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                      disabled
+                    />
                   </Grid>
                 </Grid>
                 {shippingSenderRouting?.data !== null && (
@@ -1492,33 +1504,18 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             {compactShippingInfo ? (
               <React.Fragment>
                 <Typography variant='h6'>Consignee Information</Typography>
-
                 <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label='Name'
-                      name='recipientName'
-                      value={shippingFormData.recipientName || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
+                  <Grid size={{ xs: 8, sm: 8, md: 10, lg: 10 }}>
+                    <EntitySelector
+                      selectedEntityName={shippingFormData.recipientName}
+                      handleEntityChange={handleRecipientEntityChange}
+                      onEntityCreated={(newEntityData) => {
+                        handleRecipientEntityCreated(newEntityData);
+                      }}
+                      isRecipient={true}
                     />
                   </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }}>
-                    <TextField
-                      label='ZIP'
-                      name='recipientZip'
-                      value={shippingFormData.recipientZip || ''}
-                      onChange={handleChange}
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 6, sm: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Grid>
                     <Typography onClick={() => setCompactShippingInfo(false)}>
                       <ArrowDropDownIcon
                         sx={{
@@ -1532,6 +1529,32 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         }}
                       />
                     </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6, md: 8, ld: 8 }}>
+                    <TextField
+                      label='Name'
+                      name='recipientName'
+                      value={shippingFormData.recipientName || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 4, ld: 4 }}>
+                    <TextField
+                      label='ZIP'
+                      name='recipientZip'
+                      value={shippingFormData.recipientZip || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required
+                    />
                   </Grid>
                 </Grid>
                 {shippingRecipientRouting?.data !== null && (
