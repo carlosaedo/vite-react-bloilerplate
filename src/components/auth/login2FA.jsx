@@ -64,6 +64,19 @@ const Login2FA = () => {
     }, 2000); // Adjust timing as needed
   };
 
+  const handleAutoSubmit = async () => {
+    setIsSubmitting(true);
+    const code = codeDigits.join('');
+    console.log('Submitted code:', code);
+
+    setFormData({ ...formData, code });
+    await handleRequest();
+    // Reset animation state after submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+    }, 2000); // Adjust timing as needed
+  };
+
   const handleChange = (event) => {
     setMessage(null);
     setErrorMessage(null);
@@ -74,6 +87,8 @@ const Login2FA = () => {
   };
 
   const handleDigitChange = (index, value) => {
+    setMessage(null);
+    setErrorMessage(null);
     // Only allow single digits
     if (value.length > 1) return;
     if (value && !/^\d$/.test(value)) return;
@@ -90,9 +105,16 @@ const Login2FA = () => {
 
     // Update formData for compatibility with existing logic
     setFormData({ ...formData, code: newDigits.join('') });
+
+    // Auto-submit if all digits are filled
+    if (newDigits.every((d) => d) && index === 5) {
+      handleAutoSubmit();
+    }
   };
 
   const handleKeyDown = (index, e) => {
+    setMessage(null);
+    setErrorMessage(null);
     // Handle backspace to go to previous input
     if (e.key === 'Backspace' && !codeDigits[index] && index > 0) {
       const prevInput = document.getElementById(`digit-${index - 1}`);
@@ -102,6 +124,9 @@ const Login2FA = () => {
 
   const handlePaste = (e) => {
     e.preventDefault();
+    setMessage(null);
+    setErrorMessage(null);
+
     const pastedData = e.clipboardData.getData('text').slice(0, 6);
     if (!/^\d+$/.test(pastedData)) return;
 
@@ -113,6 +138,13 @@ const Login2FA = () => {
     const nextIndex = Math.min(pastedData.length, 5);
     const nextInput = document.getElementById(`digit-${nextIndex}`);
     if (nextInput) nextInput.focus();
+
+    const newDigitsArray = [...newDigits];
+
+    // Auto-submit if all digits are filled
+    if (newDigitsArray.every((d) => d) && newDigitsArray.length === 6) {
+      handleAutoSubmit();
+    }
   };
 
   return (
