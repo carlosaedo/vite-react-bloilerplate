@@ -51,7 +51,7 @@ const TrackingSearch = () => {
             display: 'flex',
             gap: 2,
             width: '100%',
-            maxWidth: '500px',
+
             alignItems: 'stretch',
             flexDirection: { xs: 'column', sm: 'row' },
           }}
@@ -72,7 +72,6 @@ const TrackingSearch = () => {
             startIcon={<SearchIcon />}
             sx={{
               color: 'white',
-              padding: '12px 0',
               fontSize: '1rem',
               fontWeight: 'bold',
               textTransform: 'none',
