@@ -815,10 +815,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const handleChangeFormTypeToParent = () => {
     handleChangeFormType(false);
   };
-
-  if (loadingShippingForm) return <CircularProgress />;
+  if (loadingShippingForm) return <CircularProgress sx={{ marginTop: 4 }} />;
   //
-  //if (loading) return <CircularProgress sx={{ marginTop: 4 }} />;
+
   if (errorClient) return <Alert severity='error'>{errorClient}</Alert>;
 
   return (
@@ -3258,12 +3257,30 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               ))}
             </Select>
             {errorMessage && (
-              <Typography color='error' variant='h5' gutterBottom>
+              <Typography
+                color='error'
+                variant='body2'
+                sx={{
+                  backgroundColor: '#ffebee',
+                  padding: 1,
+                  borderRadius: 1,
+                  border: '1px solid #ffcdd2',
+                }}
+              >
                 {errorMessage}
               </Typography>
             )}
             {message && (
-              <Typography variant='h5' gutterBottom>
+              <Typography
+                variant='body2'
+                sx={{
+                  backgroundColor: '#e8f5e8',
+                  padding: 1,
+                  borderRadius: 1,
+                  border: '1px solid #c8e6c9',
+                  color: '#2e7d32',
+                }}
+              >
                 {message}
               </Typography>
             )}

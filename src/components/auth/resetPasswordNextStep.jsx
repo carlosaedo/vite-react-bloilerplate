@@ -103,12 +103,34 @@ const ResetPasswordNextStep = () => {
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
           {errorMessage && (
-            <Typography color='error' variant='body2'>
+            <Typography
+              color='error'
+              variant='body2'
+              sx={{
+                backgroundColor: '#ffebee',
+                padding: 1,
+                borderRadius: 1,
+                border: '1px solid #ffcdd2',
+              }}
+            >
               {errorMessage}
             </Typography>
           )}
 
-          {message && <Typography variant='body2'>{message}</Typography>}
+          {message && (
+            <Typography
+              variant='body2'
+              sx={{
+                backgroundColor: '#e8f5e8',
+                padding: 1,
+                borderRadius: 1,
+                border: '1px solid #c8e6c9',
+                color: '#2e7d32',
+              }}
+            >
+              {message}
+            </Typography>
+          )}
 
           <TextField
             label='Email'

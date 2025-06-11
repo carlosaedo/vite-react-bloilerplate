@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
+
+import torrestirApi from '../api/torrestirApi';
 import {
   Box,
   Paper,
@@ -66,7 +67,7 @@ const mockShippingForms = [
   },
   {
     clientId: 'client001',
-    trackingNumber: 'TRK-1001',
+    trackingNumber: 'TRK-1002',
     shippingPayment: 'Pronto',
     shippingPaymentTo: 'Expeditor',
     deliveryDate: '2025-06-10',
@@ -102,7 +103,7 @@ const mockShippingForms = [
   },
   {
     clientId: 'client001',
-    trackingNumber: 'TRK-1001',
+    trackingNumber: 'TRK-1003',
     shippingPayment: 'Pronto',
     shippingPaymentTo: 'Expeditor',
     deliveryDate: '2025-06-10',
@@ -138,7 +139,7 @@ const mockShippingForms = [
   },
   {
     clientId: 'client001',
-    trackingNumber: 'TRK-1001',
+    trackingNumber: 'TRK-1004',
     shippingPayment: 'Pronto',
     shippingPaymentTo: 'Expeditor',
     deliveryDate: '2025-06-10',
@@ -174,7 +175,7 @@ const mockShippingForms = [
   },
   {
     clientId: 'client002',
-    trackingNumber: 'TRK-1002',
+    trackingNumber: 'TRK-1005',
     shippingPayment: 'Pronto',
     shippingPaymentTo: 'Expeditor',
     deliveryDate: '2025-06-11',
@@ -208,20 +209,11 @@ const mockShippingForms = [
     shipperInstructions: '',
     consigneeInstructions: '',
   },
-  // Add 2–3 more entries as needed...
 ];
 
 const ShippingForms = () => {
-  const { getToken } = useAuth();
-  const token = getToken();
-  const isTokenPresent = !!token;
-
-  const [userInfo] = useState(() => {
-    if (token) {
-      return jwtDecode(token);
-    }
-    return {};
-  });
+  const { token } = useAuth();
+  console.log(token);
 
   const handleClick = (form) => {
     console.log('Form clicked:', form);
@@ -305,18 +297,22 @@ const ShippingForms = () => {
                       >
                         {form.trackingNumber}
                       </Typography>
-                      <Chip
-                        label={form.canEdit ? 'Edit' : 'View'}
-                        size='small'
+                      <Box
                         sx={{
+                          px: 1.5,
+                          py: 0.5,
                           backgroundColor: form.canEdit ? '#003D2C' : '#adb8b4',
                           color: '#ffffff',
                           fontWeight: 900,
                           fontSize: '0.75rem',
                           border: '1px solid rgb(255, 255, 255)',
                           boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
+                          borderRadius: '16px',
+                          display: 'inline-block',
                         }}
-                      />
+                      >
+                        {form.canEdit ? 'Edit' : 'View'}
+                      </Box>
                     </Box>
 
                     {/* Center section - Shipper & Consignee */}
@@ -353,7 +349,7 @@ const ShippingForms = () => {
                           display: 'flex',
                           alignItems: 'center',
                           lineHeight: 1,
-                          transform: 'translateY(-6px)', // this does the trick
+                          transform: 'translateY(-6px)',
                         }}
                       >
                         →
@@ -361,7 +357,6 @@ const ShippingForms = () => {
 
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
                         <FaRegUser color='#003D2C' />
-
                         <Typography
                           variant='body2'
                           sx={{
@@ -401,18 +396,22 @@ const ShippingForms = () => {
                         </Typography>
                       </Box>
 
-                      <Chip
-                        label={`${form.shippingPayment} to ${form.shippingPaymentTo}`}
-                        size='small'
+                      <Box
                         sx={{
+                          px: 1.5,
+                          py: 0.5,
                           backgroundColor: '#ffc928',
                           color: '#003D2C',
                           fontWeight: 600,
                           fontSize: '0.75rem',
                           border: '1px solid #eaf4f0',
                           boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
+                          borderRadius: '16px',
+                          display: 'inline-block',
                         }}
-                      />
+                      >
+                        {`${form.shippingPayment} to ${form.shippingPaymentTo}`}
+                      </Box>
 
                       {form.insured ? (
                         <Box
@@ -420,10 +419,10 @@ const ShippingForms = () => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 0.5,
-                            px: 1,
+                            px: 1.5,
                             py: 0.5,
                             backgroundColor: '#adb8b4',
-                            borderRadius: 1,
+                            borderRadius: '16px',
                             border: '1px solid rgb(255, 255, 255)',
                             boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
                           }}
@@ -446,10 +445,10 @@ const ShippingForms = () => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 0.5,
-                            px: 1,
+                            px: 1.5,
                             py: 0.5,
                             backgroundColor: '#adb8b4',
-                            borderRadius: 1,
+                            borderRadius: '16px',
                             border: '1px solid rgb(255, 255, 255)',
                             boxShadow: '0 4px 4px rgba(0,0,0,0.06)',
                           }}

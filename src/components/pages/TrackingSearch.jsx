@@ -71,15 +71,12 @@ const TrackingSearch = () => {
             disabled={!trackingNumber.trim()}
             startIcon={<SearchIcon />}
             sx={{
-              backgroundColor: '#003D2C',
-              color: '#ffffff',
-              fontWeight: 600,
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
-              minWidth: '120px',
-              textTransform: 'none',
+              color: 'white',
+              padding: '12px 0',
               fontSize: '1rem',
+              fontWeight: 'bold',
+              textTransform: 'none',
+              borderRadius: 1,
               '&:hover': {
                 backgroundColor: '#003D2C',
               },
