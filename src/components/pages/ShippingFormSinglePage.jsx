@@ -3473,27 +3473,27 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             flexWrap='wrap'
           >
             <Typography>
-              Total Weight: <strong>{infoValues.totalWeight || 0} kg</strong>
+              Total Weight: <strong>{infoValues?.totalWeight || 0} kg</strong>
             </Typography>
 
             <Typography>
-              Total CBM: <strong>{infoValues.totalCBM || 0}</strong>
+              Total CBM: <strong>{infoValues?.totalCBM || 0}</strong>
             </Typography>
 
             <Typography>
-              Total LDM: <strong>{infoValues.totalLDM || 0}</strong>
+              Total LDM: <strong>{infoValues?.totalLDM || 0}</strong>
             </Typography>
 
             <Typography>
-              Total Taxable Weight: <strong>{infoValues.totalTaxableWeight || 0} kg</strong>
+              Total Taxable Weight: <strong>{infoValues?.totalTaxableWeight || 0} kg</strong>
             </Typography>
 
             <Typography>
-              Total Volumes: <strong>{infoValues.quantityByType.volume || 0}</strong>
+              Total Volumes: <strong>{infoValues?.quantityByType?.volume || 0}</strong>
             </Typography>
 
             <Typography>
-              Total Palets: <strong>{infoValues.quantityByType.palete || 0}</strong>
+              Total Palets: <strong>{infoValues?.quantityByType?.palete || 0}</strong>
             </Typography>
             <Button
               sx={{ marginRight: 1 }}
