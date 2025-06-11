@@ -189,7 +189,7 @@ const EntitySelector = ({
         <DialogContent>
           <Grid container spacing={2} mt={1}>
             {Object.keys(defaultNewEntity).map((key) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
+              <Grid size={{ xs: 12, sm: 12, md: 12, ld: 12 }} key={key}>
                 <TextField
                   key={key}
                   label={key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -202,7 +202,7 @@ const EntitySelector = ({
             ))}
           </Grid>
           <Grid container spacing={2} mt={1}>
-            <Grid size={{ xs: 6, sm: 6, md: 4 }}>
+            <Grid>
               <FormControlLabel
                 control={
                   <Checkbox
