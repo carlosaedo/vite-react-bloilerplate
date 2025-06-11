@@ -425,6 +425,9 @@ const Header = () => {
                   }
                   label={`${displayName.split('@')[0]} | ${userRole || 'user'}`}
                   sx={{ width: '100%', justifyContent: 'flex-start', py: 1 }}
+                  component={Link}
+                  to='/login'
+                  clickable
                 />
               </Box>
 
