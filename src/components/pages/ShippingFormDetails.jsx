@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -12,6 +13,8 @@ import {
   Avatar,
   IconButton,
   Tooltip,
+  Link as MuiLink,
+  Button,
 } from '@mui/material';
 import {
   LocalShipping,
@@ -29,7 +32,7 @@ import {
   Cancel,
   Money,
 } from '@mui/icons-material';
-
+import { Link } from 'react-router-dom';
 import * as stringUtils from '../../utils/stringOperations.js';
 
 import { FaTemperatureLow as Temperature } from 'react-icons/fa';
@@ -39,14 +42,18 @@ import { RxDimensions } from 'react-icons/rx';
 import { LiaShippingFastSolid, LiaFileSignatureSolid } from 'react-icons/lia';
 
 export default function ShippingFormDetails({ form }) {
+  const navigateTo = useNavigate();
   if (!form) return null;
-
   const primaryColor = '#003D2C';
   const secondaryColor = '#ffc928';
   const primaryLight = '#1B5E4F';
   const primaryDark = '#001A14';
   const secondaryLight = '#FFE082';
   const secondaryDark = '#FF8F00';
+
+  const handleEdit = () => {
+    navigateTo('/edit-shipping-form', { state: form });
+  };
 
   return (
     <Card
@@ -95,9 +102,16 @@ export default function ShippingFormDetails({ form }) {
                 <LocalShipping sx={{ fontSize: 20 }} />
               </Avatar>
               {form.canEdit && (
-                <Typography variant='h6' fontWeight='bold'>
-                  EDIT FORM
-                </Typography>
+                <Button
+                  sx={{
+                    background: '#ffc928',
+                    color: '#003D2C',
+                    '&:hover': { background: '#ffffff', color: '#003D2C' },
+                  }}
+                  onClick={handleEdit}
+                >
+                  Edit Form
+                </Button>
               )}
 
               <Box sx={{ flex: 1 }}>

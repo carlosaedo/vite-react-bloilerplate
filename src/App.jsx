@@ -23,6 +23,8 @@ import Tracking from './components/pages/Tracking';
 import TestType00 from './components/pages/TestType-00';
 import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
 
+import EditShippingFormSinglePage from './components/pages/EditShippingFormSinglePage';
+
 import ShippingForm from './components/pages/ShippingFormParent';
 import ShippingForms from './components/pages/ShippingForms';
 
@@ -74,7 +76,9 @@ const App = () => {
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/client-new' element={<ClientNew />} />
                 </Route>
-
+                <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                  <Route path='/edit-shipping-form' element={<EditShippingFormSinglePage />} />
+                </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route
                     path='/shipping-form'
