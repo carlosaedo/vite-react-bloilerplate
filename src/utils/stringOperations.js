@@ -14,9 +14,12 @@ function toSpacedTitleCase(str) {
 
 function toSpacedCapitalized(str) {
   if (!str) return '';
+
   return str
-    .replace(/([A-Z])/g, ' $1') // Add space before each uppercase letter
-    .replace(/^./, (char) => char.toUpperCase()); // Capitalize the first character
+    .replace(/_/g, ' ') // Convert underscores to spaces
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space between camelCase
+    .toLowerCase() // Convert all to lowercase first
+    .replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize first letter of each word
 }
 
 function toCamelCase(str) {

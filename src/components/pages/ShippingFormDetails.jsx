@@ -27,9 +27,16 @@ import {
   Warning,
   CheckCircle,
   Cancel,
+  Money,
 } from '@mui/icons-material';
 
+import * as stringUtils from '../../utils/stringOperations.js';
+
 import { FaTemperatureLow as Temperature } from 'react-icons/fa';
+import { FiPackage } from 'react-icons/fi';
+import { RxDimensions } from 'react-icons/rx';
+
+import { LiaShippingFastSolid, LiaFileSignatureSolid } from 'react-icons/lia';
 
 export default function ShippingFormDetails({ form }) {
   if (!form) return null;
@@ -87,6 +94,12 @@ export default function ShippingFormDetails({ form }) {
               <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 40, height: 40 }}>
                 <LocalShipping sx={{ fontSize: 20 }} />
               </Avatar>
+              {form.canEdit && (
+                <Typography variant='h6' fontWeight='bold'>
+                  EDIT FORM
+                </Typography>
+              )}
+
               <Box sx={{ flex: 1 }}>
                 <Typography variant='h6' fontWeight='bold'>
                   {form.trackingNumber}
@@ -162,7 +175,7 @@ export default function ShippingFormDetails({ form }) {
               >
                 <Stack direction='row' alignItems='center' spacing={1.5}>
                   <Avatar sx={{ bgcolor: secondaryColor, width: 32, height: 32 }}>
-                    <Security sx={{ fontSize: 16, color: primaryColor }} />
+                    <Money sx={{ fontSize: 16, color: primaryColor }} />
                   </Avatar>
                   <Box>
                     <Typography variant='body2' color={secondaryDark} fontWeight='600'>
@@ -363,7 +376,7 @@ export default function ShippingFormDetails({ form }) {
                 }}
               >
                 <Typography variant='body2' fontWeight='600' color={secondaryDark} sx={{ mb: 1 }}>
-                  📋 Shipper Instructions
+                  <LiaShippingFastSolid /> Shipper Instructions
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
                   {form.shipperInstructions || 'No instructions'}
@@ -381,7 +394,7 @@ export default function ShippingFormDetails({ form }) {
                 }}
               >
                 <Typography variant='body2' fontWeight='600' color={primaryColor} sx={{ mb: 1 }}>
-                  📝 Consignee Instructions
+                  <LiaFileSignatureSolid /> Consignee Instructions
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
                   {form.consigneeInstructions || 'No instructions'}
@@ -442,7 +455,7 @@ export default function ShippingFormDetails({ form }) {
                               color='text.secondary'
                               sx={{ fontFamily: 'monospace' }}
                             >
-                              {pkg.sscc}
+                              SSCC: {pkg.sscc}
                             </Typography>
                           </Box>
                         </Stack>
@@ -451,7 +464,7 @@ export default function ShippingFormDetails({ form }) {
                       <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
                         <Box sx={{ bgcolor: `${primaryColor}05`, borderRadius: 1, p: 1 }}>
                           <Typography variant='caption' color={primaryColor} fontWeight='600'>
-                            📏 Dimensions
+                            <RxDimensions /> Dimensions
                           </Typography>
                           <Typography variant='caption' display='block'>
                             {pkg.packageWeight}kg • {pkg.packageLength}×{pkg.packageWidth}×
@@ -466,7 +479,7 @@ export default function ShippingFormDetails({ form }) {
                       <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
                         <Box sx={{ bgcolor: `${secondaryColor}05`, borderRadius: 1, p: 1 }}>
                           <Typography variant='caption' color={secondaryDark} fontWeight='600'>
-                            ⚙️ Properties
+                            Properties
                           </Typography>
                           <Stack direction='row' spacing={0.5} sx={{ mt: 0.5 }}>
                             <Chip
@@ -497,7 +510,8 @@ export default function ShippingFormDetails({ form }) {
                             <strong>Marks:</strong> {pkg.marksAndNumbers}
                           </Typography>
                           <Typography variant='caption' color='text.secondary' display='block'>
-                            <strong>Goods:</strong> {pkg.typeOfGoods}
+                            <strong>Goods:</strong>{' '}
+                            {stringUtils.toSpacedCapitalized(pkg.typeOfGoods)}
                           </Typography>
                           <Typography
                             variant='caption'
@@ -526,7 +540,7 @@ export default function ShippingFormDetails({ form }) {
               }}
             >
               <Typography variant='body2' color='text.secondary'>
-                📦 No packages provided
+                <FiPackage /> No packages provided
               </Typography>
             </Paper>
           )}
