@@ -426,20 +426,60 @@ const ShippingForms = () => {
                             width: '100%',
                           }}
                         >
-                          <Typography variant='body2'>
-                            <FiPackage /> Packages: 3
+                          <Typography
+                            sx={{
+                              background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                              backgroundClip: 'text',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }}
+                            variant='body2'
+                          >
+                            <FiPackage color='#003D2C' /> Packages: 3
                           </Typography>
-                          <Typography variant='body2'>
-                            <TbPackages /> Volumes: 2
+                          <Typography
+                            sx={{
+                              background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                              backgroundClip: 'text',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }}
+                            variant='body2'
+                          >
+                            <TbPackages color='#003D2C' /> Volumes: 2
                           </Typography>
-                          <Typography variant='body2'>
-                            <LuWeight /> Weight: 356Kg
+                          <Typography
+                            sx={{
+                              background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                              backgroundClip: 'text',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }}
+                            variant='body2'
+                          >
+                            <LuWeight color='#003D2C' /> Weight: 356Kg
                           </Typography>
-                          <Typography variant='body2'>
-                            <TbPackageExport /> CBM: 6453
+                          <Typography
+                            sx={{
+                              background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                              backgroundClip: 'text',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }}
+                            variant='body2'
+                          >
+                            <TbPackageExport color='#003D2C' /> CBM: 6453
                           </Typography>
-                          <Typography variant='body2'>
-                            <GiReceiveMoney /> Taxable Weight: 6445
+                          <Typography
+                            sx={{
+                              background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                              backgroundClip: 'text',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }}
+                            variant='body2'
+                          >
+                            <GiReceiveMoney color='#003D2C' /> Taxable Weight: 6445
                           </Typography>
                         </Stack>
                       </Box>
