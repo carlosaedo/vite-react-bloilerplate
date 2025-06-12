@@ -1,21 +1,10 @@
 import React, { useState } from 'react';
 import torrestirApi from '../api/torrestirApi';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  InputAdornment,
-  IconButton,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  Link as MuiLink,
-} from '@mui/material';
+import { Box, TextField, Button, Typography, Link as MuiLink } from '@mui/material';
 
-import FlorkHide from '../../assets/flork-114-png.png';
-import FlorkYay from '../../assets/yay-flork.png';
+import Message from '../messages/Message';
+import ErrorMessage from '../messages/ErrorMessage';
 
 const CreateAccount = () => {
   const navigateTo = useNavigate();
@@ -86,35 +75,8 @@ const CreateAccount = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
-          {errorMessage && (
-            <Typography
-              color='error'
-              variant='body2'
-              sx={{
-                backgroundColor: '#ffebee',
-                padding: 1,
-                borderRadius: 1,
-                border: '1px solid #ffcdd2',
-              }}
-            >
-              {errorMessage}
-            </Typography>
-          )}
-
-          {message && (
-            <Typography
-              variant='body2'
-              sx={{
-                backgroundColor: '#e8f5e8',
-                padding: 1,
-                borderRadius: 1,
-                border: '1px solid #c8e6c9',
-                color: '#2e7d32',
-              }}
-            >
-              {message}
-            </Typography>
-          )}
+          <ErrorMessage errorMessage={errorMessage} />
+          <Message message={message} />
 
           <TextField
             label='Token'

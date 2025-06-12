@@ -5,6 +5,9 @@ import { Box, Typography, Button, Stack, Link as MuiLink, TextField } from '@mui
 
 import { useAuth } from '../context/AuthContext';
 
+import Message from '../messages/Message';
+import ErrorMessage from '../messages/ErrorMessage';
+
 const Login2FA = () => {
   const navigateTo = useNavigate();
   const { userEmail } = useParams();
@@ -194,35 +197,8 @@ const Login2FA = () => {
           onSubmit={handleSubmit}
           sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
         >
-          {errorMessage && (
-            <Typography
-              color='error'
-              variant='body2'
-              sx={{
-                backgroundColor: '#ffebee',
-                padding: 1,
-                borderRadius: 1,
-                border: '1px solid #ffcdd2',
-              }}
-            >
-              {errorMessage}
-            </Typography>
-          )}
-
-          {message && (
-            <Typography
-              variant='body2'
-              sx={{
-                backgroundColor: '#e8f5e8',
-                padding: 1,
-                borderRadius: 1,
-                border: '1px solid #c8e6c9',
-                color: '#2e7d32',
-              }}
-            >
-              {message}
-            </Typography>
-          )}
+          <ErrorMessage errorMessage={errorMessage} />
+          <Message message={message} />
 
           {/* 6-digit code input */}
           <Box

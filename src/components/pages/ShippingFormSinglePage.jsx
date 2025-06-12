@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-import api from '../api/api';
 import torrestirApi from '../api/torrestirApi';
 import { useShippingFormContext } from '../context/ShippingFormContext';
 import * as stringUtils from '../../utils/stringOperations.js';
@@ -36,15 +35,12 @@ import {
   Stack,
   useMediaQuery,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  Autocomplete,
-  InputAdornment,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from '@mui/material';
+
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
 import { FaUserTie } from 'react-icons/fa';
@@ -60,6 +56,9 @@ import {
   ArrowDropUp as ArrowDropUpIcon,
 } from '@mui/icons-material';
 import EntitySelector from '../entityComponent/EntitySelector';
+
+import Message from '../messages/Message';
+import ErrorMessage from '../messages/ErrorMessage';
 
 const shippingServices = [
   { value: 'standard', label: 'Standard' },
@@ -598,6 +597,18 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       ...shippingFormData,
       packages: [...shippingFormData.packages, newPackage],
     };
+
+    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+      calculateShippingFormTotals([...shippingFormData.packages, newPackage]);
+
+    setInfoValues({
+      totalQuantity,
+      totalWeight,
+      totalCBM,
+      totalLDM,
+      totalTaxableWeight,
+      quantityByType,
+    });
 
     setShippingFormData(updatedFormData);
     setSelectedPackageIndex(updatedFormData.packages.length - 1);
@@ -3611,34 +3622,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 </MenuItem>
               ))}
             </Select>
-            {errorMessage && (
-              <Typography
-                color='error'
-                variant='body2'
-                sx={{
-                  backgroundColor: '#ffebee',
-                  padding: 1,
-                  borderRadius: 1,
-                  border: '1px solid #ffcdd2',
-                }}
-              >
-                {errorMessage}
-              </Typography>
-            )}
-            {message && (
-              <Typography
-                variant='body2'
-                sx={{
-                  backgroundColor: '#e8f5e8',
-                  padding: 1,
-                  borderRadius: 1,
-                  border: '1px solid #c8e6c9',
-                  color: '#2e7d32',
-                }}
-              >
-                {message}
-              </Typography>
-            )}
+            <ErrorMessage errorMessage={errorMessage} />
+            <Message message={message} />
             <Button onClick={resetForm} variant='outlined' color='primary'>
               Reset Form
             </Button>
