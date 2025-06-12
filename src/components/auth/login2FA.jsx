@@ -34,8 +34,8 @@ const Login2FA = () => {
       });
       if (response?.data?.token) {
         login(response?.data?.token);
+        setMessage('Código 2FA aceite. A redirecionar...');
         setTimeout(() => {
-          setMessage('Código 2FA aceite. A redirecionar...');
           navigateTo('/');
         }, 1000);
       } else {
