@@ -11,6 +11,9 @@ import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals
 
 import { sanitizeDecimalInput, sanitizeDecimalInputTemp } from '../../utils/sanitizeDecimalInput';
 import { useAuth } from '../context/AuthContext';
+
+import TruckLoader from '../truckLoader/truckLoader';
+
 import {
   Grid,
   Box,
@@ -827,7 +830,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const handleChangeFormTypeToParent = () => {
     handleChangeFormType(false);
   };
-  if (loadingShippingForm) return <CircularProgress sx={{ marginTop: 4 }} />;
+  if (loadingShippingForm) return <TruckLoader sx={{ marginTop: 4 }} />;
   //
 
   if (errorClient) return <Alert severity='error'>{errorClient}</Alert>;

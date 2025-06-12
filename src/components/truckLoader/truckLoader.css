@@ -1,0 +1,73 @@
+.truck-loader {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 150px;
+  overflow: hidden;
+}
+
+/* Truck image movement */
+.truck-loader img {
+  animation: truckDrive 1.5s infinite ease-in-out;
+  height: 48px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Road lines container */
+.road {
+  position: absolute;
+  bottom: 0;
+  width: 300px;
+  height: 20px;
+  background-color: #333;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Moving stripes on the road */
+.road::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    #ffffff,
+    #ffffff 20px,
+    transparent 20px,
+    transparent 40px
+  );
+  animation: roadMove 2s linear infinite;
+  transform: translateY(-50%);
+}
+
+@keyframes truckDrive {
+  0% {
+    transform: translateX(-1px) translateY(0);
+  }
+  25% {
+    transform: translateX(0px) translateY(-1px);
+  }
+  50% {
+    transform: translateX(2px) translateY(0);
+  }
+  75% {
+    transform: translateX(0px) translateY(1px);
+  }
+  100% {
+    transform: translateX(-2px) translateY(0);
+  }
+}
+
+@keyframes roadMove {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: -50%;
+  }
+}

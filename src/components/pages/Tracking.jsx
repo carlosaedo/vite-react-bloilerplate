@@ -18,7 +18,7 @@ import {
   FaMinus,
   FaExclamationTriangle,
 } from 'react-icons/fa'; // Example for the small box icon
-
+import TruckLoader from '../truckLoader/truckLoader';
 import { useTranslation } from 'react-i18next';
 
 const TTL = 10 * 60 * 1000; // 10 minutes in ms
@@ -128,7 +128,7 @@ const Tracking = () => {
     }
   }, [trackingNumber]);
 
-  if (!data) return <CircularProgress sx={{ marginTop: 4 }} />;
+  if (!data) return <TruckLoader sx={{ marginTop: 4 }} />;
 
   const {
     currentStage,
