@@ -15,6 +15,7 @@ import {
   Chip,
   Avatar,
   Button,
+  Tooltip,
 } from '@mui/material';
 import { FaRegUser, FaMapMarkerAlt, FaMoneyCheckAlt } from 'react-icons/fa';
 import {
@@ -24,6 +25,12 @@ import {
   MdShield,
   MdPayment,
 } from 'react-icons/md';
+import { CgArrowsShrinkV } from 'react-icons/cg';
+import { FiPackage } from 'react-icons/fi';
+import { TbPackages, TbPackageExport } from 'react-icons/tb';
+import { LuWeight } from 'react-icons/lu';
+import { GiReceiveMoney } from 'react-icons/gi';
+
 import { useAuth } from '../context/AuthContext';
 
 // Mock data
@@ -320,27 +327,41 @@ const ShippingForms = () => {
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 3,
+                        gap: { xs: 2, sm: 3 },
                         flex: '2 1 auto',
                         minWidth: 0,
+                        flexWrap: { xs: 'wrap', sm: 'nowrap' },
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                      {/* Shipper */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          minWidth: 0,
+                          flexShrink: 1,
+                          flexBasis: { xs: '100%', sm: 'auto' },
+                        }}
+                      >
                         <FaRegUser color='#ffc928' />
-                        <Typography
-                          variant='body2'
-                          sx={{
-                            color: 'rgb(65, 87, 81)',
-                            fontWeight: 500,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
-                        >
-                          {form.shipperName} ({form.shipperCity})
-                        </Typography>
+                        <Tooltip title={form.shipperName + ', ' + form.shipperCity} arrow>
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              color: 'rgb(65, 87, 81)',
+                              fontWeight: 500,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {form.shipperName} ({form.shipperCity})
+                          </Typography>{' '}
+                        </Tooltip>
                       </Box>
 
+                      {/* Arrow */}
                       <Box
                         sx={{
                           color: '#003D2C',
@@ -355,20 +376,72 @@ const ShippingForms = () => {
                         →
                       </Box>
 
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                      {/* Consignee */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          minWidth: 0,
+                          flexShrink: 1,
+                          flexBasis: { xs: '100%', sm: 'auto' },
+                        }}
+                      >
                         <FaRegUser color='#003D2C' />
-                        <Typography
-                          variant='body2'
+                        <Tooltip title={form.consigneeName + ', ' + form.consigneeCity} arrow>
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              color: 'rgb(65, 87, 81)',
+                              fontWeight: 500,
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {form.consigneeName} ({form.consigneeCity})
+                          </Typography>
+                        </Tooltip>
+                      </Box>
+
+                      {/* Cargo Details */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          minWidth: 0,
+                          flexGrow: 1,
+                          flexBasis: { xs: '100%', sm: 'auto' },
+                        }}
+                      >
+                        <Stack
+                          direction={{ xs: 'column', sm: 'row' }}
+                          spacing={{ xs: 0.5, sm: 1 }}
+                          useFlexGap
+                          flexWrap='wrap'
                           sx={{
                             color: 'rgb(65, 87, 81)',
                             fontWeight: 500,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                            width: '100%',
                           }}
                         >
-                          {form.consigneeName} ({form.consigneeCity})
-                        </Typography>
+                          <Typography variant='body2'>
+                            <FiPackage /> Packages: 3
+                          </Typography>
+                          <Typography variant='body2'>
+                            <TbPackages /> Volumes: 2
+                          </Typography>
+                          <Typography variant='body2'>
+                            <LuWeight /> Weight: 356Kg
+                          </Typography>
+                          <Typography variant='body2'>
+                            <TbPackageExport /> CBM: 6453
+                          </Typography>
+                          <Typography variant='body2'>
+                            <GiReceiveMoney /> Taxable Weight: 6445
+                          </Typography>
+                        </Stack>
                       </Box>
                     </Box>
 
