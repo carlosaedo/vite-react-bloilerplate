@@ -51,9 +51,16 @@ export default function ShippingFormDetails({ form }) {
 
   const [formData, setFormData] = useState(form);
 
+  // Only update if form actually changed
+  useEffect(() => {
+    if (form) {
+      setFormData(form);
+    }
+  }, [form]);
+
   useEffect(() => {
     const fetchLabels = async () => {
-      if (!form?.packages?.length) return;
+      if (!formData?.packages?.length) return;
 
       try {
         const updatedPackages = await Promise.all(
@@ -61,8 +68,8 @@ export default function ShippingFormDetails({ form }) {
             console.log(pkg);
             try {
               const response = await torrestirApi.post('/api/BookingLabel/generate', {
-                ClientId: form?.clientId,
-                TrackingId: form?.trackingNumber,
+                ClientId: formData?.clientId,
+                TrackingId: formData?.trackingNumber,
                 Sscc: pkg?.sscc,
                 Format: 'png',
               });
@@ -88,7 +95,7 @@ export default function ShippingFormDetails({ form }) {
     };
 
     fetchLabels();
-  }, [form]);
+  }, [formData?.clientId, formData?.trackingNumber]); // Only depend on the unique identifiers
 
   const primaryColor = '#003D2C';
   const secondaryColor = '#ffc928';
