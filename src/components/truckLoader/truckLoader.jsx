@@ -1,6 +1,6 @@
 import React from 'react';
 import './truckLoader.css';
-import Truck from '../../assets/torrestir_loadingTruck.png';
+import Truck from '../../assets/torrestir_loadingTruck_optimized.png';
 
 const TruckLoader = () => {
   return (
