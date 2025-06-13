@@ -11,7 +11,7 @@ import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals
 import { useLocation, useNavigate } from 'react-router-dom';
 import { sanitizeDecimalInput, sanitizeDecimalInputTemp } from '../../utils/sanitizeDecimalInput';
 import { useAuth } from '../context/AuthContext';
-
+import isEqual from 'lodash/isEqual';
 import TruckLoader from '../truckLoader/truckLoader';
 
 import {
@@ -130,8 +130,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const navigateTo = useNavigate();
   const externalFormData = location?.state?.form;
 
-  console.log('hum: ', location?.state?.form);
-
   const [errorMessage, setErrorMessage] = useState(null);
   const [errorClient, setErrorClient] = useState(null);
 
@@ -153,7 +151,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const context = useShippingFormContext();
 
   const [localShippingFormData, setLocalShippingFormData] = useState(externalFormData);
-
   const shippingFormData = isExternal ? localShippingFormData : context.shippingFormData;
   const setShippingFormData = isExternal ? setLocalShippingFormData : context.setShippingFormData;
   const resetShippingFormData = isExternal ? () => {} : context.resetShippingFormData;
@@ -850,7 +847,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       date: today,
       year: year,
       waybillNumber: waybillRandom,
-      hour: time,
+      hour: shippingFormData.hour || time,
     };
 
     setShippingFormData(updatedData);
@@ -1034,7 +1031,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='Date'
                 name='date'
                 type='date'
-                value={shippingFormData.date}
+                value={shippingFormData.date || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -1048,7 +1045,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='Delivery Date'
                 name='deliveryDate'
                 type='date'
-                value={shippingFormData.deliveryDate}
+                value={shippingFormData.deliveryDate || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -1077,7 +1074,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='Shipper Reference'
                 name='shipperRef'
                 type='text'
-                value={shippingFormData.shipperRef}
+                value={shippingFormData.shipperRef || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -1090,7 +1087,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='Consignee Reference'
                 name='consigneeRef'
                 type='text'
-                value={shippingFormData.consigneeRef}
+                value={shippingFormData.consigneeRef || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -2244,7 +2241,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               label='Shipper Instructions'
               name='shipperInstructions'
               type='text'
-              value={shippingFormData.shipperInstructions}
+              value={shippingFormData.shipperInstructions || ''}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -2264,7 +2261,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               label='Consignee Instructions'
               name='consigneeInstructions'
               type='text'
-              value={shippingFormData.consigneeInstructions}
+              value={shippingFormData.consigneeInstructions || ''}
               onChange={handleChange}
               fullWidth
               size='small'
@@ -2283,7 +2280,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 select
                 label='Shipping Payment'
                 name='shippingPayment'
-                value={shippingFormData.shippingPayment}
+                value={shippingFormData.shippingPayment || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -2302,7 +2299,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 select
                 label='Payment'
                 name='shippingPaymentTo'
-                value={shippingFormData.shippingPaymentTo}
+                value={shippingFormData.shippingPaymentTo || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -2321,7 +2318,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='VAT Shipper'
                 name='senderTaxId'
                 type='text'
-                value={shippingFormData.senderTaxId}
+                value={shippingFormData.senderTaxId || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -2335,7 +2332,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='VAT Consignee'
                 name='recipientTaxId'
                 type='text'
-                value={shippingFormData.recipientTaxId}
+                value={shippingFormData.recipientTaxId || ''}
                 onChange={handleChange}
                 fullWidth
                 size='small'
@@ -2997,7 +2994,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Marks and Numbers'
                     name={`marksAndNumbers_${selectedPackageIndex}`}
                     type='text'
-                    value={shippingFormData.packages[selectedPackageIndex]?.marksAndNumbers}
+                    value={shippingFormData.packages[selectedPackageIndex]?.marksAndNumbers || ''}
                     onChange={(e) =>
                       handlePackageChange(selectedPackageIndex, 'marksAndNumbers', e.target.value)
                     }
@@ -3011,7 +3008,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Quantity'
                     name={`packageQuantity_${selectedPackageIndex}`}
                     type='number'
-                    value={shippingFormData.packages[selectedPackageIndex]?.packageQuantity}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageQuantity || ''}
                     onChange={(e) =>
                       handlePackageChange(selectedPackageIndex, 'packageQuantity', e.target.value)
                     }
@@ -3027,7 +3024,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     select
                     label='Package Type'
                     name={`packageType_${selectedPackageIndex}`}
-                    value={shippingFormData.packages[selectedPackageIndex]?.packageType}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageType || ''}
                     onChange={(e) =>
                       handlePackageChange(selectedPackageIndex, 'packageType', e.target.value)
                     }
@@ -3070,7 +3067,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   <TextField
                     label='Weight (kg)'
                     name={`packageWeight_${selectedPackageIndex}`}
-                    value={shippingFormData.packages[selectedPackageIndex]?.packageWeight}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageWeight || ''}
                     onChange={(e) =>
                       handlePackageChange(selectedPackageIndex, 'packageWeight', e.target.value)
                     }
@@ -3108,7 +3105,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TextField
                       label='CBM'
                       name={`CBM_${selectedPackageIndex}`}
-                      value={shippingFormData.packages[selectedPackageIndex]?.CBM}
+                      value={shippingFormData.packages[selectedPackageIndex]?.CBM || ''}
                       onChange={(e) => {
                         handlePackageChange(selectedPackageIndex, 'CBM', e.target.value);
                       }}
@@ -3129,7 +3126,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TextField
                       label='LDM'
                       name={`LDM_${selectedPackageIndex}`}
-                      value={shippingFormData.packages[selectedPackageIndex]?.LDM}
+                      value={shippingFormData.packages[selectedPackageIndex]?.LDM || ''}
                       onChange={(e) => {
                         handlePackageChange(selectedPackageIndex, 'LDM', e.target.value);
                       }}
@@ -3180,7 +3177,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             variant='body2'
                             sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}
                           >
-                            {shippingFormData.packages[selectedPackageIndex]?.CBM}
+                            {shippingFormData.packages[selectedPackageIndex]?.CBM || ''}
                           </Typography>
                         </Box>
                       </Box>
@@ -3219,7 +3216,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   <TextField
                     label='Note'
                     name={`packageDescription_${selectedPackageIndex}`}
-                    value={shippingFormData.packages[selectedPackageIndex]?.packageNote}
+                    value={shippingFormData.packages[selectedPackageIndex]?.packageNote || ''}
                     onChange={(e) =>
                       handlePackageChange(selectedPackageIndex, 'packageNote', e.target.value)
                     }
@@ -3276,7 +3273,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TextField
                       label='Value of Goods (€)'
                       name={`packageValue_${selectedPackageIndex}`}
-                      value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods}
+                      value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods || ''}
                       onChange={(e) =>
                         handlePackageChange(selectedPackageIndex, 'valueOfGoods', e.target.value)
                       }
@@ -3320,7 +3317,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           label='MIN'
                           name={`tempControlledMinTemp_${selectedPackageIndex}`}
                           value={
-                            shippingFormData?.packages[selectedPackageIndex]?.tempControlledMinTemp
+                            shippingFormData?.packages[selectedPackageIndex]
+                              ?.tempControlledMinTemp || ''
                           }
                           onChange={(e) =>
                             handlePackageChange(
@@ -3346,7 +3344,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           label='MAX'
                           name={`tempControlledMaxTemp_${selectedPackageIndex}`}
                           value={
-                            shippingFormData?.packages[selectedPackageIndex]?.tempControlledMaxTemp
+                            shippingFormData?.packages[selectedPackageIndex]
+                              ?.tempControlledMaxTemp || ''
                           }
                           onChange={(e) =>
                             handlePackageChange(
@@ -3373,7 +3372,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   label='SSCC'
                   name='sscc'
                   type='text'
-                  value={shippingFormData.packages[selectedPackageIndex]?.sscc}
+                  value={shippingFormData.packages[selectedPackageIndex]?.sscc || ''}
                   fullWidth
                   size='small'
                   margin='dense'
@@ -3408,7 +3407,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   <TextField
                     label='Value of Goods (€)'
                     name='valueOfGoods'
-                    value={shippingFormData?.valueOfGoods}
+                    value={shippingFormData?.valueOfGoods || ''}
                     onChange={handleChange}
                     fullWidth
                     size='small'
@@ -3422,7 +3421,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     select
                     label='Insured'
                     name={'insuredBy'}
-                    value={shippingFormData.insuredBy}
+                    value={shippingFormData.insuredBy || ''}
                     onChange={handleChange}
                     fullWidth
                     size='small'
@@ -3459,7 +3458,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   select
                   label='Customs clear'
                   name={'customsClearedBy'}
-                  value={shippingFormData.customsClearedBy}
+                  value={shippingFormData.customsClearedBy || ''}
                   onChange={handleChange}
                   fullWidth
                   size='small'
@@ -3658,14 +3657,30 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             </Select>
             <ErrorMessage errorMessage={errorMessage} />
             <Message message={message} />
+            {!isExternal && (
+              <Button onClick={resetForm} variant='outlined' color='primary'>
+                Reset Form
+              </Button>
+            )}
             {isExternal && (
-              <Button variant='contained' color='primary' onClick={() => navigateTo(-1)}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  if (!isEqual(externalFormData, shippingFormData)) {
+                    const confirmed = window.confirm(
+                      'Are you sure you want to leave without saving? Your changes will be lost.',
+                    );
+                    if (!confirmed) return;
+                    navigateTo(-1);
+                  } else {
+                    navigateTo(-1);
+                  }
+                }}
+              >
                 Go Back
               </Button>
             )}
-            <Button onClick={resetForm} variant='outlined' color='primary'>
-              Reset Form
-            </Button>
             <Button variant='contained' color='primary' onClick={handleSubmit}>
               Submit
             </Button>

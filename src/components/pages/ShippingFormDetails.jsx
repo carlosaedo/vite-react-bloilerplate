@@ -105,8 +105,69 @@ export default function ShippingFormDetails({ form }) {
   const secondaryDark = '#FF8F00';
 
   const handleEdit = () => {
-    console.log('form', form);
-    navigateTo('/edit-shipping-form', { state: { form } });
+    const formDataToEditFormPayload = (form) => {
+      return {
+        clientId: form.clientId,
+        trackingRef: form.trackingNumber,
+        shippingPayment: form.shippingPayment,
+        shippingPaymentTo: form.shippingPaymentTo,
+        deliveryDate: form.deliveryDate,
+        hour: form.deliveryDateHour,
+        shipperRef: form.shipperReference,
+        consigneeRef: form.consigneeReference,
+
+        senderId: form.shipperId,
+        senderName: form.shipperName,
+        senderEmail: form.shipperEmail,
+        senderPhone: form.shipperPhone,
+        senderStreet: form.shipperStreet,
+        senderStreet2: form.shipperSAdd2,
+        senderCity: form.shipperCity,
+        senderZip: form.shipperZip,
+        senderCountry: form.shipperCountry,
+        senderVAT: form.shipperTaxId,
+
+        recipientId: form.consigneeId,
+        recipientName: form.consigneeName,
+        recipientEmail: form.consigneeEmail,
+        recipientPhone: form.consigneePhone,
+        recipientStreet: form.consigneeAdd,
+        recipientStreet2: form.consigneeAdd2,
+        recipientCity: form.consigneeCity,
+        recipientZip: form.consigneeZip,
+        recipientCountry: form.consigneeCountry,
+        recipientVAT: form.consigneeTaxId,
+
+        packages: form.packages.map((pkg) => ({
+          packageQuantity: pkg.packageQuantity,
+          packageWeight: pkg.packageWeight,
+          packageLength: pkg.packageLength,
+          packageWidth: pkg.packageWidth,
+          packageHeight: pkg.packageHeight,
+          packageNote: pkg.packageNote,
+          packageType: pkg.packageType,
+          sscc: pkg.sscc,
+          CBM: pkg.cbm,
+          LDM: pkg.ldm,
+          TaxableWeight: pkg.taxableWeight,
+          stackable: pkg.stackable,
+          dangerousGoods: pkg.dangerousGoods,
+          marksAndNumbers: pkg.marksAndNumbers,
+          typeOfGoods: pkg.typeOfGoods,
+          tempControlled: pkg.tempControlled,
+          tempControlledMinTemp: pkg.tempControlledMinTemp,
+          tempControlledMaxTemp: pkg.tempControlledMaxTemp,
+        })),
+
+        valueOfGoods: form.valueOfGoods,
+        insured: form.insured,
+        customs: form.customs,
+        shippingService: form.shippingService,
+        shipperInstructions: form.shipperInstructions,
+        consigneeInstructions: form.consigneeInstructions,
+      };
+    };
+    navigateTo('/edit-shipping-form', { state: { form: formDataToEditFormPayload(form) } });
   };
 
   if (!form) return null;
