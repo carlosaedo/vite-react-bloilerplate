@@ -24,6 +24,19 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          // default state
+          color: '#003d2c',
+
+          // hover state
+          '&:hover': {
+            backgroundColor: '#ffc928',
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {

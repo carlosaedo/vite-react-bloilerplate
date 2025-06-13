@@ -28,8 +28,8 @@ export default function RotatedImage({ base64, zpl, label = 'Label' }) {
 
     img.onload = () => {
       // Set canvas size for rotated image (swap width/height)
-      canvas.width = img.height;
-      canvas.height = img.width;
+      canvas.width = img.width;
+      canvas.height = img.height;
 
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
