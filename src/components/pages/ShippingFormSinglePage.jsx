@@ -2978,6 +2978,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <IconButton
                       onClick={() => removePackage(selectedPackageIndex)}
                       color='error'
+                      sx={{ color: '#c72835' }}
                       size='small'
                     >
                       <DeleteIcon />
