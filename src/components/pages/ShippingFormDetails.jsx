@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -35,15 +35,61 @@ import {
 import { Link } from 'react-router-dom';
 import * as stringUtils from '../../utils/stringOperations.js';
 
+import { useAuth } from '../context/AuthContext';
+import torrestirApi from '../api/torrestirApi';
+
 import { FaTemperatureLow as Temperature } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
 import { RxDimensions } from 'react-icons/rx';
 
 import { LiaShippingFastSolid, LiaFileSignatureSolid } from 'react-icons/lia';
 
+import Base64Img from '../base64Img/Base64Img';
+
 export default function ShippingFormDetails({ form }) {
   const navigateTo = useNavigate();
-  if (!form) return null;
+
+  const [formData, setFormData] = useState(form);
+
+  useEffect(() => {
+    const fetchLabels = async () => {
+      if (!form?.packages?.length) return;
+
+      try {
+        const updatedPackages = await Promise.all(
+          formData.packages.map(async (pkg) => {
+            console.log(pkg);
+            try {
+              const response = await torrestirApi.post('/api/BookingLabel/generate', {
+                ClientId: form?.clientId,
+                TrackingId: form?.trackingNumber,
+                Sscc: pkg?.sscc,
+                Format: 'png',
+              });
+
+              const labelImg = response?.data?.pngBase64;
+
+              console.log('labelImg', labelImg);
+              return { ...pkg, labelImg };
+            } catch (error) {
+              console.error(`Failed to fetch label for ${pkg.sscc}`, error);
+              return { ...pkg, labelImg: null }; // still return the package
+            }
+          }),
+        );
+
+        setFormData((prev) => ({
+          ...prev,
+          packages: updatedPackages,
+        }));
+      } catch (error) {
+        console.error('Error fetching package labels:', error);
+      }
+    };
+
+    fetchLabels();
+  }, [form]);
+
   const primaryColor = '#003D2C';
   const secondaryColor = '#ffc928';
   const primaryLight = '#1B5E4F';
@@ -54,6 +100,8 @@ export default function ShippingFormDetails({ form }) {
   const handleEdit = () => {
     navigateTo('/edit-shipping-form', { state: form });
   };
+
+  if (!form) return null;
 
   return (
     <Card
@@ -101,7 +149,7 @@ export default function ShippingFormDetails({ form }) {
               <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 40, height: 40 }}>
                 <LocalShipping sx={{ fontSize: 20 }} />
               </Avatar>
-              {form.canEdit && (
+              {formData.canEdit && (
                 <Button
                   sx={{
                     background: '#ffc928',
@@ -116,7 +164,7 @@ export default function ShippingFormDetails({ form }) {
 
               <Box sx={{ flex: 1 }}>
                 <Typography variant='h6' fontWeight='bold'>
-                  {form.trackingNumber}
+                  {formData.trackingNumber}
                 </Typography>
                 <Typography variant='caption' sx={{ opacity: 0.9 }}>
                   Tracking Number
@@ -161,7 +209,7 @@ export default function ShippingFormDetails({ form }) {
                       Delivery
                     </Typography>
                     <Typography variant='body2' fontWeight='bold'>
-                      {form.deliveryDate} at {form.deliveryDateHour}
+                      {formData.deliveryDate} at {formData.deliveryDateHour}
                     </Typography>
                   </Box>
                 </Stack>
@@ -196,7 +244,7 @@ export default function ShippingFormDetails({ form }) {
                       Payment
                     </Typography>
                     <Typography variant='body2' fontWeight='bold'>
-                      {form.shippingPayment} → {form.shippingPaymentTo}
+                      {formData.shippingPayment} → {formData.shippingPaymentTo}
                     </Typography>
                   </Box>
                 </Stack>
@@ -229,25 +277,25 @@ export default function ShippingFormDetails({ form }) {
                 </Stack>
                 <Stack spacing={1}>
                   <Typography variant='body2' fontWeight='600'>
-                    {form.shipperName}
+                    {formData.shipperName}
                   </Typography>
                   <Stack direction='row' alignItems='center' spacing={1}>
                     <Email sx={{ fontSize: 12, color: 'text.secondary' }} />
-                    <Typography variant='caption'>{form.shipperEmail}</Typography>
+                    <Typography variant='caption'>{formData.shipperEmail}</Typography>
                     <Phone sx={{ fontSize: 12, color: 'text.secondary', ml: 1 }} />
-                    <Typography variant='caption'>{form.shipperPhone}</Typography>
+                    <Typography variant='caption'>{formData.shipperPhone}</Typography>
                   </Stack>
                   <Typography variant='caption' color='text.secondary'>
-                    {form.shipperAdd1}
-                    {form.shipperAdd2 ? `, ${form.shipperAdd2}` : ''}, {form.shipperCity},{' '}
-                    {form.shipperZip}, {form.shipperCountry}
+                    {formData.shipperAdd1}
+                    {formData.shipperAdd2 ? `, ${formData.shipperAdd2}` : ''},{' '}
+                    {formData.shipperCity}, {formData.shipperZip}, {formData.shipperCountry}
                   </Typography>
                   <Typography
                     variant='caption'
                     color={secondaryDark}
                     sx={{ bgcolor: `${secondaryColor}15`, p: 0.5, borderRadius: 1 }}
                   >
-                    VAT: {form.shipperVAT} • REF: {form.shipperReference}
+                    VAT: {formData.shipperVAT} • REF: {formData.shipperReference}
                   </Typography>
                 </Stack>
               </Paper>
@@ -273,25 +321,25 @@ export default function ShippingFormDetails({ form }) {
                 </Stack>
                 <Stack spacing={1}>
                   <Typography variant='body2' fontWeight='600'>
-                    {form.consigneeName}
+                    {formData.consigneeName}
                   </Typography>
                   <Stack direction='row' alignItems='center' spacing={1}>
                     <Email sx={{ fontSize: 12, color: 'text.secondary' }} />
-                    <Typography variant='caption'>{form.consigneeEmail}</Typography>
+                    <Typography variant='caption'>{formData.consigneeEmail}</Typography>
                     <Phone sx={{ fontSize: 12, color: 'text.secondary', ml: 1 }} />
-                    <Typography variant='caption'>{form.consigneePhone}</Typography>
+                    <Typography variant='caption'>{formData.consigneePhone}</Typography>
                   </Stack>
                   <Typography variant='caption' color='text.secondary'>
-                    {form.consigneeAdd1}
-                    {form.consigneeAdd2 ? `, ${form.consigneeAdd2}` : ''}, {form.consigneeCity},{' '}
-                    {form.consigneeZip}, {form.consigneeCountry}
+                    {formData.consigneeAdd1}
+                    {formData.consigneeAdd2 ? `, ${formData.consigneeAdd2}` : ''},{' '}
+                    {formData.consigneeCity}, {formData.consigneeZip}, {formData.consigneeCountry}
                   </Typography>
                   <Typography
                     variant='caption'
                     color={primaryColor}
                     sx={{ bgcolor: `${primaryColor}15`, p: 0.5, borderRadius: 1 }}
                   >
-                    VAT: {form.consigneeVAT} • REF: {form.consigneeReference}
+                    VAT: {formData.consigneeVAT} • REF: {formData.consigneeReference}
                   </Typography>
                 </Stack>
               </Paper>
@@ -312,7 +360,7 @@ export default function ShippingFormDetails({ form }) {
                 }}
               >
                 <Typography variant='h6' fontWeight='bold' color={primaryColor}>
-                  {form.valueOfGoods}€
+                  {formData.valueOfGoods}€
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
                   Value of Goods
@@ -325,8 +373,8 @@ export default function ShippingFormDetails({ form }) {
                 sx={{
                   p: 2,
                   borderRadius: 2,
-                  bgcolor: form.insured ? `${primaryColor}08` : `${secondaryColor}08`,
-                  border: form.insured
+                  bgcolor: formData.insured ? `${primaryColor}08` : `${secondaryColor}08`,
+                  border: formData.insured
                     ? `1px solid ${primaryColor}20`
                     : `1px solid ${secondaryColor}40`,
                   textAlign: 'center',
@@ -334,14 +382,14 @@ export default function ShippingFormDetails({ form }) {
               >
                 <Avatar
                   sx={{
-                    bgcolor: form.insured ? primaryColor : secondaryColor,
+                    bgcolor: formData.insured ? primaryColor : secondaryColor,
                     width: 32,
                     height: 32,
                     mx: 'auto',
                     mb: 1,
                   }}
                 >
-                  {form.insured ? (
+                  {formData.insured ? (
                     <CheckCircle sx={{ fontSize: 16 }} />
                   ) : (
                     <Cancel sx={{ fontSize: 16, color: primaryColor }} />
@@ -350,9 +398,9 @@ export default function ShippingFormDetails({ form }) {
                 <Typography
                   variant='body2'
                   fontWeight='bold'
-                  color={form.insured ? primaryColor : secondaryDark}
+                  color={formData.insured ? primaryColor : secondaryDark}
                 >
-                  {form.insured ? 'Insured' : 'Not Insured'}
+                  {formData.insured ? 'Insured' : 'Not Insured'}
                 </Typography>
               </Paper>
             </Grid>
@@ -368,7 +416,7 @@ export default function ShippingFormDetails({ form }) {
                 }}
               >
                 <Typography variant='body2' fontWeight='bold' color={secondaryDark}>
-                  {form.customs}
+                  {formData.customs}
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
                   Customs
@@ -393,7 +441,7 @@ export default function ShippingFormDetails({ form }) {
                   <LiaShippingFastSolid /> Shipper Instructions
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
-                  {form.shipperInstructions || 'No instructions'}
+                  {formData.shipperInstructions || 'No instructions'}
                 </Typography>
               </Paper>
             </Grid>
@@ -411,7 +459,7 @@ export default function ShippingFormDetails({ form }) {
                   <LiaFileSignatureSolid /> Consignee Instructions
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
-                  {form.consigneeInstructions || 'No instructions'}
+                  {formData.consigneeInstructions || 'No instructions'}
                 </Typography>
               </Paper>
             </Grid>
@@ -420,18 +468,18 @@ export default function ShippingFormDetails({ form }) {
           <Divider sx={{ borderStyle: 'dashed', borderColor: `${primaryColor}20` }} />
 
           {/* Compact Packages */}
-          {form.packages?.length ? (
+          {formData.packages?.length ? (
             <Box>
               <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 2 }}>
                 <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
                   <Inventory sx={{ fontSize: 16 }} />
                 </Avatar>
                 <Typography variant='subtitle1' fontWeight='bold'>
-                  Packages ({form.packages.length})
+                  Packages ({formData.packages.length})
                 </Typography>
               </Stack>
               <Stack spacing={2}>
-                {form.packages.map((pkg, index) => (
+                {formData.packages.map((pkg, index) => (
                   <Paper
                     key={pkg.sscc}
                     elevation={0}
@@ -474,8 +522,11 @@ export default function ShippingFormDetails({ form }) {
                           </Box>
                         </Stack>
                       </Grid>
-
-                      <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
+                        {' '}
+                        <Base64Img base64={pkg.labelImg} />
+                      </Grid>
+                      <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
                         <Box sx={{ bgcolor: `${primaryColor}05`, borderRadius: 1, p: 1 }}>
                           <Typography variant='caption' color={primaryColor} fontWeight='600'>
                             <RxDimensions /> Dimensions
@@ -490,7 +541,7 @@ export default function ShippingFormDetails({ form }) {
                         </Box>
                       </Grid>
 
-                      <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
                         <Box sx={{ bgcolor: `${secondaryColor}05`, borderRadius: 1, p: 1 }}>
                           <Typography variant='caption' color={secondaryDark} fontWeight='600'>
                             Properties

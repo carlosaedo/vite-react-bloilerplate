@@ -5,6 +5,8 @@ import { Box, Typography, Button, Stack, Link as MuiLink, TextField } from '@mui
 
 import { useAuth } from '../context/AuthContext';
 
+import TruckLoader from '../truckLoader/truckLoader';
+
 import Message from '../messages/Message';
 import ErrorMessage from '../messages/ErrorMessage';
 
@@ -181,6 +183,7 @@ const Login2FA = () => {
         >
           Two-Factor Authentication
         </Typography>
+        <TruckLoader />
 
         <Typography
           variant='body1'
