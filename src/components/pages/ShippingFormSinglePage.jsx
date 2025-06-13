@@ -344,10 +344,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   ]);
 
   useEffect(() => {
-    if (!loadingShippingForm && !clientFromStorage?.clientId) {
+    if (!loadingShippingForm && !isExternal && !clientFromStorage?.clientId) {
       setErrorClient('No client selected. Cannot show shipping form. Please select a client.');
     }
-  }, [loadingShippingForm, clientFromStorage?.clientId]);
+  }, [loadingShippingForm, clientFromStorage?.clientId, isExternal]);
 
   const handleChange = (event) => {
     const { name, type, checked } = event.target;
@@ -948,6 +948,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 flexWrap: 'wrap',
               }}
             >
+              {isExternal && 'Editing '}
               Shipping Form
               {shippingFormData.trackingRef ? (
                 <Box
