@@ -102,7 +102,7 @@ const Sidebar = ({ onToggle }) => {
 
   const toggleSidebarMenuItem = () => {
     if (!collapsed) {
-      setCollapsed(true);
+      //setCollapsed(true);
     }
   };
 

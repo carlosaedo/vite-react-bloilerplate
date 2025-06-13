@@ -67,17 +67,27 @@ export default function ShippingFormDetails({ form }) {
           formData.packages.map(async (pkg) => {
             console.log(pkg);
             try {
-              const response = await torrestirApi.post('/api/BookingLabel/generate', {
-                ClientId: formData?.clientId,
-                TrackingId: formData?.trackingNumber,
-                Sscc: pkg?.sscc,
-                Format: 'png',
-              });
+              const [pngResponse, zplResponse] = await Promise.all([
+                torrestirApi.post('/api/BookingLabel/generate', {
+                  ClientId: formData?.clientId,
+                  TrackingId: formData?.trackingNumber,
+                  Sscc: pkg?.sscc,
+                  Format: 'png',
+                }),
+                torrestirApi.post('/api/BookingLabel/generate', {
+                  ClientId: formData?.clientId,
+                  TrackingId: formData?.trackingNumber,
+                  Sscc: pkg?.sscc,
+                  Format: 'zpl',
+                }),
+              ]);
 
-              const labelImg = response?.data?.pngBase64;
+              // Now you can use pngResponse and zplResponse
 
-              console.log('labelImg', labelImg);
-              return { ...pkg, labelImg };
+              const labelImg = pngResponse?.data?.pngBase64;
+              const labelZpl = zplResponse?.data?.zpl;
+
+              return { ...pkg, labelImg, labelZpl };
             } catch (error) {
               console.error(`Failed to fetch label for ${pkg.sscc}`, error);
               return { ...pkg, labelImg: null }; // still return the package
@@ -593,7 +603,7 @@ export default function ShippingFormDetails({ form }) {
                       </Grid>
                       <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
                         {' '}
-                        <Base64Img base64={pkg.labelImg} />
+                        <Base64Img base64={pkg.labelImg} zpl={pkg.labelZpl} label={pkg.sscc} />
                       </Grid>
                       <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
                         <Box sx={{ bgcolor: `${primaryColor}05`, borderRadius: 1, p: 1 }}>

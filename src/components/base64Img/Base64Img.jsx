@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useZebraBrowserPrint from '../hooks/useZebraBrowserPrint';
 import {
   Card,
   CardContent,
@@ -12,8 +13,9 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon, Print as PrintIcon } from '@mui/icons-material';
 
-export default function RotatedImage({ base64, label = 'Label' }) {
+export default function RotatedImage({ base64, zpl, label = 'Label' }) {
   const [open, setOpen] = useState(false);
+  useZebraBrowserPrint();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -35,7 +37,7 @@ export default function RotatedImage({ base64, label = 'Label' }) {
       // Rotate and draw image
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(Math.PI / 2); // 90 degrees
+      //ctx.rotate(Math.PI / 2); // 90 degrees
       ctx.drawImage(img, -img.width / 2, -img.height / 2);
       ctx.restore();
 
@@ -88,6 +90,33 @@ export default function RotatedImage({ base64, label = 'Label' }) {
     img.src = `data:image/png;base64,${base64}`;
   };
 
+  const handlePrintZpl = () => {
+    if (!zpl) return;
+
+    if (window.BrowserPrint) {
+      window.BrowserPrint.getDefaultDevice('printer', function (printer) {
+        if (!printer) {
+          alert('No printer found');
+          return;
+        }
+
+        printer.send(
+          zpl,
+          function () {
+            console.log('Print sent successfully');
+          },
+          function (error) {
+            console.error('Print failed', error);
+          },
+        );
+      });
+    } else {
+      alert(
+        'Zebra Browser Print not available. Is it installed and running? Go to: https://www.zebra.com/us/en/software/printer-software.html',
+      );
+    }
+  };
+
   if (!base64) return null;
 
   return (
@@ -130,8 +159,8 @@ export default function RotatedImage({ base64, label = 'Label' }) {
               src={`data:image/png;base64,${base64}`}
               alt='Thumbnail'
               sx={{
-                transform: 'rotate(90deg)',
-                transformOrigin: 'center center',
+                //transform: 'rotate(90deg)',
+                //transformOrigin: 'center center',
                 height: 60,
                 width: 'auto',
                 maxWidth: 80,
@@ -185,7 +214,10 @@ export default function RotatedImage({ base64, label = 'Label' }) {
               <Typography variant='h6'>{label}</Typography>
               <Box>
                 <IconButton onClick={handlePrint} sx={{ mr: 1 }} color='primary'>
-                  <PrintIcon />
+                  <PrintIcon /> IMG
+                </IconButton>
+                <IconButton onClick={handlePrintZpl} sx={{ mr: 1 }} color='primary'>
+                  <PrintIcon /> ZPL
                 </IconButton>
                 <IconButton onClick={handleClose}>
                   <CloseIcon />
@@ -210,8 +242,8 @@ export default function RotatedImage({ base64, label = 'Label' }) {
                 src={`data:image/png;base64,${base64}`}
                 alt={label}
                 sx={{
-                  transform: 'rotate(90deg)',
-                  transformOrigin: 'center center',
+                  //transform: 'rotate(90deg)',
+                  //transformOrigin: 'center center',
                   maxHeight: 'calc(90vh - 120px)',
                   maxWidth: 'calc(90vw - 40px)',
                   objectFit: 'contain',
