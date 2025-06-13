@@ -227,6 +227,7 @@ const mockShippingForms = [
         tempControlledMaxTemp: '10',
       },
     ],
+    canEdit: true,
   },
   {
     clientId: 'client001',

@@ -77,7 +77,10 @@ const App = () => {
                   <Route path='/client-new' element={<ClientNew />} />
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-                  <Route path='/edit-shipping-form' element={<EditShippingFormSinglePage />} />
+                  <Route
+                    path='/edit-shipping-form'
+                    element={<ShippingForm sidebarWidth={sidebarWidth} />}
+                  />
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route

@@ -105,7 +105,8 @@ export default function ShippingFormDetails({ form }) {
   const secondaryDark = '#FF8F00';
 
   const handleEdit = () => {
-    navigateTo('/edit-shipping-form', { state: form });
+    console.log('form', form);
+    navigateTo('/edit-shipping-form', { state: { form } });
   };
 
   if (!form) return null;

@@ -8,7 +8,7 @@ import {
   calculateShippingFormSizeValuesLDM,
 } from '../../utils/calculateShippingFormSizeShippingForm';
 import calculateShippingFormTotals from '../../utils/calculateShippingFormTotals.js';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 import { sanitizeDecimalInput, sanitizeDecimalInputTemp } from '../../utils/sanitizeDecimalInput';
 import { useAuth } from '../context/AuthContext';
 
@@ -126,20 +126,42 @@ const shippingPaymentTo = [
 ];
 
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
+  const location = useLocation();
+  const navigateTo = useNavigate();
+  const externalFormData = location?.state?.form;
+
+  console.log('hum: ', location?.state?.form);
+
   const [errorMessage, setErrorMessage] = useState(null);
   const [errorClient, setErrorClient] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { token } = useAuth();
-  const {
+
+  /*const {
     shippingFormData,
     setShippingFormData,
     resetShippingFormData,
     trackingNumberShippingForm,
     retryFetchTrackingNumber,
     loadingShippingForm,
-  } = useShippingFormContext();
+  } = useShippingFormContext();*/
+
+  const isExternal = externalFormData !== undefined;
+
+  const context = useShippingFormContext();
+
+  const [localShippingFormData, setLocalShippingFormData] = useState(externalFormData);
+
+  const shippingFormData = isExternal ? localShippingFormData : context.shippingFormData;
+  const setShippingFormData = isExternal ? setLocalShippingFormData : context.setShippingFormData;
+  const resetShippingFormData = isExternal ? () => {} : context.resetShippingFormData;
+  const retryFetchTrackingNumber = isExternal ? () => {} : context.retryFetchTrackingNumber;
+  const trackingNumberShippingForm = isExternal
+    ? externalFormData.trackingNumber
+    : context.trackingNumberShippingForm;
+  const loadingShippingForm = isExternal ? false : context.loadingShippingForm;
   const [message, setMessage] = useState(null);
 
   const [compactShippingInfo, setCompactShippingInfo] = useState(true);
@@ -679,7 +701,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setErrorMessage(null);
     setMessage(null);
     resetShippingFormData();
-    setInfoValues({ totalWeight: 0, totalPackages: 0 });
+    setInfoValues({
+      totalQuantity: 0,
+      totalWeight: 0,
+      totalCBM: 0,
+      totalLDM: 0,
+      totalTaxableWeight: 0,
+      quantityByType: 0,
+    });
   };
 
   const validateFromBeforeSubmit = () => {
@@ -837,18 +866,19 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   return (
     <React.Fragment>
-      {(shippingFormData.trackingRef === null || trackingNumberShippingForm === null) && (
-        <Alert
-          severity='error'
-          action={
-            <Button color='inherit' size='small' onClick={retryFetchTrackingNumber}>
-              Retry Now
-            </Button>
-          }
-        >
-          Cannot get tracking number from the server. Retrying automatically every 10 seconds...
-        </Alert>
-      )}
+      {!isExternal &&
+        (shippingFormData.trackingRef === null || trackingNumberShippingForm === null) && (
+          <Alert
+            severity='error'
+            action={
+              <Button color='inherit' size='small' onClick={retryFetchTrackingNumber}>
+                Retry Now
+              </Button>
+            }
+          >
+            Cannot get tracking number from the server. Retrying automatically every 10 seconds...
+          </Alert>
+        )}
 
       <Paper
         sx={{
@@ -3627,6 +3657,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             </Select>
             <ErrorMessage errorMessage={errorMessage} />
             <Message message={message} />
+            {isExternal && (
+              <Button variant='contained' color='primary' onClick={() => navigateTo(-1)}>
+                Go Back
+              </Button>
+            )}
             <Button onClick={resetForm} variant='outlined' color='primary'>
               Reset Form
             </Button>
