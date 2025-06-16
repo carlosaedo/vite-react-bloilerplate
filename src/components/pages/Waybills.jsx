@@ -15,18 +15,15 @@ import {
   Link as MuiLink,
   Button,
 } from '@mui/material';
-const EditShippingFormSinglePage = () => {
-  const { state: form } = useLocation();
+const Waybills = () => {
   const navigateTo = useNavigate();
 
-  console.log(form);
   return (
     <div>
-      <h2>Editing: {form?.trackingNumber}</h2>
-      This is a mock component
-      <Button onClick={() => navigateTo(-1)}>Go Back</Button>
+      <h2>Waybills</h2>
+      component
     </div>
   );
 };
 
-export default EditShippingFormSinglePage;
+export default Waybills;

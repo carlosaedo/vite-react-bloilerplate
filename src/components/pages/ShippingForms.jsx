@@ -16,7 +16,9 @@ import {
   Avatar,
   Button,
   Tooltip,
+  TextField,
 } from '@mui/material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import { FaRegUser, FaMapMarkerAlt, FaMoneyCheckAlt } from 'react-icons/fa';
 import {
   MdOutlineLocalShipping,
@@ -32,6 +34,9 @@ import { LuWeight } from 'react-icons/lu';
 import { GiReceiveMoney } from 'react-icons/gi';
 import ShippingFormDetails from './ShippingFormDetails';
 import TruckLoader from '../truckLoader/truckLoader';
+
+import Message from '../messages/Message';
+import ErrorMessage from '../messages/ErrorMessage';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -306,11 +311,58 @@ const mockShippingForms = [
 const ShippingForms = () => {
   const { token } = useAuth();
   const [selectedForm, setSelectedForm] = useState(null);
+
+  const [message, setMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+
   console.log(token);
+
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const [searchForm, setSearchForm] = useState(null);
 
   const handleClick = (form) => {
     console.log('Form clicked:', form);
     setSelectedForm(form); // trigger a re-render
+  };
+
+  const handleTrackingNumberChange = (value) => {
+    setTrackingNumber(value);
+    setErrorMessage(null);
+    setSearchForm(null);
+  };
+
+  const handleSearchFormByTrackingNumber = async () => {
+    console.log('Form clicked:', trackingNumber);
+    try {
+      const response = await torrestirApi.get(
+        `/api/bookings/external?trackingNumber=${trackingNumber}&clientId=37aacab0-13c9-11f0-854e-005056b7886b`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log(response.data);
+      if (response.status === 200) {
+        setErrorMessage(null);
+        setSearchForm(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching shipping forms:', error);
+      if (error.response.status === 404) {
+        setErrorMessage('Tracking number not found');
+      } else if (error.response.status === 403) {
+        setErrorMessage('Tracking number not found');
+      } else {
+        setErrorMessage('Error fetching shipping forms');
+      }
+    }
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && trackingNumber.trim()) {
+      handleSearchFormByTrackingNumber();
+    }
   };
 
   return (
@@ -328,6 +380,53 @@ const ShippingForms = () => {
         >
           Shipping Forms
         </Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            width: '100%',
+            mb: 2,
+            alignItems: 'stretch',
+            flexDirection: { xs: 'column', sm: 'row' },
+          }}
+        >
+          <TextField
+            fullWidth
+            variant='outlined'
+            placeholder='Tracking number'
+            value={trackingNumber}
+            onChange={(e) => {
+              handleTrackingNumberChange(e.target.value);
+            }}
+            onKeyDown={handleKeyPress}
+          />
+
+          <Button
+            variant='contained'
+            onClick={handleSearchFormByTrackingNumber}
+            disabled={!trackingNumber.trim()}
+            startIcon={<SearchIcon />}
+            sx={{
+              color: 'white',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              textTransform: 'none',
+              borderRadius: 1,
+              '&:hover': {
+                backgroundColor: '#003D2C',
+              },
+              '&:disabled': {
+                backgroundColor: '#adb8b4',
+                color: '#ffffff',
+              },
+            }}
+          >
+            Search
+          </Button>
+          <ErrorMessage errorMessage={errorMessage} />
+          <Message message={message} />
+        </Box>
 
         <List sx={{ padding: 0 }}>
           {mockShippingForms.map((form, idx) => (

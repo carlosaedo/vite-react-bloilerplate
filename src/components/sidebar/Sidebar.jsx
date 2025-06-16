@@ -34,6 +34,8 @@ import { GrUserNew } from 'react-icons/gr';
 
 import { MdSupervisorAccount } from 'react-icons/md';
 import { RiPagesLine } from 'react-icons/ri';
+import { IoDocumentTextOutline } from 'react-icons/io5';
+
 import './Sidebar.css';
 import { useAuth } from '../context/AuthContext';
 
@@ -120,7 +122,12 @@ const Sidebar = ({ onToggle }) => {
   };
 
   const allItems = [
-    { label: 'Home', icon: <FaHome />, path: '/', roles: ['user', 'admin', 'client'] },
+    {
+      label: 'Home',
+      icon: <FaHome style={{ height: '19px', width: '19px' }} />,
+      path: '/',
+      roles: ['user', 'admin', 'client'],
+    },
     {
       label: 'Clients',
       icon: <FaUsers />,
@@ -147,7 +154,7 @@ const Sidebar = ({ onToggle }) => {
       children: [
         {
           label: 'Create Shipping Form',
-          icon: <RiPagesLine />,
+          icon: <RiPagesLine style={{ height: '19px', width: '19px' }} />,
           path: '/shipping-form',
           roles: ['user', 'admin', 'client'],
         },
@@ -155,6 +162,12 @@ const Sidebar = ({ onToggle }) => {
           label: 'Shipping Forms',
           icon: <FaThList />,
           path: '/shipping-forms',
+          roles: ['user', 'admin', 'client'],
+        },
+        {
+          label: 'Waybills',
+          icon: <IoDocumentTextOutline style={{ height: '19px', width: '19px' }} />,
+          path: '/waybills',
           roles: ['user', 'admin', 'client'],
         },
       ],
@@ -165,8 +178,18 @@ const Sidebar = ({ onToggle }) => {
       path: '/tracking',
       roles: ['user', 'admin', 'client'],
     },
-    { label: 'Test Type 00', icon: <FaTable />, path: '/test-type-00', roles: ['user', 'admin'] },
-    { label: 'Incidents', icon: <FaExclamation />, path: '/incidents', roles: ['user', 'admin'] },
+    {
+      label: 'Test Type 00',
+      icon: <FaTable />,
+      path: '/test-type-00',
+      roles: ['user', 'admin'],
+    },
+    {
+      label: 'Incidents',
+      icon: <FaExclamation />,
+      path: '/incidents',
+      roles: ['user', 'admin'],
+    },
   ];
 
   const filterByRole = (items) =>
@@ -327,7 +350,7 @@ const Sidebar = ({ onToggle }) => {
                       className={isLoggedIn ? 'logged-in' : ''}
                       sx={{ minWidth: collapsed ? '24px' : '35px' }}
                     >
-                      <FaUserCircle />
+                      <FaUserCircle style={{ height: '19px', width: '19px' }} />
                     </ListItemIcon>
                     <ListItemText
                       sx={{
@@ -355,7 +378,7 @@ const Sidebar = ({ onToggle }) => {
                     className={({ isActive }) => (isActive ? 'active' : '')}
                   >
                     <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>
-                      <FaHome />
+                      <FaHome style={{ height: '19px', width: '19px' }} />
                     </ListItemIcon>
                     <ListItemText
                       sx={{
@@ -380,7 +403,7 @@ const Sidebar = ({ onToggle }) => {
                     className={({ isActive }) => (isActive ? 'active' : '')}
                   >
                     <ListItemIcon sx={{ minWidth: collapsed ? '24px' : '35px' }}>
-                      <FaRegUserCircle />
+                      <FaRegUserCircle style={{ height: '19px', width: '19px' }} />
                     </ListItemIcon>
                     <ListItemText
                       sx={{

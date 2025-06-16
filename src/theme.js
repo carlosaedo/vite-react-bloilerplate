@@ -24,6 +24,20 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: '#ffffff', // white background
+          color: '#333333', // dark gray text
+          boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)', // subtle shadow
+          fontSize: '0.875rem',
+          borderRadius: '6px',
+        },
+        arrow: {
+          color: '#ffffff', // arrow matches tooltip background
+        },
+      },
+    },
     MuiIconButton: {
       styleOverrides: {
         root: {

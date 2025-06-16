@@ -23,6 +23,8 @@ import Tracking from './components/pages/Tracking';
 import TestType00 from './components/pages/TestType-00';
 import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
 
+import Waybills from './components/pages/Waybills';
+
 import EditShippingFormSinglePage from './components/pages/EditShippingFormSinglePage';
 
 import ShippingForm from './components/pages/ShippingFormParent';
@@ -90,6 +92,9 @@ const App = () => {
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/shipping-forms' element={<ShippingForms />} />
+                </Route>
+                <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                  <Route path='/waybills' element={<Waybills />} />
                 </Route>
               </React.Fragment>
             ) : (
