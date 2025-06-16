@@ -43,6 +43,7 @@ import torrestirApi from '../api/torrestirApi';
 import { FaTemperatureLow as Temperature } from 'react-icons/fa';
 import { FiPackage } from 'react-icons/fi';
 import { RxDimensions } from 'react-icons/rx';
+import { AiOutlineBarcode } from 'react-icons/ai';
 
 import { LiaShippingFastSolid, LiaFileSignatureSolid } from 'react-icons/lia';
 
@@ -52,6 +53,8 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
   const navigateTo = useNavigate();
 
   const [formData, setFormData] = useState(form);
+
+  const [showSSCC, setShowSSCC] = useState(false);
 
   // Only update if form actually changed
   useEffect(() => {
@@ -67,35 +70,46 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
       try {
         const updatedPackages = await Promise.all(
           formData.packages.map(async (pkg) => {
-            console.log(pkg);
-            try {
-              const [pngResponse, zplResponse] = await Promise.all([
-                torrestirApi.post('/api/BookingLabel/generate', {
-                  ClientId: formData?.clientId,
-                  TrackingId: formData?.trackingNumber,
-                  Sscc: pkg?.sscc,
-                  Format: 'png',
-                }),
-                torrestirApi.post('/api/BookingLabel/generate', {
-                  ClientId: formData?.clientId,
-                  TrackingId: formData?.trackingNumber,
-                  Sscc: pkg?.sscc,
-                  Format: 'zpl',
-                }),
-              ]);
+            const updatedSsccs = pkg?.ssccs?.length
+              ? await Promise.all(
+                  pkg.ssccs.map(async (sscc) => {
+                    try {
+                      const [pngResponse, zplResponse] = await Promise.all([
+                        torrestirApi.post('/api/BookingLabel/generate', {
+                          ClientId: formData?.clientId,
+                          TrackingId: formData?.trackingNumber,
+                          Sscc: sscc?.sscc,
+                          Format: 'png',
+                        }),
+                        torrestirApi.post('/api/BookingLabel/generate', {
+                          ClientId: formData?.clientId,
+                          TrackingId: formData?.trackingNumber,
+                          Sscc: sscc?.sscc,
+                          Format: 'zpl',
+                        }),
+                      ]);
 
-              // Now you can use pngResponse and zplResponse
+                      return {
+                        ...sscc,
+                        labelImg: pngResponse?.data?.pngBase64,
+                        labelZpl: zplResponse?.data?.zpl,
+                      };
+                    } catch (error) {
+                      console.error(`Failed to fetch label for ${sscc.sscc}`, error);
+                      return { ...sscc, labelImg: null, labelZpl: null };
+                    }
+                  }),
+                )
+              : [];
 
-              const labelImg = pngResponse?.data?.pngBase64;
-              const labelZpl = zplResponse?.data?.zpl;
-
-              return { ...pkg, labelImg, labelZpl };
-            } catch (error) {
-              console.error(`Failed to fetch label for ${pkg.sscc}`, error);
-              return { ...pkg, labelImg: null }; // still return the package
-            }
+            return {
+              ...pkg,
+              ssccs: updatedSsccs,
+            };
           }),
         );
+
+        console.log('Updated packages:', updatedPackages);
 
         setFormData((prev) => ({
           ...prev,
@@ -585,7 +599,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                   <Stack spacing={2}>
                     {formData.packages.map((pkg, index) => (
                       <Paper
-                        key={pkg.sscc}
+                        key={index}
                         elevation={0}
                         sx={{
                           p: 2,
@@ -616,20 +630,10 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                                 <Typography variant='body2' fontWeight='bold' color={primaryColor}>
                                   {pkg.packageType.toUpperCase()}
                                 </Typography>
-                                <Typography
-                                  variant='caption'
-                                  color='text.secondary'
-                                  sx={{ fontFamily: 'monospace' }}
-                                >
-                                  SSCC: {pkg.sscc}
-                                </Typography>
                               </Box>
                             </Stack>
                           </Grid>
-                          <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
-                            {' '}
-                            <Base64Img base64={pkg.labelImg} zpl={pkg.labelZpl} label={pkg.sscc} />
-                          </Grid>
+
                           <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
                             <Box sx={{ bgcolor: `${primaryColor}05`, borderRadius: 1, p: 1 }}>
                               <Typography variant='caption' color={primaryColor} fontWeight='600'>
@@ -693,6 +697,50 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                             </Box>
                           </Grid>
                         </Grid>
+                        {/* SSCSS */}
+                        {!!pkg?.ssccs?.length && (
+                          <Button variant='outlined' onClick={() => setShowSSCC(!showSSCC)}>
+                            {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
+                          </Button>
+                        )}
+                        {showSSCC && pkg?.ssccs?.length > 0 && (
+                          <Stack spacing={2} sx={{ mt: 2 }}>
+                            <Box>
+                              <Stack
+                                direction='row'
+                                alignItems='center'
+                                spacing={1.5}
+                                sx={{ mb: 2 }}
+                              >
+                                <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
+                                  <AiOutlineBarcode sx={{ fontSize: 16 }} />
+                                </Avatar>
+                                <Typography variant='subtitle1' fontWeight='bold'>
+                                  SSCCs and Labels ({pkg.ssccs.length})
+                                </Typography>
+                              </Stack>
+                              <Stack direction='row' spacing={2} flexWrap='wrap'>
+                                {pkg?.ssccs?.map((sscc, index) => (
+                                  <Stack
+                                    key={sscc.id || index}
+                                    direction='column'
+                                    spacing={1}
+                                    alignItems='center'
+                                  >
+                                    <Typography variant='caption' fontWeight='medium'>
+                                      #{sscc.sscc}
+                                    </Typography>
+                                    <Base64Img
+                                      base64={sscc.labelImg}
+                                      zpl={sscc.labelZpl}
+                                      label={sscc.sscc}
+                                    />
+                                  </Stack>
+                                ))}
+                              </Stack>
+                            </Box>
+                          </Stack>
+                        )}{' '}
                       </Paper>
                     ))}
                   </Stack>
