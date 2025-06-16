@@ -11,22 +11,6 @@ export const ShippingFormProvider = ({ children }) => {
   const [trackingNumberShippingForm, setTrackingNumberShippingForm] = useState(null);
   const { token } = useAuth();
 
-  function generateMockSSCC() {
-    let randomDigits = '';
-    for (let i = 0; i < 16; i++) {
-      randomDigits += Math.floor(Math.random() * 10);
-    }
-    return '00' + randomDigits;
-  }
-
-  function generateMockTrackingREF() {
-    let randomDigits = '';
-    for (let i = 0; i < 20; i++) {
-      randomDigits += Math.floor(Math.random() * 10);
-    }
-    return 'TT' + randomDigits;
-  }
-
   // Initialize form data with default values
   const getInitialFormData = (trackingRef = null) => ({
     senderTaxId: '',
@@ -69,7 +53,6 @@ export const ShippingFormProvider = ({ children }) => {
         packageHeight: '',
         packageNote: '',
         packageType: 'volume',
-        sscc: generateMockSSCC(),
         CBM: '',
         LDM: '',
         TaxableWeight: '',
@@ -220,8 +203,7 @@ export const ShippingFormProvider = ({ children }) => {
   }, [formData]);
 
   const resetForm = () => {
-    const newTrackingRef = generateMockTrackingREF();
-    const resetData = getInitialFormData(newTrackingRef);
+    const resetData = getInitialFormData(trackingNumberShippingForm);
 
     setFormData(resetData);
 

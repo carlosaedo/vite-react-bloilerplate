@@ -81,14 +81,6 @@ const insuredByOptions = [
 
 const typeOfGoodsOptions = [{ value: 'general_goods', label: 'General Goods' }];
 
-function generateMockSSCC() {
-  let randomDigits = '';
-  for (let i = 0; i < 16; i++) {
-    randomDigits += Math.floor(Math.random() * 10);
-  }
-  return '00' + randomDigits;
-}
-
 const defaultPackageValues = {
   packageQuantity: '1',
   packageWeight: '',
@@ -97,7 +89,6 @@ const defaultPackageValues = {
   packageHeight: '',
   packageNote: '',
   packageType: 'volume',
-  sscc: generateMockSSCC(),
   CBM: '',
   LDM: '',
   TaxableWeight: '',
@@ -173,8 +164,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     page * rowsPerPage + rowsPerPage,
   );
 
-  const [showSSCC, setShowSSCC] = useState(false);
-
   const [showDimensions, setShowDimensions] = useState(false);
 
   const [selectedPackageIndex, setSelectedPackageIndex] = useState(0);
@@ -202,7 +191,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const newPackage = {
       ...defaultPackageValues,
       ...packageToClone,
-      sscc: generateMockSSCC(),
     };
 
     const updatedFormData = {
@@ -792,7 +780,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           packageHeight: pkg.packageHeight,
           packageNote: pkg.packageNote,
           packageType: pkg.packageType,
-          sscc: pkg.sscc,
           cbm: pkg.CBM,
           ldm: pkg.LDM,
           taxableWeight: pkg.TaxableWeight,
@@ -2457,11 +2444,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               <Typography variant='body2'>
                                 <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                               </Typography>
-                              {showSSCC && (
-                                <Typography variant='body2'>
-                                  <strong>SSCC:</strong> {pkg?.sscc}
-                                </Typography>
-                              )}
                             </Box>
                           }
                           arrow
@@ -2480,11 +2462,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               },
                             }}
                           >
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
+                            <TableCell>
                               <Typography
                                 variant='subtitle1'
                                 sx={{ display: 'flex', alignItems: 'center' }}
@@ -2509,90 +2487,34 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                 </Box>
                               </Typography>
                             </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
-                              {pkg?.packageQuantity || '-'}
-                            </TableCell>
+                            <TableCell>{pkg?.packageQuantity || '-'}</TableCell>
 
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
+                            <TableCell>
                               {pkg?.packageType?.charAt(0).toUpperCase() +
                                 pkg?.packageType?.slice(1) || '-'}
                             </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
-                              {pkg?.packageWeight || '-'}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
-                              {pkg?.CBM || '-'}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
-                              {pkg?.LDM || '-'}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
-                              {pkg?.TaxableWeight || '-'}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
-                              {pkg?.packageNote || '-'}
-                            </TableCell>
+                            <TableCell>{pkg?.packageWeight || '-'}</TableCell>
+                            <TableCell>{pkg?.CBM || '-'}</TableCell>
+                            <TableCell>{pkg?.LDM || '-'}</TableCell>
+                            <TableCell>{pkg?.TaxableWeight || '-'}</TableCell>
+                            <TableCell>{pkg?.packageNote || '-'}</TableCell>
 
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
+                            <TableCell>
                               <Tooltip title='Stackable' arrow>
                                 {pkg?.stackable ? 'Yes' : 'No'}
                               </Tooltip>
                             </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
+                            <TableCell>
                               <Tooltip title='Dangerous Goods' arrow>
                                 {pkg?.dangerousGoods ? 'Yes' : 'No'}
                               </Tooltip>
                             </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
+                            <TableCell>
                               <Tooltip title='Temperature Controlled' arrow>
                                 {pkg?.tempControlled ? 'Yes' : 'No'}
                               </Tooltip>
                             </TableCell>
-                            <TableCell
-                              sx={{
-                                borderBottom: showSSCC ? 'none !important' : undefined,
-                              }}
-                            >
+                            <TableCell>
                               {pkg?.tempControlled
                                 ? pkg?.tempControlledMinTemp || pkg?.tempControlledMaxTemp
                                   ? `${
@@ -2609,24 +2531,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                             </TableCell>
                           </TableRow>
                         </Tooltip>
-                        {showSSCC && (
-                          <TableRow>
-                            <TableCell colSpan={12}>
-                              <Typography
-                                variant='body2'
-                                sx={{
-                                  fontFamily: 'monospace',
-                                  pl: 5,
-                                  color: 'text.secondary',
-                                  fontSize: '0.75rem',
-                                  fontStyle: 'italic !important',
-                                }}
-                              >
-                                <strong>SSCC:</strong> {pkg?.sscc}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        )}
                       </React.Fragment>
                     );
                   })}
@@ -2773,12 +2677,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <strong>Customs:</strong>{' '}
                     {shippingFormData?.packages[selectedPackageIndex]?.customs ? 'Yes' : 'No'}
                   </Typography>
-                  {showSSCC && (
-                    <Typography variant='body2'>
-                      <strong>SSCC:</strong>{' '}
-                      {shippingFormData?.packages[selectedPackageIndex]?.sscc}
-                    </Typography>
-                  )}
                 </Box>
               }
               arrow
@@ -3368,18 +3266,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   </React.Fragment>
                 )}
               </Grid>
-              {showSSCC && (
-                <TextField
-                  label='SSCC'
-                  name='sscc'
-                  type='text'
-                  value={shippingFormData.packages[selectedPackageIndex]?.sscc || ''}
-                  fullWidth
-                  size='small'
-                  margin='dense'
-                  disabled={true}
-                />
-              )}
             </React.Fragment>
           </Box>
           {/*
@@ -3540,15 +3426,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <Typography>
               Total Palets: <strong>{infoValues?.quantityByType?.palete || 0}</strong>
             </Typography>
-            <Button
-              sx={{ marginRight: 1 }}
-              variant='outlined'
-              startIcon={showSSCC ? <IoMdEyeOff /> : <IoMdEye />}
-              onClick={showSSCC ? () => setShowSSCC(false) : () => setShowSSCC(true)}
-              size='small'
-            >
-              {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
-            </Button>
+
             <Button
               sx={{ marginRight: 1 }}
               variant='outlined'
@@ -3641,11 +3519,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         <Typography variant='body2'>
                           <strong>Customs:</strong> {pkg?.customs ? 'Yes' : 'No'}
                         </Typography>
-                        {showSSCC && (
-                          <Typography variant='body2'>
-                            <strong>SSCC:</strong> {pkg?.sscc}
-                          </Typography>
-                        )}
                       </Box>
                     }
                     arrow

@@ -15,6 +15,8 @@ import {
   Tooltip,
   Link as MuiLink,
   Button,
+  Dialog,
+  DialogContent,
 } from '@mui/material';
 import {
   LocalShipping,
@@ -46,7 +48,7 @@ import { LiaShippingFastSolid, LiaFileSignatureSolid } from 'react-icons/lia';
 
 import Base64Img from '../base64Img/Base64Img';
 
-export default function ShippingFormDetails({ form }) {
+export default function ShippingFormDetails({ form, openDialog = true, onCloseDialog }) {
   const navigateTo = useNavigate();
 
   const [formData, setFormData] = useState(form);
@@ -183,513 +185,538 @@ export default function ShippingFormDetails({ form }) {
   if (!form) return null;
 
   return (
-    <Card
-      variant='outlined'
-      sx={{
-        margin: 2,
-        borderRadius: 3,
-        p: 0,
-        bgcolor: 'background.paper',
-        boxShadow: '0 4px 16px rgba(0,61,44,0.08)',
-        border: `1px solid ${primaryColor}20`,
-        overflow: 'hidden',
-        position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '3px',
-          background: `linear-gradient(90deg, ${primaryColor}, ${secondaryColor}, ${primaryColor})`,
-          backgroundSize: '200% 100%',
-          animation: 'shimmer 3s ease-in-out infinite',
-        },
-        '@keyframes shimmer': {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
-      }}
+    <Dialog
+      open={openDialog}
+      onClose={onCloseDialog}
+      maxWidth='xl'
+      fullWidth
+      slotProps={{ paper: { sx: { borderRadius: 3, overflow: 'visible' } } }}
     >
-      <CardContent sx={{ p: 2.5 }}>
-        <Stack spacing={2.5}>
-          {/* Compact Tracking Header */}
-          <Box
-            sx={{
-              background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryLight} 100%)`,
-              borderRadius: 2,
-              p: 2,
-              color: 'white',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            <Stack direction='row' alignItems='center' spacing={2}>
-              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 40, height: 40 }}>
-                <LocalShipping sx={{ fontSize: 20 }} />
-              </Avatar>
-              {formData.canEdit && (
-                <Button
-                  sx={{
-                    background: '#ffc928',
-                    color: '#003D2C',
-                    '&:hover': { background: '#ffffff', color: '#003D2C' },
-                  }}
-                  onClick={handleEdit}
-                >
-                  Edit Form
-                </Button>
-              )}
-
-              <Box sx={{ flex: 1 }}>
-                <Typography variant='h6' fontWeight='bold'>
-                  {formData.trackingNumber}
-                </Typography>
-                <Typography variant='caption' sx={{ opacity: 0.9 }}>
-                  Tracking Number
-                </Typography>
-              </Box>
-              <Tooltip title='Track shipment'>
-                <IconButton size='small' sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)' }}>
-                  <Info fontSize='small' />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          </Box>
-
-          {/* Compact Shipment Info */}
-          <Grid container spacing={2}>
-            <Grid item size={{ xs: 12, md: 6 }}>
-              <Paper
-                elevation={0}
+      <DialogContent sx={{ p: 0 }}>
+        {/* Your entire <Card> JSX goes here */}
+        <Card
+          variant='outlined'
+          sx={{
+            borderRadius: 3,
+            p: 0,
+            bgcolor: 'background.paper',
+            boxShadow: '0 4px 16px rgba(0,61,44,0.08)',
+            border: `1px solid ${primaryColor}20`,
+            overflow: 'hidden',
+            position: 'relative',
+            margin: 0,
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '3px',
+              background: `linear-gradient(90deg, ${primaryColor}, ${secondaryColor}, ${primaryColor})`,
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 3s ease-in-out infinite',
+            },
+            '@keyframes shimmer': {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+          }}
+        >
+          <CardContent sx={{ p: 2.5 }}>
+            <Stack spacing={2.5}>
+              {/* Compact Tracking Header */}
+              <Box
                 sx={{
-                  p: 2,
+                  background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryLight} 100%)`,
                   borderRadius: 2,
-                  bgcolor: `${primaryColor}08`,
-                  border: `1px solid ${primaryColor}20`,
+                  p: 2,
+                  color: 'white',
                   position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: '3px',
-                    background: primaryColor,
-                  },
+                  overflow: 'hidden',
                 }}
               >
-                <Stack direction='row' alignItems='center' spacing={1.5}>
-                  <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
-                    <Assessment sx={{ fontSize: 16 }} />
+                <Stack direction='row' alignItems='center' spacing={2}>
+                  <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 40, height: 40 }}>
+                    <LocalShipping sx={{ fontSize: 20 }} />
                   </Avatar>
-                  <Box>
-                    <Typography variant='body2' color={primaryColor} fontWeight='600'>
-                      Delivery
-                    </Typography>
-                    <Typography variant='body2' fontWeight='bold'>
-                      {formData.deliveryDate} at {formData.deliveryDateHour}
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Paper>
-            </Grid>
-            <Grid item size={{ xs: 12, md: 6 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: `${secondaryColor}08`,
-                  border: `1px solid ${secondaryColor}40`,
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: '3px',
-                    background: secondaryColor,
-                  },
-                }}
-              >
-                <Stack direction='row' alignItems='center' spacing={1.5}>
-                  <Avatar sx={{ bgcolor: secondaryColor, width: 32, height: 32 }}>
-                    <Money sx={{ fontSize: 16, color: primaryColor }} />
-                  </Avatar>
-                  <Box>
-                    <Typography variant='body2' color={secondaryDark} fontWeight='600'>
-                      Payment
-                    </Typography>
-                    <Typography variant='body2' fontWeight='bold'>
-                      {formData.shippingPayment} → {formData.shippingPaymentTo}
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Paper>
-            </Grid>
-          </Grid>
-
-          <Divider sx={{ borderStyle: 'dashed', borderColor: `${primaryColor}20` }} />
-
-          {/* Compact Shipper & Consignee */}
-          <Grid container spacing={2}>
-            <Grid item size={{ xs: 12, md: 6 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: `${secondaryColor}06`,
-                  border: `1px solid ${secondaryColor}30`,
-                  height: '100%',
-                }}
-              >
-                <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 1.5 }}>
-                  <Avatar sx={{ bgcolor: secondaryColor, width: 32, height: 32 }}>
-                    <Business sx={{ fontSize: 16, color: primaryColor }} />
-                  </Avatar>
-                  <Typography variant='subtitle2' fontWeight='bold' color={secondaryDark}>
-                    Shipper
-                  </Typography>
-                </Stack>
-                <Stack spacing={1}>
-                  <Typography variant='body2' fontWeight='600'>
-                    {formData.shipperName}
-                  </Typography>
-                  <Stack direction='row' alignItems='center' spacing={1}>
-                    <Email sx={{ fontSize: 12, color: 'text.secondary' }} />
-                    <Typography variant='caption'>{formData.shipperEmail}</Typography>
-                    <Phone sx={{ fontSize: 12, color: 'text.secondary', ml: 1 }} />
-                    <Typography variant='caption'>{formData.shipperPhone}</Typography>
-                  </Stack>
-                  <Typography variant='caption' color='text.secondary'>
-                    {formData.shipperAdd1}
-                    {formData.shipperAdd2 ? `, ${formData.shipperAdd2}` : ''},{' '}
-                    {formData.shipperCity}, {formData.shipperZip}, {formData.shipperCountry}
-                  </Typography>
-                  <Typography
-                    variant='caption'
-                    color={secondaryDark}
-                    sx={{ bgcolor: `${secondaryColor}15`, p: 0.5, borderRadius: 1 }}
-                  >
-                    VAT: {formData.shipperVAT} • REF: {formData.shipperReference}
-                  </Typography>
-                </Stack>
-              </Paper>
-            </Grid>
-            <Grid item size={{ xs: 12, md: 6 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: `${primaryColor}06`,
-                  border: `1px solid ${primaryColor}30`,
-                  height: '100%',
-                }}
-              >
-                <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 1.5 }}>
-                  <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
-                    <Person sx={{ fontSize: 16 }} />
-                  </Avatar>
-                  <Typography variant='subtitle2' fontWeight='bold' color={primaryColor}>
-                    Consignee
-                  </Typography>
-                </Stack>
-                <Stack spacing={1}>
-                  <Typography variant='body2' fontWeight='600'>
-                    {formData.consigneeName}
-                  </Typography>
-                  <Stack direction='row' alignItems='center' spacing={1}>
-                    <Email sx={{ fontSize: 12, color: 'text.secondary' }} />
-                    <Typography variant='caption'>{formData.consigneeEmail}</Typography>
-                    <Phone sx={{ fontSize: 12, color: 'text.secondary', ml: 1 }} />
-                    <Typography variant='caption'>{formData.consigneePhone}</Typography>
-                  </Stack>
-                  <Typography variant='caption' color='text.secondary'>
-                    {formData.consigneeAdd1}
-                    {formData.consigneeAdd2 ? `, ${formData.consigneeAdd2}` : ''},{' '}
-                    {formData.consigneeCity}, {formData.consigneeZip}, {formData.consigneeCountry}
-                  </Typography>
-                  <Typography
-                    variant='caption'
-                    color={primaryColor}
-                    sx={{ bgcolor: `${primaryColor}15`, p: 0.5, borderRadius: 1 }}
-                  >
-                    VAT: {formData.consigneeVAT} • REF: {formData.consigneeReference}
-                  </Typography>
-                </Stack>
-              </Paper>
-            </Grid>
-          </Grid>
-
-          {/* Compact Value, Insurance, Customs */}
-          <Grid container spacing={2}>
-            <Grid item size={{ xs: 12, md: 4 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: `${primaryColor}08`,
-                  border: `1px solid ${primaryColor}20`,
-                  textAlign: 'center',
-                }}
-              >
-                <Typography variant='h6' fontWeight='bold' color={primaryColor}>
-                  {formData.valueOfGoods}€
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  Value of Goods
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item size={{ xs: 12, md: 4 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: formData.insured ? `${primaryColor}08` : `${secondaryColor}08`,
-                  border: formData.insured
-                    ? `1px solid ${primaryColor}20`
-                    : `1px solid ${secondaryColor}40`,
-                  textAlign: 'center',
-                }}
-              >
-                <Avatar
-                  sx={{
-                    bgcolor: formData.insured ? primaryColor : secondaryColor,
-                    width: 32,
-                    height: 32,
-                    mx: 'auto',
-                    mb: 1,
-                  }}
-                >
-                  {formData.insured ? (
-                    <CheckCircle sx={{ fontSize: 16 }} />
-                  ) : (
-                    <Cancel sx={{ fontSize: 16, color: primaryColor }} />
+                  {formData.canEdit && (
+                    <Button
+                      sx={{
+                        background: '#ffc928',
+                        color: '#003D2C',
+                        '&:hover': { background: '#ffffff', color: '#003D2C' },
+                      }}
+                      onClick={handleEdit}
+                    >
+                      Edit Form
+                    </Button>
                   )}
-                </Avatar>
-                <Typography
-                  variant='body2'
-                  fontWeight='bold'
-                  color={formData.insured ? primaryColor : secondaryDark}
-                >
-                  {formData.insured ? 'Insured' : 'Not Insured'}
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item size={{ xs: 12, md: 4 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: `${secondaryColor}08`,
-                  border: `1px solid ${secondaryColor}40`,
-                  textAlign: 'center',
-                }}
-              >
-                <Typography variant='body2' fontWeight='bold' color={secondaryDark}>
-                  {formData.customs}
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  Customs
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
 
-          {/* Compact Instructions */}
-          <Grid container spacing={2}>
-            <Grid item size={{ xs: 12, md: 6 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: `${secondaryColor}06`,
-                  border: `1px solid ${secondaryColor}30`,
-                }}
-              >
-                <Typography variant='body2' fontWeight='600' color={secondaryDark} sx={{ mb: 1 }}>
-                  <LiaShippingFastSolid /> Shipper Instructions
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  {formData.shipperInstructions || 'No instructions'}
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item size={{ xs: 12, md: 6 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: `${primaryColor}06`,
-                  border: `1px solid ${primaryColor}30`,
-                }}
-              >
-                <Typography variant='body2' fontWeight='600' color={primaryColor} sx={{ mb: 1 }}>
-                  <LiaFileSignatureSolid /> Consignee Instructions
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  {formData.consigneeInstructions || 'No instructions'}
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant='h6' fontWeight='bold'>
+                      {formData.trackingNumber}
+                    </Typography>
+                    <Typography variant='caption' sx={{ opacity: 0.9 }}>
+                      Tracking Number
+                    </Typography>
+                  </Box>
+                  <Tooltip title='Track shipment'>
+                    <IconButton
+                      size='small'
+                      sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)' }}
+                    >
+                      <Info fontSize='small' />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Box>
 
-          <Divider sx={{ borderStyle: 'dashed', borderColor: `${primaryColor}20` }} />
-
-          {/* Compact Packages */}
-          {formData.packages?.length ? (
-            <Box>
-              <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 2 }}>
-                <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
-                  <Inventory sx={{ fontSize: 16 }} />
-                </Avatar>
-                <Typography variant='subtitle1' fontWeight='bold'>
-                  Packages ({formData.packages.length})
-                </Typography>
-              </Stack>
-              <Stack spacing={2}>
-                {formData.packages.map((pkg, index) => (
+              {/* Compact Shipment Info */}
+              <Grid container spacing={2}>
+                <Grid item size={{ xs: 12, md: 6 }}>
                   <Paper
-                    key={pkg.sscc}
                     elevation={0}
                     sx={{
                       p: 2,
                       borderRadius: 2,
-                      bgcolor: 'rgba(248,249,250,0.8)',
+                      bgcolor: `${primaryColor}08`,
                       border: `1px solid ${primaryColor}20`,
                       position: 'relative',
                       '&::before': {
                         content: '""',
                         position: 'absolute',
-                        top: 0,
                         left: 0,
-                        right: 0,
-                        height: '2px',
-                        background: `linear-gradient(90deg, ${primaryColor}, ${secondaryColor})`,
+                        top: 0,
+                        bottom: 0,
+                        width: '3px',
+                        background: primaryColor,
                       },
                     }}
                   >
-                    <Grid container spacing={2} alignItems='center'>
-                      <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Stack direction='row' alignItems='center' spacing={1}>
-                          <Avatar sx={{ bgcolor: primaryColor, width: 28, height: 28 }}>
-                            <Typography variant='caption' fontWeight='bold'>
-                              #{index + 1}
-                            </Typography>
-                          </Avatar>
-                          <Box>
-                            <Typography variant='body2' fontWeight='bold' color={primaryColor}>
-                              {pkg.packageType.toUpperCase()}
-                            </Typography>
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                              sx={{ fontFamily: 'monospace' }}
-                            >
-                              SSCC: {pkg.sscc}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </Grid>
-                      <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
-                        {' '}
-                        <Base64Img base64={pkg.labelImg} zpl={pkg.labelZpl} label={pkg.sscc} />
-                      </Grid>
-                      <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
-                        <Box sx={{ bgcolor: `${primaryColor}05`, borderRadius: 1, p: 1 }}>
-                          <Typography variant='caption' color={primaryColor} fontWeight='600'>
-                            <RxDimensions /> Dimensions
-                          </Typography>
-                          <Typography variant='caption' display='block'>
-                            {pkg.packageWeight}kg • {pkg.packageLength}×{pkg.packageWidth}×
-                            {pkg.packageHeight}cm
-                          </Typography>
-                          <Typography variant='caption' display='block'>
-                            CBM: {pkg.cbm} • Tax: {pkg.TaxableWeight}
-                          </Typography>
-                        </Box>
-                      </Grid>
-
-                      <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
-                        <Box sx={{ bgcolor: `${secondaryColor}05`, borderRadius: 1, p: 1 }}>
-                          <Typography variant='caption' color={secondaryDark} fontWeight='600'>
-                            Properties
-                          </Typography>
-                          <Stack direction='row' spacing={0.5} sx={{ mt: 0.5 }}>
-                            <Chip
-                              label={pkg.stackable ? 'Stack' : 'No Stack'}
-                              color={pkg.stackable ? 'success' : 'default'}
-                              size='small'
-                              sx={{ fontSize: '10px', height: '20px' }}
-                            />
-                            <Chip
-                              label={pkg.dangerousGoods ? 'Danger' : 'Safe'}
-                              color={pkg.dangerousGoods ? 'error' : 'success'}
-                              size='small'
-                              sx={{ fontSize: '10px', height: '20px' }}
-                            />
-                          </Stack>
-                          <Typography variant='caption' display='block' sx={{ mt: 0.5 }}>
-                            <Temperature sx={{ fontSize: 10, mr: 0.5 }} />
-                            {pkg.tempControlled
-                              ? `${pkg.tempControlledMinTemp}-${pkg.tempControlledMaxTemp}°C`
-                              : 'No temp control'}
-                          </Typography>
-                        </Box>
-                      </Grid>
-
-                      <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
-                        <Box>
-                          <Typography variant='caption' color='text.secondary'>
-                            <strong>Marks:</strong> {pkg.marksAndNumbers}
-                          </Typography>
-                          <Typography variant='caption' color='text.secondary' display='block'>
-                            <strong>Goods:</strong>{' '}
-                            {stringUtils.toSpacedCapitalized(pkg.typeOfGoods)}
-                          </Typography>
-                          <Typography
-                            variant='caption'
-                            color='text.secondary'
-                            display='block'
-                            sx={{ fontStyle: 'italic' }}
-                          >
-                            {pkg.packageNote}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    </Grid>
+                    <Stack direction='row' alignItems='center' spacing={1.5}>
+                      <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
+                        <Assessment sx={{ fontSize: 16 }} />
+                      </Avatar>
+                      <Box>
+                        <Typography variant='body2' color={primaryColor} fontWeight='600'>
+                          Delivery
+                        </Typography>
+                        <Typography variant='body2' fontWeight='bold'>
+                          {formData.deliveryDate} at {formData.deliveryDateHour}
+                        </Typography>
+                      </Box>
+                    </Stack>
                   </Paper>
-                ))}
-              </Stack>
-            </Box>
-          ) : (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                bgcolor: 'rgba(158, 158, 158, 0.05)',
-                border: '1px dashed rgba(158, 158, 158, 0.3)',
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant='body2' color='text.secondary'>
-                <FiPackage /> No packages provided
-              </Typography>
-            </Paper>
-          )}
-        </Stack>
-      </CardContent>
-    </Card>
+                </Grid>
+                <Grid item size={{ xs: 12, md: 6 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${secondaryColor}08`,
+                      border: `1px solid ${secondaryColor}40`,
+                      position: 'relative',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: '3px',
+                        background: secondaryColor,
+                      },
+                    }}
+                  >
+                    <Stack direction='row' alignItems='center' spacing={1.5}>
+                      <Avatar sx={{ bgcolor: secondaryColor, width: 32, height: 32 }}>
+                        <Money sx={{ fontSize: 16, color: primaryColor }} />
+                      </Avatar>
+                      <Box>
+                        <Typography variant='body2' color={secondaryDark} fontWeight='600'>
+                          Payment
+                        </Typography>
+                        <Typography variant='body2' fontWeight='bold'>
+                          {formData.shippingPayment} → {formData.shippingPaymentTo}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Paper>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ borderStyle: 'dashed', borderColor: `${primaryColor}20` }} />
+
+              {/* Compact Shipper & Consignee */}
+              <Grid container spacing={2}>
+                <Grid item size={{ xs: 12, md: 6 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${secondaryColor}06`,
+                      border: `1px solid ${secondaryColor}30`,
+                      height: '100%',
+                    }}
+                  >
+                    <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 1.5 }}>
+                      <Avatar sx={{ bgcolor: secondaryColor, width: 32, height: 32 }}>
+                        <Business sx={{ fontSize: 16, color: primaryColor }} />
+                      </Avatar>
+                      <Typography variant='subtitle2' fontWeight='bold' color={secondaryDark}>
+                        Shipper
+                      </Typography>
+                    </Stack>
+                    <Stack spacing={1}>
+                      <Typography variant='body2' fontWeight='600'>
+                        {formData.shipperName}
+                      </Typography>
+                      <Stack direction='row' alignItems='center' spacing={1}>
+                        <Email sx={{ fontSize: 12, color: 'text.secondary' }} />
+                        <Typography variant='caption'>{formData.shipperEmail}</Typography>
+                        <Phone sx={{ fontSize: 12, color: 'text.secondary', ml: 1 }} />
+                        <Typography variant='caption'>{formData.shipperPhone}</Typography>
+                      </Stack>
+                      <Typography variant='caption' color='text.secondary'>
+                        {formData.shipperAdd1}
+                        {formData.shipperAdd2 ? `, ${formData.shipperAdd2}` : ''},{' '}
+                        {formData.shipperCity}, {formData.shipperZip}, {formData.shipperCountry}
+                      </Typography>
+                      <Typography
+                        variant='caption'
+                        color={secondaryDark}
+                        sx={{ bgcolor: `${secondaryColor}15`, p: 0.5, borderRadius: 1 }}
+                      >
+                        VAT: {formData.shipperVAT} • REF: {formData.shipperReference}
+                      </Typography>
+                    </Stack>
+                  </Paper>
+                </Grid>
+                <Grid item size={{ xs: 12, md: 6 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${primaryColor}06`,
+                      border: `1px solid ${primaryColor}30`,
+                      height: '100%',
+                    }}
+                  >
+                    <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 1.5 }}>
+                      <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
+                        <Person sx={{ fontSize: 16 }} />
+                      </Avatar>
+                      <Typography variant='subtitle2' fontWeight='bold' color={primaryColor}>
+                        Consignee
+                      </Typography>
+                    </Stack>
+                    <Stack spacing={1}>
+                      <Typography variant='body2' fontWeight='600'>
+                        {formData.consigneeName}
+                      </Typography>
+                      <Stack direction='row' alignItems='center' spacing={1}>
+                        <Email sx={{ fontSize: 12, color: 'text.secondary' }} />
+                        <Typography variant='caption'>{formData.consigneeEmail}</Typography>
+                        <Phone sx={{ fontSize: 12, color: 'text.secondary', ml: 1 }} />
+                        <Typography variant='caption'>{formData.consigneePhone}</Typography>
+                      </Stack>
+                      <Typography variant='caption' color='text.secondary'>
+                        {formData.consigneeAdd1}
+                        {formData.consigneeAdd2 ? `, ${formData.consigneeAdd2}` : ''},{' '}
+                        {formData.consigneeCity}, {formData.consigneeZip},{' '}
+                        {formData.consigneeCountry}
+                      </Typography>
+                      <Typography
+                        variant='caption'
+                        color={primaryColor}
+                        sx={{ bgcolor: `${primaryColor}15`, p: 0.5, borderRadius: 1 }}
+                      >
+                        VAT: {formData.consigneeVAT} • REF: {formData.consigneeReference}
+                      </Typography>
+                    </Stack>
+                  </Paper>
+                </Grid>
+              </Grid>
+
+              {/* Compact Value, Insurance, Customs */}
+              <Grid container spacing={2}>
+                <Grid item size={{ xs: 12, md: 4 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${primaryColor}08`,
+                      border: `1px solid ${primaryColor}20`,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant='h6' fontWeight='bold' color={primaryColor}>
+                      {formData.valueOfGoods}€
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      Value of Goods
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item size={{ xs: 12, md: 4 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: formData.insured ? `${primaryColor}08` : `${secondaryColor}08`,
+                      border: formData.insured
+                        ? `1px solid ${primaryColor}20`
+                        : `1px solid ${secondaryColor}40`,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        bgcolor: formData.insured ? primaryColor : secondaryColor,
+                        width: 32,
+                        height: 32,
+                        mx: 'auto',
+                        mb: 1,
+                      }}
+                    >
+                      {formData.insured ? (
+                        <CheckCircle sx={{ fontSize: 16 }} />
+                      ) : (
+                        <Cancel sx={{ fontSize: 16, color: primaryColor }} />
+                      )}
+                    </Avatar>
+                    <Typography
+                      variant='body2'
+                      fontWeight='bold'
+                      color={formData.insured ? primaryColor : secondaryDark}
+                    >
+                      {formData.insured ? 'Insured' : 'Not Insured'}
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item size={{ xs: 12, md: 4 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${secondaryColor}08`,
+                      border: `1px solid ${secondaryColor}40`,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant='body2' fontWeight='bold' color={secondaryDark}>
+                      {formData.customs}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      Customs
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+
+              {/* Compact Instructions */}
+              <Grid container spacing={2}>
+                <Grid item size={{ xs: 12, md: 6 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${secondaryColor}06`,
+                      border: `1px solid ${secondaryColor}30`,
+                    }}
+                  >
+                    <Typography
+                      variant='body2'
+                      fontWeight='600'
+                      color={secondaryDark}
+                      sx={{ mb: 1 }}
+                    >
+                      <LiaShippingFastSolid /> Shipper Instructions
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {formData.shipperInstructions || 'No instructions'}
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid item size={{ xs: 12, md: 6 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${primaryColor}06`,
+                      border: `1px solid ${primaryColor}30`,
+                    }}
+                  >
+                    <Typography
+                      variant='body2'
+                      fontWeight='600'
+                      color={primaryColor}
+                      sx={{ mb: 1 }}
+                    >
+                      <LiaFileSignatureSolid /> Consignee Instructions
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {formData.consigneeInstructions || 'No instructions'}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ borderStyle: 'dashed', borderColor: `${primaryColor}20` }} />
+
+              {/* Compact Packages */}
+              {formData.packages?.length ? (
+                <Box>
+                  <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 2 }}>
+                    <Avatar sx={{ bgcolor: primaryColor, width: 32, height: 32 }}>
+                      <Inventory sx={{ fontSize: 16 }} />
+                    </Avatar>
+                    <Typography variant='subtitle1' fontWeight='bold'>
+                      Packages ({formData.packages.length})
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={2}>
+                    {formData.packages.map((pkg, index) => (
+                      <Paper
+                        key={pkg.sscc}
+                        elevation={0}
+                        sx={{
+                          p: 2,
+                          borderRadius: 2,
+                          bgcolor: 'rgba(248,249,250,0.8)',
+                          border: `1px solid ${primaryColor}20`,
+                          position: 'relative',
+                          '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            background: `linear-gradient(90deg, ${primaryColor}, ${secondaryColor})`,
+                          },
+                        }}
+                      >
+                        <Grid container spacing={2} alignItems='center'>
+                          <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+                            <Stack direction='row' alignItems='center' spacing={1}>
+                              <Avatar sx={{ bgcolor: primaryColor, width: 28, height: 28 }}>
+                                <Typography variant='caption' fontWeight='bold'>
+                                  #{index + 1}
+                                </Typography>
+                              </Avatar>
+                              <Box>
+                                <Typography variant='body2' fontWeight='bold' color={primaryColor}>
+                                  {pkg.packageType.toUpperCase()}
+                                </Typography>
+                                <Typography
+                                  variant='caption'
+                                  color='text.secondary'
+                                  sx={{ fontFamily: 'monospace' }}
+                                >
+                                  SSCC: {pkg.sscc}
+                                </Typography>
+                              </Box>
+                            </Stack>
+                          </Grid>
+                          <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
+                            {' '}
+                            <Base64Img base64={pkg.labelImg} zpl={pkg.labelZpl} label={pkg.sscc} />
+                          </Grid>
+                          <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
+                            <Box sx={{ bgcolor: `${primaryColor}05`, borderRadius: 1, p: 1 }}>
+                              <Typography variant='caption' color={primaryColor} fontWeight='600'>
+                                <RxDimensions /> Dimensions
+                              </Typography>
+                              <Typography variant='caption' display='block'>
+                                {pkg.packageWeight}kg • {pkg.packageLength}×{pkg.packageWidth}×
+                                {pkg.packageHeight}cm
+                              </Typography>
+                              <Typography variant='caption' display='block'>
+                                CBM: {pkg.cbm} • Tax: {pkg.TaxableWeight}
+                              </Typography>
+                            </Box>
+                          </Grid>
+
+                          <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
+                            <Box sx={{ bgcolor: `${secondaryColor}05`, borderRadius: 1, p: 1 }}>
+                              <Typography variant='caption' color={secondaryDark} fontWeight='600'>
+                                Properties
+                              </Typography>
+                              <Stack direction='row' spacing={0.5} sx={{ mt: 0.5 }}>
+                                <Chip
+                                  label={pkg.stackable ? 'Stack' : 'No Stack'}
+                                  color={pkg.stackable ? 'success' : 'default'}
+                                  size='small'
+                                  sx={{ fontSize: '10px', height: '20px' }}
+                                />
+                                <Chip
+                                  label={pkg.dangerousGoods ? 'Danger' : 'Safe'}
+                                  color={pkg.dangerousGoods ? 'error' : 'success'}
+                                  size='small'
+                                  sx={{ fontSize: '10px', height: '20px' }}
+                                />
+                              </Stack>
+                              <Typography variant='caption' display='block' sx={{ mt: 0.5 }}>
+                                <Temperature sx={{ fontSize: 10, mr: 0.5 }} />
+                                {pkg.tempControlled
+                                  ? `${pkg.tempControlledMinTemp}-${pkg.tempControlledMaxTemp}°C`
+                                  : 'No temp control'}
+                              </Typography>
+                            </Box>
+                          </Grid>
+
+                          <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+                            <Box>
+                              <Typography variant='caption' color='text.secondary'>
+                                <strong>Marks:</strong> {pkg.marksAndNumbers}
+                              </Typography>
+                              <Typography variant='caption' color='text.secondary' display='block'>
+                                <strong>Goods:</strong>{' '}
+                                {stringUtils.toSpacedCapitalized(pkg.typeOfGoods)}
+                              </Typography>
+                              <Typography
+                                variant='caption'
+                                color='text.secondary'
+                                display='block'
+                                sx={{ fontStyle: 'italic' }}
+                              >
+                                {pkg.packageNote}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </Paper>
+                    ))}
+                  </Stack>
+                </Box>
+              ) : (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: 'rgba(158, 158, 158, 0.05)',
+                    border: '1px dashed rgba(158, 158, 158, 0.3)',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant='body2' color='text.secondary'>
+                    <FiPackage /> No packages provided
+                  </Typography>
+                </Paper>
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

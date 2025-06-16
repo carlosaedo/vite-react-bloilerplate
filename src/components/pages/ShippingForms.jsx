@@ -312,6 +312,8 @@ const ShippingForms = () => {
   const { token } = useAuth();
   const [selectedForm, setSelectedForm] = useState(null);
 
+  const handleCloseDialog = () => setSelectedForm(null);
+
   const [message, setMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -774,7 +776,13 @@ const ShippingForms = () => {
           ))}
         </List>
       </Box>
-      {selectedForm && <ShippingFormDetails form={selectedForm} />}
+      {selectedForm && (
+        <ShippingFormDetails
+          form={selectedForm}
+          openDialog={true}
+          onCloseDialog={handleCloseDialog}
+        />
+      )}
     </React.Fragment>
   );
 };

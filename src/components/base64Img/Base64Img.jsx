@@ -117,6 +117,15 @@ export default function RotatedImage({ base64, zpl, label = 'Label' }) {
     }
   };
 
+  const printString = () => {
+    const printWindow = window.open('', '_blank', 'width=1,height=1');
+    printWindow.document.write(`<pre style="margin:0">${zpl}</pre>`);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
+
   if (!base64) return null;
 
   return (
@@ -218,6 +227,9 @@ export default function RotatedImage({ base64, zpl, label = 'Label' }) {
                 </IconButton>
                 <IconButton onClick={handlePrintZpl} sx={{ mr: 1 }} color='primary'>
                   <PrintIcon /> ZPL
+                </IconButton>
+                <IconButton onClick={printString} sx={{ mr: 1 }} color='primary'>
+                  <PrintIcon /> String
                 </IconButton>
                 <IconButton onClick={handleClose}>
                   <CloseIcon />
