@@ -118,7 +118,7 @@ export default function RotatedImage({ base64, zpl, label = 'Label' }) {
   };
 
   const printString = () => {
-    const printWindow = window.open('', '_blank', 'width=1,height=1');
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
     printWindow.document.write(`<pre style="margin:0">${zpl}</pre>`);
     printWindow.document.close();
     printWindow.focus();

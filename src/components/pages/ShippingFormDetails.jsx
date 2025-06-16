@@ -54,7 +54,15 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
 
   const [formData, setFormData] = useState(form);
 
-  const [showSSCC, setShowSSCC] = useState(false);
+  const [showSSCC, setShowSSCC] = useState({});
+
+  const toggleSSCC = (index) => {
+    setShowSSCC((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+    console.log(showSSCC);
+  };
 
   // Only update if form actually changed
   useEffect(() => {
@@ -619,7 +627,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                         }}
                       >
                         <Grid container spacing={2} alignItems='center'>
-                          <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+                          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <Stack direction='row' alignItems='center' spacing={1}>
                               <Avatar sx={{ bgcolor: primaryColor, width: 28, height: 28 }}>
                                 <Typography variant='caption' fontWeight='bold'>
@@ -634,7 +642,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                             </Stack>
                           </Grid>
 
-                          <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
+                          <Grid size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
                             <Box sx={{ bgcolor: `${primaryColor}05`, borderRadius: 1, p: 1 }}>
                               <Typography variant='caption' color={primaryColor} fontWeight='600'>
                                 <RxDimensions /> Dimensions
@@ -649,7 +657,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                             </Box>
                           </Grid>
 
-                          <Grid item size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
+                          <Grid size={{ xs: 12, sm: 6, md: 2, ld: 2 }}>
                             <Box sx={{ bgcolor: `${secondaryColor}05`, borderRadius: 1, p: 1 }}>
                               <Typography variant='caption' color={secondaryDark} fontWeight='600'>
                                 Properties
@@ -677,7 +685,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                             </Box>
                           </Grid>
 
-                          <Grid item size={{ xs: 12, sm: 6, md: 3 }}>
+                          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <Box>
                               <Typography variant='caption' color='text.secondary'>
                                 <strong>Marks:</strong> {pkg.marksAndNumbers}
@@ -696,14 +704,16 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                               </Typography>
                             </Box>
                           </Grid>
+                          {!!pkg?.ssccs?.length && (
+                            <Grid>
+                              <Button variant='outlined' onClick={() => toggleSSCC(index)}>
+                                {showSSCC[index] ? 'Hide SSCC' : 'Show SSCC'}
+                              </Button>
+                            </Grid>
+                          )}
                         </Grid>
                         {/* SSCSS */}
-                        {!!pkg?.ssccs?.length && (
-                          <Button variant='outlined' onClick={() => setShowSSCC(!showSSCC)}>
-                            {showSSCC ? 'Hide SSCC' : 'Show SSCC'}
-                          </Button>
-                        )}
-                        {showSSCC && pkg?.ssccs?.length > 0 && (
+                        {showSSCC[index] && pkg?.ssccs?.length > 0 && (
                           <Stack spacing={2} sx={{ mt: 2 }}>
                             <Box>
                               <Stack
@@ -720,23 +730,27 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                                 </Typography>
                               </Stack>
                               <Stack direction='row' spacing={2} flexWrap='wrap'>
-                                {pkg?.ssccs?.map((sscc, index) => (
-                                  <Stack
-                                    key={sscc.id || index}
-                                    direction='column'
-                                    spacing={1}
-                                    alignItems='center'
-                                  >
-                                    <Typography variant='caption' fontWeight='medium'>
-                                      #{sscc.sscc}
-                                    </Typography>
-                                    <Base64Img
-                                      base64={sscc.labelImg}
-                                      zpl={sscc.labelZpl}
-                                      label={sscc.sscc}
-                                    />
+                                {showSSCC[index] && pkg?.ssccs?.length > 0 && (
+                                  <Stack direction='row' spacing={2} flexWrap='wrap' mt={2}>
+                                    {pkg.ssccs.map((sscc, ssccIndex) => (
+                                      <Stack
+                                        key={sscc.id || ssccIndex}
+                                        direction='column'
+                                        spacing={1}
+                                        alignItems='center'
+                                      >
+                                        <Typography variant='caption' fontWeight='medium'>
+                                          #{sscc.sscc}
+                                        </Typography>
+                                        <Base64Img
+                                          base64={sscc.labelImg}
+                                          zpl={sscc.labelZpl}
+                                          label={sscc.sscc}
+                                        />
+                                      </Stack>
+                                    ))}
                                   </Stack>
-                                ))}
+                                )}
                               </Stack>
                             </Box>
                           </Stack>
