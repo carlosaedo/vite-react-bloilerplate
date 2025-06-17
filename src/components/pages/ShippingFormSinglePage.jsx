@@ -852,16 +852,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const time = now.toTimeString().slice(0, 5); // "HH:MM"
     const today = now.toISOString().slice(0, 10); // "yyyy-MM-dd"
     const year = now.getFullYear();
-    const waybillRandom = Math.floor(Math.random() * 1000000)
-      .toString()
-      .padStart(6, '0');
 
     const updatedData = {
       ...shippingFormData,
       deliveryTime: time,
       date: today,
       year: year,
-      waybillNumber: waybillRandom,
       hour: shippingFormData.hour || time,
     };
 

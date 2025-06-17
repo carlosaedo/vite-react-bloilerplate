@@ -11,15 +11,23 @@ export const ShippingFormProvider = ({ children }) => {
   const [trackingNumberShippingForm, setTrackingNumberShippingForm] = useState([]);
   const { token } = useAuth();
 
+  const now = new Date();
+  const time = now.toTimeString().slice(0, 5); // "HH:MM"
+  const today = now.toISOString().slice(0, 10); // "yyyy-MM-dd"
+  const year = now.getFullYear();
+  const waybillRandom = Math.floor(Math.random() * 1000000)
+    .toString()
+    .padStart(6, '0');
+
   const getInitialFormData = (trackingRef = null) => ({
     senderTaxId: '',
     recipientTaxId: '',
     shippingPayment: 'pronto',
     shippingPaymentTo: 'expeditor',
-    year: '',
-    waybillNumber: '',
-    hour: '',
-    date: '',
+    deliveryTime: time,
+    date: today,
+    year: year,
+    hour: time,
     extNumber: '',
     deliveryDate: '',
     extNumber2: '',
