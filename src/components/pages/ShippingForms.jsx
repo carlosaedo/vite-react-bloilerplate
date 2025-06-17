@@ -59,7 +59,7 @@ const mockShippingForms = [
     shipperAdd2: '',
     shipperCity: 'New York',
     shipperZip: '10001',
-    shipperCountry: 'USA',
+    shipperCountry: 'US',
     shipperVAT: 'VAT123',
     consigneeId: 'c001',
     consigneeName: 'Alice Consignee',
@@ -69,7 +69,7 @@ const mockShippingForms = [
     consigneeAdd2: '',
     consigneeCity: 'Los Angeles',
     consigneeZip: '90001',
-    consigneeCountry: 'USA',
+    consigneeCountry: 'US',
     consigneeVAT: 'VAT456',
     valueOfGoods: 1200,
     insured: true,
@@ -96,7 +96,7 @@ const mockShippingForms = [
     shipperAdd2: '',
     shipperCity: 'New York',
     shipperZip: '10001',
-    shipperCountry: 'USA',
+    shipperCountry: 'US',
     shipperVAT: 'VAT123',
     consigneeId: 'c001',
     consigneeName: 'Alice Consignee',
@@ -106,7 +106,7 @@ const mockShippingForms = [
     consigneeAdd2: '',
     consigneeCity: 'Los Angeles',
     consigneeZip: '90001',
-    consigneeCountry: 'USA',
+    consigneeCountry: 'US',
     consigneeVAT: 'VAT456',
     valueOfGoods: 1200,
     insured: true,
@@ -132,7 +132,7 @@ const mockShippingForms = [
     shipperAdd2: '',
     shipperCity: 'New York',
     shipperZip: '10001',
-    shipperCountry: 'USA',
+    shipperCountry: 'US',
     shipperVAT: 'VAT123',
     consigneeId: 'c001',
     consigneeName: 'Alice Consignee',
@@ -142,7 +142,7 @@ const mockShippingForms = [
     consigneeAdd2: '',
     consigneeCity: 'Los Angeles',
     consigneeZip: '90001',
-    consigneeCountry: 'USA',
+    consigneeCountry: 'US',
     consigneeVAT: 'VAT456',
     valueOfGoods: 1200,
     insured: true,
@@ -331,7 +331,7 @@ const mockShippingForms = [
     shipperAdd2: '',
     shipperCity: 'New York',
     shipperZip: '10001',
-    shipperCountry: 'USA',
+    shipperCountry: 'US',
     shipperVAT: 'VAT123',
     consigneeId: 'c001',
     consigneeName: 'Alice Consignee',
@@ -341,7 +341,7 @@ const mockShippingForms = [
     consigneeAdd2: '',
     consigneeCity: 'Los Angeles',
     consigneeZip: '90001',
-    consigneeCountry: 'USA',
+    consigneeCountry: 'US',
     consigneeVAT: 'VAT456',
     valueOfGoods: 1200,
     insured: true,
@@ -367,7 +367,7 @@ const mockShippingForms = [
     shipperAdd2: '',
     shipperCity: 'Chicago',
     shipperZip: '60601',
-    shipperCountry: 'USA',
+    shipperCountry: 'US',
     shipperVAT: 'VAT789',
     consigneeId: 'c002',
     consigneeName: 'Bob Receiver',
@@ -377,7 +377,7 @@ const mockShippingForms = [
     consigneeAdd2: '',
     consigneeCity: 'Houston',
     consigneeZip: '77001',
-    consigneeCountry: 'USA',
+    consigneeCountry: 'US',
     consigneeVAT: 'VAT987',
     valueOfGoods: 0,
     insured: false,
@@ -625,7 +625,8 @@ const ShippingForms = () => {
                                 textOverflow: 'ellipsis',
                               }}
                             >
-                              {form.shipperName} ({form.shipperCity})
+                              {form.shipperName} ({form.shipperCountry} - {form.shipperZip} -{' '}
+                              {form.shipperCity})
                             </Typography>{' '}
                           </Tooltip>
                         </Box>
@@ -668,89 +669,10 @@ const ShippingForms = () => {
                                 textOverflow: 'ellipsis',
                               }}
                             >
-                              {form.consigneeName} ({form.consigneeCity})
+                              {form.consigneeName} ({form.consigneeCountry} - {form.consigneeZip} -{' '}
+                              {form.consigneeCity})
                             </Typography>
                           </Tooltip>
-                        </Box>
-
-                        {/* Cargo Details */}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            minWidth: 0,
-                            flexGrow: 1,
-                            flexBasis: { xs: '100%', sm: 'auto' },
-                          }}
-                        >
-                          <Stack
-                            direction={{ xs: 'column', sm: 'row' }}
-                            spacing={{ xs: 0.5, sm: 1 }}
-                            useFlexGap
-                            flexWrap='wrap'
-                            sx={{
-                              color: 'rgb(65, 87, 81)',
-                              fontWeight: 500,
-                              width: '100%',
-                            }}
-                          >
-                            <Typography
-                              sx={{
-                                background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                              }}
-                              variant='body2'
-                            >
-                              <FiPackage color='#003D2C' /> Packages: 3
-                            </Typography>
-                            <Typography
-                              sx={{
-                                background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                              }}
-                              variant='body2'
-                            >
-                              <TbPackages color='#003D2C' /> Volumes: 2
-                            </Typography>
-                            <Typography
-                              sx={{
-                                background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                              }}
-                              variant='body2'
-                            >
-                              <LuWeight color='#003D2C' /> Weight: 356Kg
-                            </Typography>
-                            <Typography
-                              sx={{
-                                background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                              }}
-                              variant='body2'
-                            >
-                              <TbPackageExport color='#003D2C' /> cbm: 6453
-                            </Typography>
-                            <Typography
-                              sx={{
-                                background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                              }}
-                              variant='body2'
-                            >
-                              <GiReceiveMoney color='#003D2C' /> Taxable Weight: 6445
-                            </Typography>
-                          </Stack>
                         </Box>
                       </Box>
 
@@ -848,6 +770,86 @@ const ShippingForms = () => {
                           </Box>
                         )}
                       </Box>
+                    </Box>
+                    {/* Cargo Details */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        minWidth: 0,
+                        flexGrow: 1,
+                        flexBasis: { xs: '100%', sm: 'auto' },
+                        mt: 2,
+                      }}
+                    >
+                      <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={{ xs: 0.5, sm: 1 }}
+                        useFlexGap
+                        flexWrap='wrap'
+                        sx={{
+                          color: 'rgb(65, 87, 81)',
+                          fontWeight: 500,
+                          width: '100%',
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }}
+                          variant='body2'
+                        >
+                          <FiPackage color='#003D2C' /> Packages: 3
+                        </Typography>
+                        <Typography
+                          sx={{
+                            background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }}
+                          variant='body2'
+                        >
+                          <TbPackages color='#003D2C' /> Volumes: 2
+                        </Typography>
+                        <Typography
+                          sx={{
+                            background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }}
+                          variant='body2'
+                        >
+                          <LuWeight color='#003D2C' /> Weight: 356Kg
+                        </Typography>
+                        <Typography
+                          sx={{
+                            background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }}
+                          variant='body2'
+                        >
+                          <TbPackageExport color='#003D2C' /> cbm: 6453
+                        </Typography>
+                        <Typography
+                          sx={{
+                            background: 'linear-gradient(135deg, #003D2C, #2E7D32)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }}
+                          variant='body2'
+                        >
+                          <GiReceiveMoney color='#003D2C' /> Taxable Weight: 6445
+                        </Typography>
+                      </Stack>
                     </Box>
                   </Box>
                 </ListItemButton>
