@@ -8,10 +8,9 @@ const ShippingFormContext = createContext(null);
 // Provider Component
 export const ShippingFormProvider = ({ children }) => {
   const [loadingShippingForm, setLoadingShippingForm] = useState(true);
-  const [trackingNumberShippingForm, setTrackingNumberShippingForm] = useState(null);
+  const [trackingNumberShippingForm, setTrackingNumberShippingForm] = useState([]);
   const { token } = useAuth();
 
-  // Initialize form data with default values
   const getInitialFormData = (trackingRef = null) => ({
     senderTaxId: '',
     recipientTaxId: '',
@@ -84,31 +83,26 @@ export const ShippingFormProvider = ({ children }) => {
   });
 
   const [formData, setFormData] = useState(() => {
-    // Load from localStorage on initial render
     try {
-      const storedData = localStorage.getItem('shippingFormData');
-      const storedTrackingNumber = localStorage.getItem('trackingNumberShippingForm');
-
+      const storedTrackingNumbers =
+        JSON.parse(localStorage.getItem('trackingNumberShippingForm')) || [];
+      const latestTrackingNumber = storedTrackingNumbers[storedTrackingNumbers.length - 1];
+      const key = `shippingFormData_${latestTrackingNumber}`;
+      const storedData = localStorage.getItem(key);
       if (storedData) {
         const parsedData = JSON.parse(storedData);
-        // Ensure tracking ref is updated if we have a stored tracking number
-        if (storedTrackingNumber) {
-          parsedData.trackingRef = storedTrackingNumber;
-        }
+        parsedData.trackingRef = latestTrackingNumber;
         return parsedData;
       }
-      console.log(getInitialFormData(storedTrackingNumber));
-      return getInitialFormData(storedTrackingNumber);
+      return getInitialFormData(latestTrackingNumber);
     } catch (error) {
       console.error('Error loading form data from localStorage:', error);
       return getInitialFormData();
     }
   });
 
-  // Function to fetch tracking number from API
   const fetchTrackingNumber = async () => {
     if (!token) {
-      setTrackingNumberShippingForm(null);
       setLoadingShippingForm(false);
       return false;
     }
@@ -129,68 +123,56 @@ export const ShippingFormProvider = ({ children }) => {
 
       if (response?.data) {
         const trackingNumber = response.data.trackingNumber;
-        setTrackingNumberShippingForm(trackingNumber);
-        localStorage.setItem('trackingNumberShippingForm', trackingNumber);
+        setFormData(getInitialFormData(trackingNumber));
 
-        // Update form data with the new tracking number
-        setFormData((prevData) => ({
-          ...prevData,
-          trackingRef: trackingNumber,
-        }));
+        setTrackingNumberShippingForm((prev) => {
+          const updated = [...prev, trackingNumber];
+          localStorage.setItem('trackingNumberShippingForm', JSON.stringify(updated));
+          return updated;
+        });
 
         setLoadingShippingForm(false);
-        return true; // Success
+        return trackingNumber; // Return the actual tracking number string
       } else {
-        setTrackingNumberShippingForm(null);
         setLoadingShippingForm(false);
-        return false; // Failed
+        return null;
       }
     } catch (error) {
       console.error('Error fetching tracking number:', error);
-      setTrackingNumberShippingForm(null);
       setLoadingShippingForm(false);
-      return false; // Failed
+      return null;
     }
   };
 
-  // Initialize data and set up retry mechanism
   useEffect(() => {
     let retryInterval = null;
 
     async function initializeData() {
-      // Check if we already have a tracking number in localStorage
-      const storedTrackingNumber = localStorage.getItem('trackingNumberShippingForm');
-
-      if (storedTrackingNumber && storedTrackingNumber !== 'null') {
-        setTrackingNumberShippingForm(storedTrackingNumber);
+      const stored = JSON.parse(localStorage.getItem('trackingNumberShippingForm')) || [];
+      if (stored.length > 0) {
+        const latestTracking = stored[stored.length - 1];
+        setTrackingNumberShippingForm(stored);
         setFormData((prevData) => ({
           ...prevData,
-          trackingRef: storedTrackingNumber,
+          trackingRef: latestTracking,
         }));
         setLoadingShippingForm(false);
         return;
       }
 
-      // Try to fetch tracking number
       const success = await fetchTrackingNumber();
-
-      // If failed and we have a token, set up retry interval
       if (!success && token) {
         retryInterval = setInterval(async () => {
-          console.log('Retrying to fetch tracking number...');
           const retrySuccess = await fetchTrackingNumber();
-
-          // Clear interval if successful
           if (retrySuccess) {
             clearInterval(retryInterval);
           }
-        }, 10000); // Retry every 10 seconds
+        }, 10000);
       }
     }
 
     initializeData();
 
-    // Cleanup interval on unmount or token change
     return () => {
       if (retryInterval) {
         clearInterval(retryInterval);
@@ -198,36 +180,59 @@ export const ShippingFormProvider = ({ children }) => {
     };
   }, [token]);
 
-  // Save form data to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem('shippingFormData', JSON.stringify(formData));
+      if (formData?.trackingRef) {
+        const key = `shippingFormData_${formData.trackingRef}`;
+        localStorage.setItem(key, JSON.stringify(formData));
+      }
     } catch (error) {
       console.error('Error saving form data to localStorage:', error);
     }
   }, [formData]);
 
-  const resetForm = () => {
-    const resetData = getInitialFormData(trackingNumberShippingForm);
-
+  const resetForm = (trackingNumber = trackingNumberShippingForm) => {
+    const resetData = getInitialFormData(trackingNumber);
     setFormData(resetData);
-
-    // Clear stored data
     try {
-      localStorage.removeItem('shippingFormData');
-      // Note: Keep the tracking number in localStorage unless you want to clear it too
-      // localStorage.removeItem('trackingNumberShippingForm');
+      if (trackingNumber) {
+        const key = `shippingFormData_${trackingNumber}`;
+        localStorage.removeItem(key);
+      }
     } catch (error) {
       console.error('Error clearing localStorage:', error);
     }
   };
 
   const updateFormData = (newData) => {
-    console.log('New data on context: ', newData);
     setFormData((prevData) => ({
       ...prevData,
       ...newData,
     }));
+  };
+
+  const setActiveTrackingNumber = (trackingNumber) => {
+    if (!trackingNumber) return;
+
+    const key = `shippingFormData_${trackingNumber}`;
+    const storedData = localStorage.getItem(key);
+
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      parsedData.trackingRef = trackingNumber;
+      setFormData(parsedData);
+    } else {
+      setFormData(getInitialFormData(trackingNumber));
+    }
+  };
+
+  const removeTrackingNumber = (trackingNumber) => {
+    setTrackingNumberShippingForm((prev) => {
+      const updated = prev.filter((t) => t !== trackingNumber);
+      localStorage.setItem('trackingNumberShippingForm', JSON.stringify(updated));
+      localStorage.removeItem(`shippingFormData_${trackingNumber}`);
+      return updated;
+    });
   };
 
   return (
@@ -238,7 +243,9 @@ export const ShippingFormProvider = ({ children }) => {
         resetShippingFormData: resetForm,
         loadingShippingForm,
         trackingNumberShippingForm,
-        retryFetchTrackingNumber: fetchTrackingNumber, // Manual retry function
+        retryFetchTrackingNumber: fetchTrackingNumber,
+        removeTrackingNumber,
+        setActiveTrackingNumber,
       }}
     >
       {children}
@@ -246,7 +253,6 @@ export const ShippingFormProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use context
 export const useShippingFormContext = () => {
   const context = useContext(ShippingFormContext);
   if (!context) {

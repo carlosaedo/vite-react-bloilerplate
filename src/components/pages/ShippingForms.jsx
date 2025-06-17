@@ -407,6 +407,26 @@ const ShippingForms = () => {
     setSelectedForm(form); // trigger a re-render
   };
 
+  useEffect(() => {
+    const fetchShippingForms = async () => {
+      try {
+        const response = await torrestirApi.get(
+          `/api/bookings/search?clientId=37aacab0-13c9-11f0-854e-005056b7886b&startDate=2025-06-01&endDate=2025-06-30&page=1&pageSize=20`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching shipping forms:', error);
+      }
+    };
+
+    fetchShippingForms();
+  }, []);
+
   const handleTrackingNumberChange = (value) => {
     setTrackingNumber(value);
     setErrorMessage(null);

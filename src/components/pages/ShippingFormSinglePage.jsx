@@ -42,6 +42,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 
 import { useTheme } from '@mui/material/styles';
@@ -152,10 +154,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const setShippingFormData = isExternal ? setLocalShippingFormData : context.setShippingFormData;
   const resetShippingFormData = isExternal ? () => {} : context.resetShippingFormData;
   const retryFetchTrackingNumber = isExternal ? () => {} : context.retryFetchTrackingNumber;
-  const trackingNumberShippingForm = isExternal
-    ? externalFormData.trackingNumber
+  const trackingNumbers = isExternal
+    ? [externalFormData.trackingNumber]
     : context.trackingNumberShippingForm;
   const loadingShippingForm = isExternal ? false : context.loadingShippingForm;
+  const setActiveTrackingNumber = isExternal ? () => {} : context.setActiveTrackingNumber;
+
   const [message, setMessage] = useState(null);
 
   const [compactShippingInfo, setCompactShippingInfo] = useState(true);
@@ -875,7 +879,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   return (
     <React.Fragment>
       {!isExternal &&
-        (shippingFormData.trackingRef === null || trackingNumberShippingForm === null) && (
+        (!shippingFormData.trackingRef ||
+          !trackingNumbers ||
+          trackingNumbers.length === 0 ||
+          !trackingNumbers.includes(shippingFormData.trackingRef)) && (
           <Alert
             severity='error'
             action={
@@ -950,7 +957,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 mb: 3,
                 color: '#003D2C',
                 letterSpacing: '-0.025em',
-
                 display: 'flex',
                 alignItems: 'baseline',
                 flexWrap: 'wrap',
@@ -959,24 +965,62 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               {isExternal && 'Editing '}
               Shipping Form
               {shippingFormData.trackingRef ? (
-                <Box
-                  component='span'
-                  sx={{
-                    ml: 2,
-                    mt: { xs: 1, sm: 0 },
-                    px: 1.5,
-                    py: 0.3,
-                    bgcolor: '#ffc928',
-                    color: '#003e2d',
-                    borderRadius: 1,
-                    fontWeight: 600,
-                    fontSize: '0.875rem',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                    userSelect: 'none',
-                  }}
-                >
-                  Tracking: {shippingFormData.trackingRef}
-                </Box>
+                <React.Fragment>
+                  {!isExternal ? (
+                    <FormControl size='small' sx={{ minWidth: 180, ml: 2 }}>
+                      <InputLabel>Tracking</InputLabel>
+                      <Select
+                        label='Tracking'
+                        value={shippingFormData.trackingRef || ''}
+                        onChange={(e) => {
+                          const selected = e.target.value;
+                          setActiveTrackingNumber(selected);
+                        }}
+                      >
+                        {trackingNumbers.map((num) => (
+                          <MenuItem key={num} value={num}>
+                            {num}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <Box
+                      component='span'
+                      sx={{
+                        ml: 2,
+                        mt: { xs: 1, sm: 0 },
+                        px: 1.5,
+                        py: 0.3,
+                        bgcolor: '#ffc928',
+                        color: '#003e2d',
+                        borderRadius: 1,
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                        userSelect: 'none',
+                      }}
+                    >
+                      {`Tracking Number: ${shippingFormData?.trackingRef}`}
+                    </Box>
+                  )}
+
+                  {!isExternal && (
+                    <Button
+                      variant='outlined'
+                      size='small'
+                      onClick={async () => {
+                        const newTracking = await retryFetchTrackingNumber(); // returns string
+                        if (newTracking) {
+                          resetShippingFormData(newTracking); // requires update in context
+                        }
+                      }}
+                      sx={{ ml: 2 }}
+                    >
+                      New Tracking Number
+                    </Button>
+                  )}
+                </React.Fragment>
               ) : (
                 <Typography
                   component='span'
@@ -996,20 +1040,20 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
             {/* Optional button (still commented out) */}
             {/*
-    <Tooltip title='Multi tab form' placement='top' arrow>
-      <Button
-        onClick={handleChangeFormTypeToParent}
-        variant='contained'
-        color='primary'
-        sx={{
-          marginLeft: 'auto',
-          fontSize: '30px',
-        }}
-      >
-        <LiaWpforms />
-      </Button>
-    </Tooltip>
-    */}
+  <Tooltip title='Multi tab form' placement='top' arrow>
+    <Button
+      onClick={handleChangeFormTypeToParent}
+      variant='contained'
+      color='primary'
+      sx={{
+        marginLeft: 'auto',
+        fontSize: '30px',
+      }}
+    >
+      <LiaWpforms />
+    </Button>
+  </Tooltip>
+  */}
           </Box>
 
           {/* Right side */}
