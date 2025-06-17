@@ -76,6 +76,11 @@ export const ShippingFormProvider = ({ children }) => {
     tempControlled: false,
     tempControlledMinTemp: '',
     tempControlledMaxTemp: '',
+    RetailStoreFlag: false,
+    DriversHelperFlag: false,
+    PriorContactFlag: false,
+    PinCodeFlag: false,
+    PinCode: '',
   });
 
   const [formData, setFormData] = useState(() => {

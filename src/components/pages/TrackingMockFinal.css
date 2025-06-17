@@ -1,8 +1,5 @@
 /* Tracking.css */
 
-/* Import Google Fonts - Roboto */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-
 /* CSS Variables for easy theme management */
 :root {
   --primary-green: #003d2c;

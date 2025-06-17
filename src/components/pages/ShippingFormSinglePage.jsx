@@ -118,6 +118,10 @@ function calculateFee(value) {
   return parseFloat(Math.max(fee, 25).toFixed(2));
 }
 
+function generateSixDigitsPin() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const location = useLocation();
   const navigateTo = useNavigate();
@@ -179,6 +183,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [shippingSenderRouting, setShippingSenderRouting] = useState(null);
 
   const [shippingRecipientRouting, setShippingRecipientRouting] = useState(null);
+
+  const [isPinFieldDisabled, setIsPinFieldDisabled] = useState(true);
+
+  const handlePinFieldEdit = () => {
+    setIsPinFieldDisabled((prev) => !prev);
+  };
 
   const clientFromStorage = JSON.parse(localStorage.getItem('selectedClient')) || null;
 
@@ -351,6 +361,16 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       value = sanitizeDecimalInputTemp(value);
     }
 
+    if (name === 'PinCodeFlag' && value) {
+      updatedShippingFormData['PinCode'] = generateSixDigitsPin();
+      setIsPinFieldDisabled(true);
+    }
+
+    if (name === 'PinCodeFlag' && value === false) {
+      updatedShippingFormData['PinCode'] = '';
+      setIsPinFieldDisabled(true);
+    }
+
     if (name === 'tempControlled' && value === false) {
       updatedShippingFormData['tempControlledMaxTemp'] = '';
       updatedShippingFormData['tempControlledMinTemp'] = '';
@@ -358,6 +378,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
     if (name === 'insured' && checked === false) {
       updatedShippingFormData['valueOfGoods'] = '';
+      updatedShippingFormData['valueOfInsurance'] = '';
     }
 
     setMessage(null);
@@ -2259,6 +2280,88 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               required
             />
           </Grid>
+        </Grid>
+        <Grid container spacing={2}>
+          <Grid>
+            <FormControlLabel
+              sx={{ mt: 1 }}
+              control={
+                <Checkbox
+                  checked={shippingFormData?.RetailStoreFlag || false}
+                  onChange={handleChange}
+                  name='RetailStoreFlag'
+                  color='primary'
+                />
+              }
+              label='Retail Store'
+            />
+          </Grid>
+          <Grid>
+            <FormControlLabel
+              sx={{ mt: 1 }}
+              control={
+                <Checkbox
+                  checked={shippingFormData?.DriversHelperFlag || false}
+                  onChange={handleChange}
+                  name='DriversHelperFlag'
+                  color='primary'
+                />
+              }
+              label='Drivers Helper'
+            />
+          </Grid>
+          <Grid>
+            <FormControlLabel
+              sx={{ mt: 1 }}
+              control={
+                <Checkbox
+                  checked={shippingFormData?.PriorContactFlag || false}
+                  onChange={handleChange}
+                  name='PriorContactFlag'
+                  color='primary'
+                />
+              }
+              label='Prior Contact'
+            />
+          </Grid>
+          <Grid>
+            <FormControlLabel
+              sx={{ mt: 1 }}
+              control={
+                <Checkbox
+                  checked={shippingFormData?.PinCodeFlag || false}
+                  onChange={handleChange}
+                  name='PinCodeFlag'
+                  color='primary'
+                />
+              }
+              label='Pin Code'
+            />
+          </Grid>
+          {shippingFormData?.PinCodeFlag && (
+            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+              <TextField
+                label='Pin Code'
+                name='PinCode'
+                value={shippingFormData?.PinCode || ''}
+                onChange={handleChange}
+                fullWidth
+                size='small'
+                margin='dense'
+                required={shippingFormData?.PinCodeFlag || false}
+                disabled={isPinFieldDisabled}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <IconButton onClick={handlePinFieldEdit} edge='end' size='small'>
+                        <Edit fontSize='small' />
+                      </IconButton>
+                    ),
+                  },
+                }}
+              />
+            </Grid>
+          )}
         </Grid>
         {/* Additional Info */}
         <Box sx={{ mb: 4 }}>

@@ -9,6 +9,7 @@ import cleanLocalStorage from './utils/cleanLocalStorage.js';
 import theme from './theme'; // import the theme file
 import App from './App.jsx';
 import './index.css';
+import './Robot.css';
 
 // Check app version before rendering
 const APP_BUILD_VERSION = appBuildVersion;
