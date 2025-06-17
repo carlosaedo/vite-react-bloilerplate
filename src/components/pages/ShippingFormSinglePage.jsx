@@ -113,6 +113,11 @@ const shippingPaymentTo = [
   { value: 'destinatario', label: 'Destinatário' },
 ];
 
+function calculateFee(value) {
+  const fee = value * 0.006;
+  return parseFloat(Math.max(fee, 25).toFixed(2));
+}
+
 function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const location = useLocation();
   const navigateTo = useNavigate();
@@ -335,15 +340,16 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     const { name, type, checked } = event.target;
     let value = event.target.value;
 
+    let updatedShippingFormData = { ...shippingFormData };
+
     if (['valueOfGoods'].includes(name) && value !== '') {
       value = sanitizeDecimalInput(value);
+      updatedShippingFormData['valueOfInsurance'] = calculateFee(value);
     }
 
     if (['tempControlledMaxTemp', 'tempControlledMinTemp'].includes(name) && value !== '') {
       value = sanitizeDecimalInputTemp(value);
     }
-
-    let updatedShippingFormData = { ...shippingFormData };
 
     if (name === 'tempControlled' && value === false) {
       updatedShippingFormData['tempControlledMaxTemp'] = '';
@@ -3137,24 +3143,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     label='Dangerous Goods'
                   />
                 </Grid>
-
-                {shippingFormData.packages[selectedPackageIndex]?.insured && (
-                  <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                    <TextField
-                      label='Value of Goods (€)'
-                      name={`packageValue_${selectedPackageIndex}`}
-                      value={shippingFormData.packages[selectedPackageIndex]?.valueOfGoods || ''}
-                      onChange={(e) =>
-                        handlePackageChange(selectedPackageIndex, 'valueOfGoods', e.target.value)
-                      }
-                      fullWidth
-                      size='small'
-                      margin='dense'
-                      required={shippingFormData.packages[selectedPackageIndex]?.insured || false}
-                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-                    />
-                  </Grid>
-                )}
               </Grid>
             </React.Fragment>
           </Box>
@@ -3190,6 +3178,18 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     size='small'
                     margin='dense'
                     required={shippingFormData?.insured || false}
+                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                  <TextField
+                    label='Estimated value of Insurance € (*1)'
+                    name={'valueOfInsurance'}
+                    value={shippingFormData.valueOfInsurance || ''}
+                    fullWidth
+                    size='small'
+                    margin='dense'
+                    disabled
                     slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                   />
                 </Grid>
@@ -3315,6 +3315,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               </React.Fragment>
             )}
           </Grid>
+          <Typography
+            variant='body2'
+            color='textSecondary'
+            component='div'
+            sx={{ textAlign: 'left', mt: 2 }}
+          >
+            (*1): insurance exclusions may apply. Follow the link for more information.
+          </Typography>
         </Box>
 
         <Box
