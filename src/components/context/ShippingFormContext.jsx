@@ -60,9 +60,6 @@ export const ShippingFormProvider = ({ children }) => {
         dangerousGoods: false,
         marksAndNumbers: '',
         typeOfGoods: 'general_goods',
-        tempControlled: false,
-        tempControlledMinTemp: '',
-        tempControlledMaxTemp: '',
       },
     ],
     valueOfGoods: '',
@@ -76,6 +73,9 @@ export const ShippingFormProvider = ({ children }) => {
     consigneeRef: '',
     shipperInstructions: '',
     consigneeInstructions: '',
+    tempControlled: false,
+    tempControlledMinTemp: '',
+    tempControlledMaxTemp: '',
   });
 
   const [formData, setFormData] = useState(() => {

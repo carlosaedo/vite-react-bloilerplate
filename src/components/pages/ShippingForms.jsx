@@ -150,6 +150,9 @@ const mockShippingForms = [
     shippingService: 'Standard',
     shipperInstructions: 'Handle with care',
     consigneeInstructions: 'Deliver before noon',
+    tempControlled: true,
+    tempControlledMinTemp: '-4',
+    tempControlledMaxTemp: '10',
     packages: [
       {
         packageQuantity: '1',
@@ -166,9 +169,6 @@ const mockShippingForms = [
         dangerousGoods: true,
         marksAndNumbers: '3 on the left',
         typeOfGoods: 'general_goods',
-        tempControlled: true,
-        tempControlledMinTemp: '-4',
-        tempControlledMaxTemp: '10',
         ssccs: [
           {
             id: 1,
@@ -262,9 +262,6 @@ const mockShippingForms = [
         dangerousGoods: true,
         marksAndNumbers: '3 on the left',
         typeOfGoods: 'general_goods',
-        tempControlled: true,
-        tempControlledMinTemp: '-4',
-        tempControlledMaxTemp: '10',
       },
       {
         packageQuantity: '1',
@@ -281,9 +278,6 @@ const mockShippingForms = [
         dangerousGoods: true,
         marksAndNumbers: '3 on the left',
         typeOfGoods: 'general_goods',
-        tempControlled: true,
-        tempControlledMinTemp: '-4',
-        tempControlledMaxTemp: '10',
       },
       {
         packageQuantity: '1',
@@ -300,9 +294,6 @@ const mockShippingForms = [
         dangerousGoods: true,
         marksAndNumbers: '3 on the left',
         typeOfGoods: 'general_goods',
-        tempControlled: true,
-        tempControlledMinTemp: '-4',
-        tempControlledMaxTemp: '10',
       },
       {
         packageQuantity: '1',
@@ -319,9 +310,6 @@ const mockShippingForms = [
         dangerousGoods: true,
         marksAndNumbers: '3 on the left',
         typeOfGoods: 'general_goods',
-        tempControlled: true,
-        tempControlledMinTemp: '-4',
-        tempControlledMaxTemp: '10',
       },
     ],
     canEdit: true,

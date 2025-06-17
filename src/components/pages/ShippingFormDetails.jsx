@@ -295,7 +295,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
 
               {/* Compact Shipment Info */}
               <Grid container spacing={2}>
-                <Grid item size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -330,7 +330,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                     </Stack>
                   </Paper>
                 </Grid>
-                <Grid item size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -371,7 +371,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
 
               {/* Compact Shipper & Consignee */}
               <Grid container spacing={2}>
-                <Grid item size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -415,7 +415,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                     </Stack>
                   </Paper>
                 </Grid>
-                <Grid item size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -464,7 +464,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
 
               {/* Compact Value, Insurance, Customs */}
               <Grid container spacing={2}>
-                <Grid item size={{ xs: 12, md: 4 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -483,7 +483,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid item size={{ xs: 12, md: 4 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -520,7 +520,7 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid item size={{ xs: 12, md: 4 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -536,6 +536,32 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                     </Typography>
                     <Typography variant='caption' color='text.secondary'>
                       Customs
+                    </Typography>
+                  </Paper>
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: `${primaryColor}06`,
+                      border: `1px solid ${primaryColor}30`,
+                    }}
+                  >
+                    <Typography
+                      variant='body2'
+                      fontWeight='600'
+                      color={primaryColor}
+                      sx={{ mb: 1 }}
+                    >
+                      <Temperature />
+                      Transport temperature
+                    </Typography>
+                    <Typography variant='caption' display='block' sx={{ mt: 0.5 }}>
+                      {formData.tempControlled
+                        ? `${formData.tempControlledMinTemp}°C to ${formData.tempControlledMaxTemp}°C`
+                        : 'No temp control'}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -638,6 +664,17 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                                 <Typography variant='body2' fontWeight='bold' color={primaryColor}>
                                   {pkg.packageType.toUpperCase()}
                                 </Typography>
+                                {!!pkg?.ssccs?.length && (
+                                  <Grid>
+                                    <Button
+                                      variant='outlined'
+                                      sx={{ height: '25px', fontSize: '12px' }}
+                                      onClick={() => toggleSSCC(index)}
+                                    >
+                                      {showSSCC[index] ? '- SSCCs' : '+ SSCCs'}
+                                    </Button>
+                                  </Grid>
+                                )}
                               </Box>
                             </Stack>
                           </Grid>
@@ -676,12 +713,6 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                                   sx={{ fontSize: '10px', height: '20px' }}
                                 />
                               </Stack>
-                              <Typography variant='caption' display='block' sx={{ mt: 0.5 }}>
-                                <Temperature sx={{ fontSize: 10, mr: 0.5 }} />
-                                {pkg.tempControlled
-                                  ? `${pkg.tempControlledMinTemp}-${pkg.tempControlledMaxTemp}°C`
-                                  : 'No temp control'}
-                              </Typography>
                             </Box>
                           </Grid>
 
@@ -704,13 +735,6 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
                               </Typography>
                             </Box>
                           </Grid>
-                          {!!pkg?.ssccs?.length && (
-                            <Grid>
-                              <Button variant='outlined' onClick={() => toggleSSCC(index)}>
-                                {showSSCC[index] ? 'Hide SSCC' : 'Show SSCC'}
-                              </Button>
-                            </Grid>
-                          )}
                         </Grid>
                         {/* SSCSS */}
                         {showSSCC[index] && pkg?.ssccs?.length > 0 && (

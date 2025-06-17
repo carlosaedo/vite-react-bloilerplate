@@ -96,9 +96,6 @@ const defaultPackageValues = {
   dangerousGoods: false,
   marksAndNumbers: '',
   typeOfGoods: 'general_goods',
-  tempControlled: false,
-  tempControlledMinTemp: '',
-  tempControlledMaxTemp: '',
 };
 
 const packageType = [
@@ -342,7 +339,16 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       value = sanitizeDecimalInput(value);
     }
 
+    if (['tempControlledMaxTemp', 'tempControlledMinTemp'].includes(name) && value !== '') {
+      value = sanitizeDecimalInputTemp(value);
+    }
+
     let updatedShippingFormData = { ...shippingFormData };
+
+    if (name === 'tempControlled' && value === false) {
+      updatedShippingFormData['tempControlledMaxTemp'] = '';
+      updatedShippingFormData['tempControlledMinTemp'] = '';
+    }
 
     if (name === 'insured' && checked === false) {
       updatedShippingFormData['valueOfGoods'] = '';
@@ -369,10 +375,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       value = sanitizeDecimalInput(value);
     }
 
-    if (['tempControlledMaxTemp', 'tempControlledMinTemp'].includes(field) && value !== '') {
-      value = sanitizeDecimalInputTemp(value);
-    }
-
     const newInputs = { ...shippingFormData.packages[index], [field]: value };
 
     if (field === 'CBM' && value !== '') {
@@ -396,11 +398,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     if (['packageHeight', 'packageWidth', 'packageLength'].includes(field) && value !== '') {
       newInputs.CBM = '';
       newInputs.LDM = '';
-    }
-
-    if (field === 'tempControlled' && value === false) {
-      newInputs.tempControlledMaxTemp = '';
-      newInputs.tempControlledMinTemp = '';
     }
 
     setErrorMessage(null);
@@ -787,11 +784,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           dangerousGoods: pkg.dangerousGoods,
           marksAndNumbers: pkg.marksAndNumbers,
           typeOfGoods: pkg.typeOfGoods,
-          tempControlled: pkg.tempControlled,
-          tempControlledMinTemp: pkg.tempControlledMinTemp,
-          tempControlledMaxTemp: pkg.tempControlledMaxTemp,
         })),
 
+        tempControlled: formData.tempControlled,
+        tempControlledMinTemp: formData.tempControlledMinTemp,
+        tempControlledMaxTemp: formData.tempControlledMaxTemp,
         valueOfGoods: formData.valueOfGoods,
         insured: formData.insured,
         customs: formData.customs,
@@ -2372,12 +2369,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TableCell>
                       <strong>DG</strong>
                     </TableCell>
-                    <TableCell>
-                      <strong>TC</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>MIN / MAX</strong>
-                    </TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -2508,26 +2499,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                               <Tooltip title='Dangerous Goods' arrow>
                                 {pkg?.dangerousGoods ? 'Yes' : 'No'}
                               </Tooltip>
-                            </TableCell>
-                            <TableCell>
-                              <Tooltip title='Temperature Controlled' arrow>
-                                {pkg?.tempControlled ? 'Yes' : 'No'}
-                              </Tooltip>
-                            </TableCell>
-                            <TableCell>
-                              {pkg?.tempControlled
-                                ? pkg?.tempControlledMinTemp || pkg?.tempControlledMaxTemp
-                                  ? `${
-                                      pkg?.tempControlledMinTemp
-                                        ? pkg.tempControlledMinTemp + 'ºC'
-                                        : 'Not Set'
-                                    } / ${
-                                      pkg?.tempControlledMaxTemp
-                                        ? pkg.tempControlledMaxTemp + 'ºC'
-                                        : 'Not Set'
-                                    }`
-                                  : 'Not Set'
-                                : 'Not Set'}
                             </TableCell>
                           </TableRow>
                         </Tooltip>
@@ -3184,87 +3155,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     />
                   </Grid>
                 )}
-
-                <Grid>
-                  <FormControlLabel
-                    sx={{ mt: 1 }}
-                    control={
-                      <Checkbox
-                        checked={
-                          shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
-                        }
-                        onChange={(e) =>
-                          handlePackageChange(
-                            selectedPackageIndex,
-                            'tempControlled',
-                            e.target.checked,
-                          )
-                        }
-                        name={`tempControlled_${selectedPackageIndex}`}
-                        color='primary'
-                      />
-                    }
-                    label='Temperature Controlled'
-                  />
-                </Grid>
-
-                {shippingFormData.packages[selectedPackageIndex]?.tempControlled && (
-                  <React.Fragment>
-                    <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
-                      <Tooltip title='Temperature range from -30ºC to 30ºC' direction='top' arrow>
-                        <TextField
-                          label='MIN'
-                          name={`tempControlledMinTemp_${selectedPackageIndex}`}
-                          value={
-                            shippingFormData?.packages[selectedPackageIndex]
-                              ?.tempControlledMinTemp || ''
-                          }
-                          onChange={(e) =>
-                            handlePackageChange(
-                              selectedPackageIndex,
-                              'tempControlledMinTemp',
-                              e.target.value,
-                            )
-                          }
-                          fullWidth
-                          size='small'
-                          margin='dense'
-                          required={
-                            shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
-                          }
-                          slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-                        />
-                      </Tooltip>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
-                      <Tooltip title='Temperature range from -30ºC to 30ºC' direction='top' arrow>
-                        <TextField
-                          label='MAX'
-                          name={`tempControlledMaxTemp_${selectedPackageIndex}`}
-                          value={
-                            shippingFormData?.packages[selectedPackageIndex]
-                              ?.tempControlledMaxTemp || ''
-                          }
-                          onChange={(e) =>
-                            handlePackageChange(
-                              selectedPackageIndex,
-                              'tempControlledMaxTemp',
-                              e.target.value,
-                            )
-                          }
-                          fullWidth
-                          size='small'
-                          margin='dense'
-                          required={
-                            shippingFormData.packages[selectedPackageIndex]?.tempControlled || false
-                          }
-                          slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-                        />
-                      </Tooltip>
-                    </Grid>
-                  </React.Fragment>
-                )}
               </Grid>
             </React.Fragment>
           </Box>
@@ -3374,6 +3264,56 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 label='Customs'
               />
             </Grid>
+            <Grid>
+              <FormControlLabel
+                sx={{ mt: 1 }}
+                control={
+                  <Checkbox
+                    checked={shippingFormData?.tempControlled || false}
+                    onChange={handleChange}
+                    name='tempControlled'
+                    color='primary'
+                  />
+                }
+                label='Temperature Controlled'
+              />
+            </Grid>
+
+            {shippingFormData?.tempControlled && (
+              <React.Fragment>
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+                  <Tooltip title='Temperature range from -30ºC to 30ºC' direction='top' arrow>
+                    <TextField
+                      label='MIN'
+                      name='tempControlledMinTemp'
+                      value={shippingFormData?.tempControlledMinTemp || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required={shippingFormData?.tempControlled || false}
+                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    />
+                  </Tooltip>
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6, md: 2, lg: 1 }}>
+                  <Tooltip title='Temperature range from -30ºC to 30ºC' direction='top' arrow>
+                    <TextField
+                      label='MAX'
+                      name='tempControlledMaxTemp'
+                      value={shippingFormData?.tempControlledMaxTemp || ''}
+                      onChange={handleChange}
+                      fullWidth
+                      size='small'
+                      margin='dense'
+                      required={shippingFormData?.tempControlled || false}
+                      slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    />
+                  </Tooltip>
+                </Grid>
+              </React.Fragment>
+            )}
           </Grid>
         </Box>
 
