@@ -22,7 +22,7 @@ const ClientDetails = () => {
 
   const { clientId: paramClientId } = useParams();
 
-  const { selectedClient, setSelectedClient } = useClient();
+  const { selectedClient } = useClient();
   const clientIdFromStorage = selectedClient;
 
   const [clientId, setClientId] = useState(paramClientId ?? clientIdFromStorage?.clientId);

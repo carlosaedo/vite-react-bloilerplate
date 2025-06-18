@@ -13,6 +13,7 @@ import { sanitizeDecimalInput, sanitizeDecimalInputTemp } from '../../utils/sani
 import { useAuth } from '../context/AuthContext';
 import isEqual from 'lodash/isEqual';
 import TruckLoader from '../truckLoader/truckLoader';
+import { useClient } from '../context/ClientContext';
 
 import {
   Grid,
@@ -149,8 +150,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   const isExternal = externalFormData !== undefined;
 
-  const context = useShippingFormContext();
+  const { selectedClient } = useClient();
 
+  const context = useShippingFormContext();
   const [localShippingFormData, setLocalShippingFormData] = useState(externalFormData);
   const shippingFormData = isExternal ? localShippingFormData : context.shippingFormData;
   const setShippingFormData = isExternal ? setLocalShippingFormData : context.setShippingFormData;
@@ -196,7 +198,12 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setIsPinFieldDisabled((prev) => !prev);
   };
 
-  const clientFromStorage = JSON.parse(localStorage.getItem('selectedClient')) || null;
+  const [clientFromStorage, setClientFromStorage] = useState(selectedClient);
+
+  useEffect(() => {
+    setClientFromStorage(selectedClient);
+    console.log('selectedClient', selectedClient?.clientId);
+  }, [selectedClient]);
 
   const handleJumpToPackage = (index) => {
     setErrorMessage(null);
@@ -349,8 +356,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   useEffect(() => {
     if (!loadingShippingForm && !isExternal && !clientFromStorage?.clientId) {
       setErrorClient('No client selected. Cannot show shipping form. Please select a client.');
+    } else {
+      setErrorClient(null);
     }
-  }, [loadingShippingForm, clientFromStorage?.clientId, isExternal]);
+  }, [loadingShippingForm, clientFromStorage?.clientId, isExternal, selectedClient]);
 
   const handleChange = (event) => {
     const { name, type, checked } = event.target;
