@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import api from '../api/api';
+import torrestirApi from '../api/torrestirApi';
+import { useAuth } from '../context/AuthContext';
 
 const defaultNewEntity = {
   Name: '',
@@ -35,6 +37,7 @@ const EntitySelector = ({
   isSender = false,
   isRecipient = false,
 }) => {
+  const { token } = useAuth();
   const [options, setOptions] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [newEntityData, setNewEntityData] = useState(defaultNewEntity);
@@ -52,21 +55,46 @@ const EntitySelector = ({
 
   const fetchEntities = async (search = '', page = 1) => {
     setFetching(true);
-    try {
-      const res = await api.post(`/shipping-form/get-entities`, {
-        isSender,
-        isRecipient,
-        search,
-        page,
-        pageSize,
-        orderBy: 'Name',
-        orderDirection: 'asc',
-      });
 
-      const { data, total } = res.data.entities;
+    const cleanDataFromBackend = (data) => {
+      return {
+        Name: data.name || '',
+        Add1: data.add1 || '',
+        Add2: data.add2 || '',
+        Add3: data.add3 || '',
+        city: data.city || '',
+        state: data.state || '',
+        zip_code: data.zip_Code || '',
+        country: data.country || '',
+        external_ref: data.external_ref || '',
+        VAT: data.vat || '',
+      };
+    };
+
+    try {
+      const response = await torrestirApi.get(
+        `/api/clients/37aacab0-13c9-11f0-854e-005056b7886b/entities`,
+        {
+          params: {
+            page: page,
+            pageSize: pageSize,
+            ...(isRecipient && { delivery: isRecipient }),
+            ...(isSender && { shipping: isSender }),
+            search: search,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const items = response.data.items.map((item) => cleanDataFromBackend(item));
+
+      const total = items?.length;
+
       totalCount.current = total;
 
-      setOptions((prev) => (page === 1 ? data : [...prev, ...data]));
+      setOptions((prev) => (page === 1 ? items : [...prev, ...items]));
       setHasMore(page * pageSize < total);
     } catch (err) {
       console.error('Failed to fetch entities:', err);
