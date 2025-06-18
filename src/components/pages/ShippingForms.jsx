@@ -39,6 +39,7 @@ import Message from '../messages/Message';
 import ErrorMessage from '../messages/ErrorMessage';
 
 import { useAuth } from '../context/AuthContext';
+import { NULL } from 'sass';
 
 // Mock data
 const mockShippingForms = [
@@ -402,6 +403,8 @@ const ShippingForms = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [searchForm, setSearchForm] = useState(null);
 
+  const [shippingFormsData, setShippingFormsData] = useState([]);
+
   const handleClick = (form) => {
     console.log('Form clicked:', form);
     setSelectedForm(form); // trigger a re-render
@@ -419,6 +422,7 @@ const ShippingForms = () => {
           },
         );
         console.log(response.data);
+        setShippingFormsData(response.data.items);
       } catch (error) {
         console.error('Error fetching shipping forms:', error);
       }
@@ -531,7 +535,7 @@ const ShippingForms = () => {
         </Box>
 
         <List sx={{ padding: 0 }}>
-          {mockShippingForms.map((form, idx) => (
+          {shippingFormsData.map((form, idx) => (
             <Paper
               elevation={0}
               sx={{

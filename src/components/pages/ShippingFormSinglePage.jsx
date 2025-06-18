@@ -963,14 +963,68 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               {shippingFormData.trackingRef ? (
                 <React.Fragment>
                   {!isExternal ? (
-                    <FormControl size='small' sx={{ minWidth: 180, ml: 2 }}>
-                      <InputLabel>Tracking</InputLabel>
+                    <FormControl
+                      size='small'
+                      sx={{
+                        minWidth: 180,
+                        ml: 2,
+                        mt: { xs: 1, sm: 0 },
+                        bgcolor: '#ffc928',
+                        color: '#003e2d',
+                        borderRadius: 1,
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                      }}
+                    >
                       <Select
-                        label='Tracking'
+                        displayEmpty
                         value={shippingFormData.trackingRef || ''}
                         onChange={(e) => {
                           const selected = e.target.value;
                           setActiveTrackingNumber(selected);
+                        }}
+                        renderValue={(selected) => `Tracking Number: ${selected}`}
+                        sx={{
+                          bgcolor: '#ffc928',
+                          color: '#003e2d',
+                          borderRadius: 1,
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          px: 1.5,
+                          py: 0.3,
+                          userSelect: 'none',
+                          '& fieldset': { border: 'none' },
+                          '&:hover fieldset': { border: 'none' },
+                          '&.Mui-focused fieldset': { border: 'none' },
+                          '& .MuiSelect-select': {
+                            px: 1.5,
+                            py: 0.3,
+                          },
+                          '& .MuiSelect-icon': {
+                            color: '#003e2d',
+                          },
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              bgcolor: '#ffc928',
+                              '& .MuiMenuItem-root': {
+                                color: '#003e2d',
+                                fontWeight: 600,
+                                fontSize: '0.875rem',
+                                '&:hover': {
+                                  bgcolor: 'rgba(0, 62, 45, 0.1)',
+                                },
+                                '&.Mui-selected': {
+                                  bgcolor: 'rgba(0, 62, 45, 0.2)',
+                                  '&:hover': {
+                                    bgcolor: 'rgba(0, 62, 45, 0.3)',
+                                  },
+                                },
+                              },
+                            },
+                          },
                         }}
                       >
                         {trackingNumbers.map((num) => (
@@ -1003,7 +1057,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
                   {!isExternal && (
                     <Button
-                      variant='outlined'
                       size='small'
                       onClick={async () => {
                         const newTracking = await retryFetchTrackingNumber(); // returns string
@@ -1011,7 +1064,19 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                           resetShippingFormData(newTracking); // requires update in context
                         }
                       }}
-                      sx={{ ml: 2 }}
+                      sx={{
+                        minWidth: 180,
+                        ml: 2,
+                        mt: { xs: 1, sm: 0 },
+                        px: 1.5,
+                        py: 0.3,
+                        bgcolor: '#ffc928',
+                        color: '#003e2d',
+                        borderRadius: 1,
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                      }}
                     >
                       New Tracking Number
                     </Button>
