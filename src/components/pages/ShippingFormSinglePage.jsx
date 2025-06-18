@@ -51,10 +51,13 @@ import {
 
 import { useTheme } from '@mui/material/styles';
 import { LiaWpforms } from 'react-icons/lia';
-import { FaUserTie } from 'react-icons/fa';
+import { FaUserTie, FaPlusCircle, FaClone } from 'react-icons/fa';
+
 import { BsInfoCircleFill } from 'react-icons/bs';
-import { FaClone } from 'react-icons/fa';
+
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
+
+import { TiDelete } from 'react-icons/ti';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
@@ -1006,8 +1009,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                   <Box display='flex' alignItems='center' sx={{ p: 0, m: 0 }}>
                     <span>{num}</span>
                     {trackingNumbers.length > 1 && (
-                      <DeleteIcon
-                        sx={{ p: 0, m: 0, fontSize: '1rem', color: '#d32f2f' }}
+                      <TiDelete
+                        style={{ p: 0, m: 0, fontSize: '1.2rem', color: '#ed8a5f' }}
                         onClick={(e) => {
                           const confirmed = window.confirm(
                             'Are you sure you want to remove this tracking number and associated form data? This action cannot be undone.',
@@ -1062,7 +1065,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               },
             }}
           >
-            + New Tracking Number
+            New Tracking Number <FaPlusCircle style={{ marginLeft: '5px', color: '#ffc928' }} />
           </Box>
         </Box>
         <Box
