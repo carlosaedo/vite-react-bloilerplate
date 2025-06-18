@@ -44,6 +44,8 @@ import {
   DialogActions,
   FormControl,
   InputLabel,
+  Tabs,
+  Tab,
 } from '@mui/material';
 
 import { useTheme } from '@mui/material/styles';
@@ -933,9 +935,105 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           },
         }}
       >
+        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0 }}>
+          <Tabs
+            value={shippingFormData.trackingRef || ''}
+            onChange={(e, newValue) => {
+              setActiveTrackingNumber(newValue);
+            }}
+            variant='scrollable'
+            scrollButtons='auto'
+            sx={{
+              minHeight: 'auto',
+              '& .MuiTabs-flexContainer': {
+                gap: 0,
+              },
+              '& .MuiTab-root': {
+                minHeight: 'auto',
+                minWidth: 'auto',
+                px: 2,
+                py: 1,
+                bgcolor: '#f5f5f5',
+                color: '#666',
+                borderRadius: '8px 8px 0 0',
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                textTransform: 'none',
+                border: '1px solid #ddd',
+                borderBottom: '1px solid #ddd',
+                marginRight: '0px',
+                position: 'relative',
+                zIndex: 1,
+                '&.Mui-selected': {
+                  bgcolor: '#fff',
+                  color: '#003e2d',
+                  borderColor: '#ddd',
+                  borderBottom: '1px solid #fff',
+                  zIndex: 2,
+                },
+                '&:hover': {
+                  bgcolor: '#f8f8f8',
+                },
+                '&.Mui-selected:hover': {
+                  bgcolor: '#fff',
+                },
+                '&:first-of-type': {
+                  borderTopLeftRadius: '8px',
+                },
+              },
+              '& .MuiTabs-indicator': {
+                display: 'none',
+              },
+              '& .MuiTabs-scrollButtons': {
+                color: '#666',
+              },
+            }}
+          >
+            {trackingNumbers.map((num) => (
+              <Tab key={num} label={num} value={num} />
+            ))}
+          </Tabs>
+
+          <Box
+            onClick={async () => {
+              const newTracking = await retryFetchTrackingNumber(); // returns string
+              if (newTracking) {
+                resetShippingFormData(newTracking); // requires update in context
+                setActiveTrackingNumber(newTracking); // Switch to the new tracking number
+              }
+            }}
+            sx={{
+              minHeight: 'auto',
+              minWidth: 'auto',
+              px: 2,
+              py: 0.8,
+              bgcolor: '#f5f5f5',
+              color: '#666',
+              borderRadius: '8px 8px 0 0',
+              fontWeight: 500,
+              fontSize: '0.875rem',
+              textTransform: 'none',
+              border: '1px solid #ddd',
+              borderBottom: '1px solid #ddd',
+              marginLeft: '-1px',
+              position: 'relative',
+              zIndex: 1,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '&:hover': {
+                bgcolor: '#f8f8f8',
+              },
+            }}
+          >
+            + New Tracking Number
+          </Box>
+        </Box>
         <Box
           sx={{
-            p: 3,
+            mt: 2,
+            p: 0,
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             alignItems: { xs: 'flex-start', sm: 'center' },
@@ -959,135 +1057,31 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               }}
             >
               {isExternal && 'Editing '}
-              Shipping Form
               {shippingFormData.trackingRef ? (
-                <React.Fragment>
-                  {!isExternal ? (
-                    <FormControl
-                      size='small'
-                      sx={{
-                        minWidth: 180,
-                        ml: 2,
-                        mt: { xs: 1, sm: 0 },
-                        bgcolor: '#ffc928',
-                        color: '#003e2d',
-                        borderRadius: 1,
-                        fontWeight: 600,
-                        fontSize: '0.875rem',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                      }}
-                    >
-                      <Select
-                        displayEmpty
-                        value={shippingFormData.trackingRef || ''}
-                        onChange={(e) => {
-                          const selected = e.target.value;
-                          setActiveTrackingNumber(selected);
-                        }}
-                        renderValue={(selected) => `Tracking Number: ${selected}`}
-                        sx={{
-                          bgcolor: '#ffc928',
-                          color: '#003e2d',
-                          borderRadius: 1,
-                          fontWeight: 600,
-                          fontSize: '0.875rem',
-                          px: 1.5,
-                          py: 0.3,
-                          userSelect: 'none',
-                          '& fieldset': { border: 'none' },
-                          '&:hover fieldset': { border: 'none' },
-                          '&.Mui-focused fieldset': { border: 'none' },
-                          '& .MuiSelect-select': {
-                            px: 1.5,
-                            py: 0.3,
-                          },
-                          '& .MuiSelect-icon': {
-                            color: '#003e2d',
-                          },
-                        }}
-                        MenuProps={{
-                          PaperProps: {
-                            sx: {
-                              bgcolor: '#ffc928',
-                              '& .MuiMenuItem-root': {
-                                color: '#003e2d',
-                                fontWeight: 600,
-                                fontSize: '0.875rem',
-                                '&:hover': {
-                                  bgcolor: 'rgba(0, 62, 45, 0.1)',
-                                },
-                                '&.Mui-selected': {
-                                  bgcolor: 'rgba(0, 62, 45, 0.2)',
-                                  '&:hover': {
-                                    bgcolor: 'rgba(0, 62, 45, 0.3)',
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        }}
-                      >
-                        {trackingNumbers.map((num) => (
-                          <MenuItem key={num} value={num}>
-                            {num}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  ) : (
-                    <Box
-                      component='span'
-                      sx={{
-                        ml: 2,
-                        mt: { xs: 1, sm: 0 },
-                        px: 1.5,
-                        py: 0.3,
-                        bgcolor: '#ffc928',
-                        color: '#003e2d',
-                        borderRadius: 1,
-                        fontWeight: 600,
-                        fontSize: '0.875rem',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                        userSelect: 'none',
-                      }}
-                    >
-                      {`Tracking Number: ${shippingFormData?.trackingRef}`}
-                    </Box>
-                  )}
-
-                  {!isExternal && (
-                    <Button
-                      size='small'
-                      onClick={async () => {
-                        const newTracking = await retryFetchTrackingNumber(); // returns string
-                        if (newTracking) {
-                          resetShippingFormData(newTracking); // requires update in context
-                        }
-                      }}
-                      sx={{
-                        minWidth: 180,
-                        ml: 2,
-                        mt: { xs: 1, sm: 0 },
-                        px: 1.5,
-                        py: 0.3,
-                        bgcolor: '#ffc928',
-                        color: '#003e2d',
-                        borderRadius: 1,
-                        fontWeight: 600,
-                        fontSize: '0.875rem',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                      }}
-                    >
-                      New Tracking Number
-                    </Button>
-                  )}
-                </React.Fragment>
+                <Box
+                  component='span'
+                  sx={{
+                    ml: 0,
+                    mt: { xs: 1, sm: 0 },
+                    px: 1.5,
+                    py: 0.3,
+                    bgcolor: '#ffc928',
+                    color: '#003e2d',
+                    borderRadius: 1,
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                    userSelect: 'none',
+                  }}
+                >
+                  {`Tracking Number: ${shippingFormData?.trackingRef}`}
+                </Box>
               ) : (
                 <Typography
                   component='span'
                   variant='subtitle1'
                   sx={{
-                    ml: 2,
+                    ml: 0,
                     mt: { xs: 1, sm: 0 },
                     fontStyle: 'italic',
                     color: 'text.secondary',

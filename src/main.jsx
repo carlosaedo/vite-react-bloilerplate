@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { appBuildVersion } from './appVersion.js';
 import { AuthProvider } from './components/context/AuthContext';
+import { ClientProvider } from './components/context/ClientContext';
 import cleanLocalStorage from './utils/cleanLocalStorage.js';
 import theme from './theme'; // import the theme file
 import App from './App.jsx';
@@ -43,7 +44,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter basename='/shipping-portal/'>
-          <App />
+          <ClientProvider>
+            <App />
+          </ClientProvider>
         </BrowserRouter>
       </ThemeProvider>
     </AuthProvider>

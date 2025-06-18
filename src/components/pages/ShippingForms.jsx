@@ -39,7 +39,6 @@ import Message from '../messages/Message';
 import ErrorMessage from '../messages/ErrorMessage';
 
 import { useAuth } from '../context/AuthContext';
-import { NULL } from 'sass';
 
 // Mock data
 const mockShippingForms = [
@@ -389,6 +388,51 @@ const mockShippingForms = [
   },
 ];
 
+const formDataCleanPayload = (formData) => {
+  return {
+    clientId: formData.clientId,
+    trackingNumber: formData.trackingNo,
+    shippingPayment: formData.shippingPayment,
+    shippingPaymentTo: formData.shippingPaymentTo,
+    deliveryDate: formData.deliveryDate,
+    deliveryDateHour: formData.deliveryDateHour,
+    shipperReference: formData.shipperReference,
+    consigneeReference: formData.consigneeReference,
+
+    shipperId: formData.shipperId,
+    shipperName: formData.shipperName,
+    shipperEmail: formData.shipperEmail,
+    shipperPhone: formData.shipperPhone,
+    shipperAdd1: formData.shipperAdd1,
+    shipperAdd2: formData.shipperAdd2,
+    shipperCity: formData.shipperCity,
+    shipperZip: formData.shipperZip,
+    shipperCountry: formData.shipperCountry,
+    shipperVAT: formData.shipperVat,
+
+    consigneeId: formData.consigneeId,
+    consigneeName: formData.consigneeName,
+    consigneeEmail: formData.consigneeEmail,
+    consigneePhone: formData.consigneePhone,
+    consigneeAdd1: formData.consigneeAdd1,
+    consigneeAdd2: formData.consigneeAdd2,
+    consigneeCity: formData.consigneeCity,
+    consigneeZip: formData.consigneeZip,
+    consigneeCountry: formData.consigneeCountry,
+    consigneeVAT: formData.consigneeVat,
+
+    tempControlled: formData.tempFlag === 1,
+    tempControlledMinTemp: formData.tempMin,
+    tempControlledMaxTemp: formData.tempMax,
+    valueOfGoods: formData.valueOfGoods,
+    insured: formData.insured,
+    customs: formData.customs,
+    shippingService: formData.shippingService,
+    shipperInstructions: formData.shipperInstructions,
+    consigneeInstructions: formData.consigneeInstructions,
+  };
+};
+
 const ShippingForms = () => {
   const { token } = useAuth();
   const [selectedForm, setSelectedForm] = useState(null);
@@ -422,7 +466,12 @@ const ShippingForms = () => {
           },
         );
         console.log(response.data);
-        setShippingFormsData(response.data.items);
+
+        const newShippingFormsCleaned = response.data.items.map((form) => {
+          return formDataCleanPayload(form);
+        });
+        console.log(newShippingFormsCleaned);
+        setShippingFormsData(newShippingFormsCleaned);
       } catch (error) {
         console.error('Error fetching shipping forms:', error);
       }
@@ -584,19 +633,24 @@ const ShippingForms = () => {
                           flex: '1 1 auto',
                         }}
                       >
-                        <Typography
-                          variant='h6'
-                          fontWeight={600}
+                        <Box
+                          component='span'
                           sx={{
-                            color: '#003D2C',
-                            fontSize: '1rem',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                            ml: 2,
+                            mt: { xs: 1, sm: 0 },
+                            px: 1.5,
+                            py: 0.3,
+                            bgcolor: '#ffc928',
+                            color: '#003e2d',
+                            borderRadius: 1,
+                            fontWeight: 600,
+                            fontSize: '0.875rem',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                            userSelect: 'none',
                           }}
                         >
                           {form.trackingNumber}
-                        </Typography>
+                        </Box>
                         <Box
                           sx={{
                             px: 1.5,

@@ -13,6 +13,7 @@ import {
   Alert,
 } from '@mui/material';
 import torrestirApi from '../api/torrestirApi';
+import { useClient } from '../context/ClientContext';
 
 const ClientDetails = () => {
   const navigateTo = useNavigate();
@@ -20,7 +21,9 @@ const ClientDetails = () => {
   const { checkLoginStatusAuth, loadingAuth, getToken } = useAuth();
 
   const { clientId: paramClientId } = useParams();
-  const clientIdFromStorage = JSON.parse(localStorage.getItem('selectedClient'));
+
+  const { selectedClient, setSelectedClient } = useClient();
+  const clientIdFromStorage = selectedClient;
 
   const [clientId, setClientId] = useState(paramClientId ?? clientIdFromStorage?.clientId);
 
@@ -32,6 +35,12 @@ const ClientDetails = () => {
       setClientId(paramClientId);
     }
   }, [paramClientId]);
+
+  useEffect(() => {
+    if (paramClientId === undefined && clientIdFromStorage?.clientId !== undefined) {
+      setClientId(clientIdFromStorage?.clientId);
+    }
+  }, [selectedClient]);
 
   const navigate = useNavigate();
   const [client, setClient] = useState(null);

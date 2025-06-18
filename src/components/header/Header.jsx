@@ -34,6 +34,8 @@ import LogoTorrestir from '../../assets/Logo-Torrestir-website-1.png';
 import { useTheme } from '@mui/material/styles';
 import torrestirApi from '../api/torrestirApi';
 
+import { useClient } from '../context/ClientContext';
+
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: '#003D2C',
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
@@ -141,6 +143,7 @@ const LanguageSelect = styled(FormControl)(({ theme }) => ({
 
 const Header = () => {
   const { user, userRole, checkLoginStatusAuth, loadingAuth, getToken } = useAuth();
+  const { selectedClient, setSelectedClient } = useClient();
   const navigateTo = useNavigate();
   const token = getToken();
   const isTokenPresent = !!token;
@@ -153,23 +156,6 @@ const Header = () => {
   const [clientOptions, setClientOptions] = useState([]);
 
   const [inputValue, setInputValue] = useState('');
-
-  // Initialize state from localStorage
-  const [selectedClient, setSelectedClient] = useState(() => {
-    const savedClient = localStorage.getItem('selectedClient');
-    // Try to parse the saved client if it exists
-    if (savedClient) {
-      try {
-        return JSON.parse(savedClient);
-      } catch (error) {
-        // If parsing fails, return the first client
-        console.error('Error parsing selectedClient from localStorage:', error);
-        return clientOptions[0];
-      }
-    }
-    // Default to first client if nothing in localStorage
-    return clientOptions[0];
-  });
 
   const [selectedAppLanguage, setSelectedAppLanguage] = useState(() => {
     const savedLanguage = localStorage.getItem('appLanguage');
@@ -219,7 +205,7 @@ const Header = () => {
     if (!newValue || !newValue.clientId) return;
     setSelectedClient(newValue);
     localStorage.setItem('selectedClient', JSON.stringify(newValue));
-    navigateTo(`/client-details/${newValue.clientId}`);
+    //navigateTo(`/client-details/${newValue.clientId}`);
   };
 
   const handleLanguageChange = (lang) => {

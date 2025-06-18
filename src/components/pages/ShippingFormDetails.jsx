@@ -49,7 +49,7 @@ import { LiaShippingFastSolid, LiaFileSignatureSolid } from 'react-icons/lia';
 
 import Base64Img from '../base64Img/Base64Img';
 
-export default function ShippingFormDetails({ form, openDialog = true, onCloseDialog }) {
+const ShippingFormDetails = ({ form, openDialog = true, onCloseDialog }) => {
   const navigateTo = useNavigate();
 
   const [formData, setFormData] = useState(form);
@@ -805,4 +805,6 @@ export default function ShippingFormDetails({ form, openDialog = true, onCloseDi
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default ShippingFormDetails;
