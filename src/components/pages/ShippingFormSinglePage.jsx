@@ -167,7 +167,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [message, setMessage] = useState(null);
 
   const [compactShippingInfo, setCompactShippingInfo] = useState(true);
-
+  const removeTrackingNumber = context.removeTrackingNumber;
   //const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(0);
@@ -999,7 +999,33 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             }}
           >
             {trackingNumbers.map((num) => (
-              <Tab key={num} label={num} value={num} />
+              <Tab
+                key={num}
+                value={num}
+                label={
+                  <Box display='flex' alignItems='center' sx={{ p: 0, m: 0 }}>
+                    <span>{num}</span>
+                    {trackingNumbers.length > 1 && (
+                      <DeleteIcon
+                        sx={{ p: 0, m: 0, fontSize: '1rem', color: '#d32f2f' }}
+                        onClick={(e) => {
+                          const confirmed = window.confirm(
+                            'Are you sure you want to remove this tracking number and associated form data? This action cannot be undone.',
+                          );
+                          if (!confirmed) return;
+                          e.stopPropagation(); // Prevents tab change
+                          console.log('delete this tab');
+                          setActiveTrackingNumber(
+                            num === trackingNumbers[0] ? trackingNumbers[1] : trackingNumbers[0],
+                          );
+                          removeTrackingNumber(num);
+                        }}
+                        fontSize='small'
+                      />
+                    )}
+                  </Box>
+                }
+              />
             ))}
           </Tabs>
 
