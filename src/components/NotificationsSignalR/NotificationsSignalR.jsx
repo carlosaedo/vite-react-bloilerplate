@@ -24,8 +24,13 @@ function NotificationsSignalR() {
       setMessages((prev) => [...prev, { user, message }]);
     });
 
+    connection.on('ReceiveNotification', (notification) => {
+      console.log('Received notification:', notification);
+    });
+
     return () => {
       connection.off('ReceiveMessage');
+      connection.off('ReceiveNotification');
       connection.stop();
     };
   }, []);
@@ -40,7 +45,7 @@ function NotificationsSignalR() {
 
   return (
     <div>
-      <h3>Notifications</h3>
+      <h3>Chat</h3>
       {isConnected ? <p>Connected</p> : <p>Not Connected</p>}
       {messages.map((m, idx) => (
         <div key={idx}>
