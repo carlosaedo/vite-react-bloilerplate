@@ -22,6 +22,7 @@ import TrackingSearch from './components/pages/TrackingSearch';
 import Tracking from './components/pages/Tracking';
 import TestType00 from './components/pages/TestType-00';
 import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
+import NotificationsSignalR from './components/NotificationsSignalR/NotificationsSignalR';
 
 import Waybills from './components/pages/Waybills';
 
@@ -95,6 +96,9 @@ const App = () => {
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/waybills' element={<Waybills />} />
+                </Route>
+                <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                  <Route path='/notifications' element={<NotificationsSignalR />} />
                 </Route>
               </React.Fragment>
             ) : (
