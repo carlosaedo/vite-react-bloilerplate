@@ -15,9 +15,6 @@ export const ShippingFormProvider = ({ children }) => {
   const time = now.toTimeString().slice(0, 5); // "HH:MM"
   const today = now.toISOString().slice(0, 10); // "yyyy-MM-dd"
   const year = now.getFullYear();
-  const waybillRandom = Math.floor(Math.random() * 1000000)
-    .toString()
-    .padStart(6, '0');
 
   const getInitialFormData = (trackingRef = null) => ({
     senderTaxId: '',

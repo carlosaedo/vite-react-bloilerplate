@@ -68,7 +68,13 @@ export default function RotatedImage({ base64, zpl, label = 'Label' }) {
                     object-fit: contain;
                   }
                   @media print {
-                    body { margin: 0; padding: 0; }
+                    @page {
+                      margin: 0;
+                    }
+                    body {
+                      margin: 0 10px;
+                      padding: 0;
+                    }
                   }
                 </style>
               </head>
@@ -222,15 +228,15 @@ export default function RotatedImage({ base64, zpl, label = 'Label' }) {
             >
               <Typography variant='h6'>{label}</Typography>
               <Box>
-                <IconButton onClick={handlePrint} sx={{ mr: 1 }} color='primary'>
+                <Button onClick={handlePrint} sx={{ mr: 1 }} color='primary'>
                   <PrintIcon /> IMG
-                </IconButton>
-                <IconButton onClick={handlePrintZpl} sx={{ mr: 1 }} color='primary'>
+                </Button>
+                <Button onClick={handlePrintZpl} sx={{ mr: 1 }} color='primary'>
                   <PrintIcon /> ZPL
-                </IconButton>
-                <IconButton onClick={printString} sx={{ mr: 1 }} color='primary'>
-                  <PrintIcon /> String
-                </IconButton>
+                </Button>
+                <Button onClick={printString} sx={{ mr: 1 }} color='primary'>
+                  <PrintIcon /> DIRECT TEXT
+                </Button>
                 <IconButton onClick={handleClose}>
                   <CloseIcon />
                 </IconButton>
