@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -35,6 +36,7 @@ import { useAuth } from '../context/AuthContext';
 
 function NotificationsList() {
   const { token } = useAuth();
+  const navigateTo = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -64,7 +66,7 @@ function NotificationsList() {
   }, [token]);
 
   const handleBack = () => {
-    window.history.back();
+    navigateTo(-1);
   };
 
   const handleRefresh = () => {
