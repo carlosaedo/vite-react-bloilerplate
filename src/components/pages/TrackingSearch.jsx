@@ -5,12 +5,12 @@ import { Search as SearchIcon } from '@mui/icons-material';
 
 const TrackingSearch = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
-  const navigate = useNavigate();
+  const navigateTo = useNavigate();
 
   const handleSearch = () => {
     if (trackingNumber.trim()) {
       // Navigate to the tracking page with the tracking number as a parameter
-      navigate(`/tracking/${trackingNumber.trim()}`);
+      navigateTo(`/tracking/${trackingNumber.trim()}`);
     }
   };
 

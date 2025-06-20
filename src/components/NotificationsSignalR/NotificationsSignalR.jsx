@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Badge,
   IconButton,
@@ -26,11 +27,11 @@ import {
 import torrestirApi from '../api/torrestirApi';
 
 import connection from '../SignalR/connection';
-
 import { useAuth } from '../context/AuthContext';
 
 function NotificationsSignalR() {
   const { token } = useAuth();
+  const navigateTo = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -94,7 +95,7 @@ function NotificationsSignalR() {
   };
 
   const handleSeeAll = () => {
-    window.location.href = '/notifications';
+    navigateTo('/notifications');
     handleClose();
   };
 

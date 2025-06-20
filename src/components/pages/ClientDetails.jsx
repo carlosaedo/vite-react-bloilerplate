@@ -42,7 +42,6 @@ const ClientDetails = () => {
     }
   }, [selectedClient]);
 
-  const navigate = useNavigate();
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -146,7 +145,7 @@ const ClientDetails = () => {
   };
 
   const handleCreateNew = () => {
-    navigate('/client-new');
+    navigateTo('/client-new');
   };
 
   const handleRestore = async () => {
