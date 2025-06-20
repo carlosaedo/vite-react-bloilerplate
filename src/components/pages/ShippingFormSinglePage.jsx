@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import isEqual from 'lodash/isEqual';
 import TruckLoader from '../truckLoader/truckLoader';
 import { useClient } from '../context/ClientContext';
+import { useConfirm } from '../context/ConfirmationModalContext';
 
 import {
   Grid,
@@ -134,7 +135,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const location = useLocation();
   const navigateTo = useNavigate();
   const externalFormData = location?.state?.form;
-
+  const confirm = useConfirm();
   const [errorMessage, setErrorMessage] = useState(null);
   const [errorClient, setErrorClient] = useState(null);
 
@@ -666,8 +667,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setSelectedPackageIndex(updatedFormData.packages.length - 1);
   };
 
-  const removeAllPackages = () => {
-    const confirmed = window.confirm(
+  const removeAllPackages = async () => {
+    const confirmed = await confirm(
       'Are you sure you want to remove all packages? This action cannot be undone.',
     );
     if (!confirmed) return;
@@ -1011,8 +1012,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     {trackingNumbers.length > 1 && (
                       <TiDelete
                         style={{ p: 0, m: 0, fontSize: '1.2rem', color: '#ed8a5f' }}
-                        onClick={(e) => {
-                          const confirmed = window.confirm(
+                        onClick={async (e) => {
+                          const confirmed = await confirm(
                             'Are you sure you want to remove this tracking number and associated form data? This action cannot be undone.',
                           );
                           if (!confirmed) return;
@@ -3728,9 +3729,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
               <Button
                 variant='contained'
                 color='primary'
-                onClick={() => {
+                onClick={async () => {
                   if (!isEqual(externalFormData, shippingFormData)) {
-                    const confirmed = window.confirm(
+                    const confirmed = await confirm(
                       'Are you sure you want to leave without saving? Your changes will be lost.',
                     );
                     if (!confirmed) return;

@@ -6,6 +6,7 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import { appBuildVersion } from './appVersion.js';
 import { AuthProvider } from './components/context/AuthContext';
 import { ClientProvider } from './components/context/ClientContext';
+import { ConfirmationProvider } from './components/context/ConfirmationModalContext';
 import cleanLocalStorage from './utils/cleanLocalStorage.js';
 import theme from './theme'; // import the theme file
 import App from './App.jsx';
@@ -45,7 +46,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <CssBaseline />
         <BrowserRouter basename='/shipping-portal/'>
           <ClientProvider>
-            <App />
+            <ConfirmationProvider>
+              <App />
+            </ConfirmationProvider>
           </ClientProvider>
         </BrowserRouter>
       </ThemeProvider>
