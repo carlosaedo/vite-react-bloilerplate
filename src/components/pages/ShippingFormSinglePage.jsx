@@ -668,9 +668,13 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   };
 
   const removeAllPackages = async () => {
-    const confirmed = await confirm(
-      'Are you sure you want to remove all packages? This action cannot be undone.',
-    );
+    const confirmed = await confirm({
+      message: 'Are you sure you want to remove all packages? This action cannot be undone.',
+      title: 'Delete All Packages',
+      confirmText: 'Delete All',
+      cancelText: 'Keep Packages',
+      severity: 'error',
+    });
     if (!confirmed) return;
     setErrorMessage(null);
     setMessage(null);
@@ -1013,9 +1017,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                       <TiDelete
                         style={{ p: 0, m: 0, fontSize: '1.2rem', color: '#ed8a5f' }}
                         onClick={async (e) => {
-                          const confirmed = await confirm(
-                            'Are you sure you want to remove this tracking number and associated form data? This action cannot be undone.',
-                          );
+                          const confirmed = await confirm({
+                            message:
+                              'Are you sure you want to remove this tracking number and associated form data? This action cannot be undone.',
+                            title: 'Delete Tracking Number and Form Data',
+                            confirmText: 'Delete All',
+                            cancelText: 'Keep Data',
+                            severity: 'error',
+                          });
                           if (!confirmed) return;
                           e.stopPropagation(); // Prevents tab change
                           console.log('delete this tab');
@@ -3731,9 +3740,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                 color='primary'
                 onClick={async () => {
                   if (!isEqual(externalFormData, shippingFormData)) {
-                    const confirmed = await confirm(
-                      'Are you sure you want to leave without saving? Your changes will be lost.',
-                    );
+                    const confirmed = await confirm({
+                      message:
+                        'Are you sure you want to leave without saving? Your changes will be lost.',
+                      title: 'Are you sure?',
+                      confirmText: 'Leave Without Saving',
+                      cancelText: 'Cancel',
+                      severity: 'warning',
+                    });
                     if (!confirmed) return;
                     navigateTo(-1);
                   } else {

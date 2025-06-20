@@ -8,6 +8,8 @@ import { styled, alpha } from '@mui/material/styles';
 import { FaRegUser, FaUsers } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
 
+import { useConfirm } from '../context/ConfirmationModalContext';
+
 const LogoutCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: '16px',
@@ -52,6 +54,7 @@ const LogoutButton = styled(Button)(({ theme }) => ({
 const Logout = ({ userInfoData }) => {
   const navigateTo = useNavigate();
   const { logout } = useAuth();
+  const confirm = useConfirm();
 
   function convertUnixToReadable(unixTimestamp) {
     const date = new Date(unixTimestamp * 1000);
@@ -66,6 +69,14 @@ const Logout = ({ userInfoData }) => {
   }
 
   const handleLogout = async () => {
+    const confirmed = await confirm({
+      message: 'Are you sure you want to leave? ',
+      title: 'Logout Confirmation',
+      confirmText: 'Logout',
+      cancelText: 'Stay Logged In',
+      severity: 'warning',
+    });
+    if (!confirmed) return;
     const result = await logout();
     if (result) {
       navigateTo('/');
