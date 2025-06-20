@@ -75,7 +75,7 @@ export function ConfirmationProvider({ children }) {
           <DialogContentText>{message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleClose(false)} color='inherit'>
+          <Button onClick={() => handleClose(false)} variant='contained' color='inherit'>
             {cancelText}
           </Button>
           <Button
