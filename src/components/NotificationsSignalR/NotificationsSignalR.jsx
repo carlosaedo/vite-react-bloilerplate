@@ -2,36 +2,33 @@ import React, { useEffect, useState } from 'react';
 import connection from '../SignalR/connection';
 
 function NotificationsSignalR() {
-  const [messages, setMessages] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const startConnection = async () => {
-      try {
-        await connection.start();
-        console.log('SignalR connected');
-        setIsConnected(true);
-      } catch (err) {
-        console.error('SignalR connection failed:', err);
-        setIsConnected(false);
+      // Simple fix: only start if disconnected
+      if (connection.state === 'Disconnected') {
+        try {
+          await connection.start();
+          console.log('SignalR connected');
+          setIsConnected(true);
+        } catch (err) {
+          console.error('SignalR connection failed:', err);
+          setIsConnected(false);
+        }
       }
     };
 
     startConnection();
 
-    // Listen for messages
-    connection.on('ReceiveMessage', (user, message) => {
-      setMessages((prev) => [...prev, { user, message }]);
-    });
-
     connection.on('ReceiveNotification', (notification) => {
       console.log('Received notification:', notification);
+      setNotifications((prev) => [...prev, notification]);
     });
 
     return () => {
-      connection.off('ReceiveMessage');
       connection.off('ReceiveNotification');
-      connection.stop();
     };
   }, []);
 
@@ -45,14 +42,12 @@ function NotificationsSignalR() {
 
   return (
     <div>
-      <h3>Chat</h3>
+      <h3>Notifications</h3>
       {isConnected ? <p>Connected</p> : <p>Not Connected</p>}
-      {messages.map((m, idx) => (
-        <div key={idx}>
-          <b>{m.user}:</b> {m.message}
-        </div>
-      ))}
       <button onClick={sendMessage}>Send Test Message</button>
+      {notifications.map((notification, index) => (
+        <div key={index}>{JSON.stringify(notification)}</div>
+      ))}
     </div>
   );
 }
