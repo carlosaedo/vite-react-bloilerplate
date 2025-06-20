@@ -33,6 +33,7 @@ import { MdBusinessCenter } from 'react-icons/md';
 import LogoTorrestir from '../../assets/Logo-Torrestir-website-1.png';
 import { useTheme } from '@mui/material/styles';
 import torrestirApi from '../api/torrestirApi';
+import NotificationsSignalR from '../NotificationsSignalR/NotificationsSignalR';
 
 import { useClient } from '../context/ClientContext';
 
@@ -142,10 +143,9 @@ const LanguageSelect = styled(FormControl)(({ theme }) => ({
 }));
 
 const Header = () => {
-  const { user, userRole, checkLoginStatusAuth, loadingAuth, getToken } = useAuth();
+  const { user, userRole, checkLoginStatusAuth, loadingAuth, token } = useAuth();
   const { selectedClient, setSelectedClient } = useClient();
   const navigateTo = useNavigate();
-  const token = getToken();
   const isTokenPresent = !!token;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -348,7 +348,7 @@ const Header = () => {
                     <MenuItem value='jp'>JP</MenuItem>
                   </Select>
                 </LanguageSelect>
-
+                {token && <NotificationsSignalR />}
                 {/* User Info */}
                 <UserChip
                   avatar={
@@ -363,10 +363,13 @@ const Header = () => {
                 />
               </NavSection>
             ) : (
-              /* Mobile View - Hamburger Menu */
-              <IconButton onClick={toggleDrawer} sx={{ color: '#ffc928' }}>
-                <FaBars size={20} />
-              </IconButton>
+              <React.Fragment>
+                {token && <NotificationsSignalR />}
+                {/* Mobile View - Hamburger Menu */}
+                <IconButton onClick={toggleDrawer} sx={{ color: '#ffc928' }}>
+                  <FaBars size={20} />
+                </IconButton>
+              </React.Fragment>
             )}
 
             {/* Mobile Drawer */}
