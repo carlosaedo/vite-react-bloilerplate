@@ -433,6 +433,72 @@ const formDataCleanPayload = (formData) => {
   };
 };
 
+const formDataCleanPayloadWithPackages = (formData, lines = []) => {
+  return {
+    clientId: formData.clientId,
+    trackingNumber: formData.trackingNo,
+    shippingPayment: formData.shippingPayment,
+    shippingPaymentTo: formData.shippingPaymentTo,
+    deliveryDate: formData.deliveryDate,
+    deliveryDateHour: formData.deliveryDateHour,
+    shipperReference: formData.shipperReference,
+    consigneeReference: formData.consigneeReference,
+
+    shipperId: formData.shipperId,
+    shipperName: formData.shipperName,
+    shipperEmail: formData.shipperEmail,
+    shipperPhone: formData.shipperPhone,
+    shipperAdd1: formData.shipperAdd1,
+    shipperAdd2: formData.shipperAdd2,
+    shipperCity: formData.shipperCity,
+    shipperZip: formData.shipperZip,
+    shipperCountry: formData.shipperCountry,
+    shipperVAT: formData.shipperVat,
+
+    consigneeId: formData.consigneeId,
+    consigneeName: formData.consigneeName,
+    consigneeEmail: formData.consigneeEmail,
+    consigneePhone: formData.consigneePhone,
+    consigneeAdd1: formData.consigneeAdd1,
+    consigneeAdd2: formData.consigneeAdd2,
+    consigneeCity: formData.consigneeCity,
+    consigneeZip: formData.consigneeZip,
+    consigneeCountry: formData.consigneeCountry,
+    consigneeVAT: formData.consigneeVat,
+
+    tempControlled: formData.tempFlag === 1,
+    tempControlledMinTemp: formData.tempMin,
+    tempControlledMaxTemp: formData.tempMax,
+    valueOfGoods: formData.valueOfGoods,
+    insured: formData.insured,
+    customs: formData.customs,
+    shippingService: formData.shippingService,
+    shipperInstructions: formData.shipperInstructions,
+    consigneeInstructions: formData.consigneeInstructions,
+
+    packages: lines?.map((line) => ({
+      packageQuantity: line.qty,
+      packageWeight: line.gw,
+      packageLength: line.measureLength,
+      packageWidth: line.measureWidth,
+      packageHeight: line.measureHeight,
+      packageNote: line.note,
+      packageType: line.pckType,
+      ssccs: line.ssccs?.map((s) => ({ sscc: s.sscc })),
+      CBM: line.cbm,
+      LDM: line.ldm,
+      TaxableWeight: line.taxableWeight ?? null, // if you don’t have this, default to null
+      stackable: line.stackFlag === 1,
+      dangerousGoods: line.dgFlag === 1,
+      marksAndNumbers: line.marksNumbers,
+      typeOfGoods: line.typeGoods,
+      tempControlled: line.tempFlag === 1,
+      tempControlledMinTemp: line.tempMin ?? null,
+      tempControlledMaxTemp: line.tempMax ?? null,
+    })),
+  };
+};
+
 const ShippingForms = () => {
   const { token } = useAuth();
   const [selectedForm, setSelectedForm] = useState(null);
@@ -451,7 +517,37 @@ const ShippingForms = () => {
 
   const handleClick = (form) => {
     console.log('Form clicked:', form);
-    setSelectedForm(form); // trigger a re-render
+    const fetchShippingFormData = async () => {
+      try {
+        const response = await torrestirApi.get(
+          `/api/bookings/external?trackingNumber=${form?.trackingNumber}&clientId=${form?.clientId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        console.log(response.data);
+
+        const booking = response.data.booking;
+        const lines = response.data.lines;
+
+        const newShippingFormsCleaned = formDataCleanPayloadWithPackages(booking, lines);
+
+        console.log(newShippingFormsCleaned);
+        //setShippingFormsData(newShippingFormsCleaned);
+        setSelectedForm(newShippingFormsCleaned);
+      } catch (error) {
+        console.error('Error fetching shipping forms:', error);
+      }
+    };
+
+    if (__BUILD_TYPE__ === 'internal') {
+      console.log('Internal build logic here');
+    }
+
+    fetchShippingFormData();
+    //setSelectedForm(form); // trigger a re-render
   };
 
   useEffect(() => {

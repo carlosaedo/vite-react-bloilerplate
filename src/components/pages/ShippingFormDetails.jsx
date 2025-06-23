@@ -54,6 +54,8 @@ const ShippingFormDetails = ({ form, openDialog = true, onCloseDialog }) => {
 
   const [formData, setFormData] = useState(form);
 
+  console.log('ShippingFormDetails formData:', formData);
+
   const [showSSCC, setShowSSCC] = useState({});
 
   const toggleSSCC = (index) => {
