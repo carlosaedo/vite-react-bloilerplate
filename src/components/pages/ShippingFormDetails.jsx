@@ -571,7 +571,7 @@ const ShippingFormDetails = ({ form, openDialog = true, onCloseDialog }) => {
 
               {/* Compact Instructions */}
               <Grid container spacing={2}>
-                <Grid item size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -594,7 +594,7 @@ const ShippingFormDetails = ({ form, openDialog = true, onCloseDialog }) => {
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid item size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Paper
                     elevation={0}
                     sx={{
