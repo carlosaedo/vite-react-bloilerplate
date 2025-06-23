@@ -59,6 +59,7 @@ function NotificationsSignalR() {
 
     const startConnection = async () => {
       // Simple fix: only start if disconnected
+      console.log('Current connection:', connection.state);
       if (connection.state === 'Disconnected') {
         try {
           await connection.start();
@@ -67,6 +68,10 @@ function NotificationsSignalR() {
         } catch (err) {
           console.error('SignalR connection failed:', err);
           setIsConnected(false);
+          setTimeout(() => {
+            console.log('Retrying SignalR connection...');
+            startConnection(); // retry again
+          }, 10000);
         }
       }
     };
