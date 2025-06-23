@@ -86,8 +86,26 @@ function NotificationsSignalR() {
       }
     });
 
+    connection.onclose((err) => {
+      console.error('Connection closed:', err?.message);
+      setIsConnected(false);
+    });
+
+    connection.onreconnecting((err) => {
+      console.warn('Reconnecting...', err?.message);
+      setIsConnected(false);
+    });
+
+    connection.onreconnected(() => {
+      console.log('Reconnected!');
+      setIsConnected(true);
+    });
+
     return () => {
       connection.off('ReceiveNotification');
+      connection.off('onclose');
+      connection.off('onreconnecting');
+      connection.off('onreconnected');
     };
   }, []);
 
