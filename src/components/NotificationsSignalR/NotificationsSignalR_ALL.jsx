@@ -84,13 +84,10 @@ function NotificationsList() {
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
       // Make API call to mark as read
-      await torrestirApi.put(
-        `/api/notifications/${notificationId}/read`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      await torrestirApi.patch(`/api/notifications/${notificationId}/read`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log(`Notification ${notificationId} marked as read`);
     } catch (error) {
       console.error('Error marking notification as read:', error);
       // Revert optimistic update on error
@@ -104,14 +101,29 @@ function NotificationsList() {
       setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: true })));
       setUnreadCount(0);
 
-      // Make API call to mark all as read
-      await torrestirApi.put(
-        '/api/notifications/mark-all-read',
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+      const unreadNotifications = notifications.filter((n) => !n.isRead);
+
+      const results = await Promise.allSettled(
+        unreadNotifications.map((notification) => {
+          const notificationId = notification.notificationId;
+          console.log(`Marking notification ${notificationId} as read`);
+          return torrestirApi.patch(`/api/notifications/${notificationId}/read`, null, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }),
       );
+
+      // Log any errors
+      for (const [index, result] of results.entries()) {
+        if (result.status === 'rejected') {
+          console.error(
+            `Failed to mark notification ${unreadNotifications[index].notificationId}:`,
+            result.reason,
+          );
+        }
+      }
+
+      console.log(`All notifications marked as read`);
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       // Revert optimistic update on error

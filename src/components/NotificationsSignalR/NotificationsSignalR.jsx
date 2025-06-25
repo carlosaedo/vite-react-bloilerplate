@@ -123,6 +123,19 @@ function NotificationsSignalR() {
   };
 
   const handleMarkAsRead = (notificationId) => {
+    const updateNotificationReadOnServer = async () => {
+      try {
+        await torrestirApi.patch(`/api/notifications/${notificationId}/read`, null, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log(`Notification ${notificationId} marked as read`);
+      } catch (error) {
+        console.error(`Error marking notification ${notificationId} as read on server:`, error);
+      }
+    };
+
+    updateNotificationReadOnServer();
+
     setNotifications((prev) =>
       prev.map((notif) =>
         notif.notificationId === notificationId ? { ...notif, isRead: true } : notif,
@@ -256,7 +269,7 @@ function NotificationsSignalR() {
               Nenhuma notificação
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              Suas notificações aparecerão aqui
+              A suas notificações aparecerão aqui
             </Typography>
           </Box>
         ) : (
