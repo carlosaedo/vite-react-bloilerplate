@@ -59,10 +59,6 @@ function NotificationsList() {
     console.log('lol');
   };
 
-  const handleMarkAsRead = async (notificationId) => {
-    await markNotificationAsRead(notificationId);
-  };
-
   const handleMarkAllAsRead = async () => {
     await markAllAsRead();
   };
