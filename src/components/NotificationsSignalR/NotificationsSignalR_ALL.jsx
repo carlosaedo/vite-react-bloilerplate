@@ -112,11 +112,11 @@ function NotificationsList() {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'Agora mesmo';
-    if (minutes < 60) return `${minutes}m atrás`;
-    if (hours < 24) return `${hours}h atrás`;
-    if (days === 1) return 'Ontem';
-    return `${days} dias atrás`;
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days === 1) return 'Yesterday';
+    return `${days} days ago`;
   };
 
   const formatFullDate = (createdAt) => {

@@ -729,10 +729,18 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = async () => {
+    const confirmed = await confirm({
+      message: 'Are you sure you want to reset the form data? This action cannot be undone.',
+      title: 'Reset Form Data',
+      confirmText: 'Reset',
+      cancelText: 'Cancel',
+      severity: 'error',
+    });
+    if (!confirmed) return;
     setErrorMessage(null);
     setMessage(null);
-    resetShippingFormData();
+    resetShippingFormData(shippingFormData.trackingRef);
     setInfoValues({
       totalQuantity: 0,
       totalWeight: 0,

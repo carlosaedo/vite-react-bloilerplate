@@ -198,17 +198,10 @@ export const ShippingFormProvider = ({ children }) => {
     }
   }, [formData]);
 
-  const resetForm = (trackingNumber = trackingNumberShippingForm) => {
-    const resetData = getInitialFormData(trackingNumber);
+  const resetForm = (activeTrackingNumber) => {
+    console.log(activeTrackingNumber);
+    const resetData = getInitialFormData(activeTrackingNumber);
     setFormData(resetData);
-    try {
-      if (trackingNumber) {
-        const key = `shippingFormData_${trackingNumber}`;
-        localStorage.removeItem(key);
-      }
-    } catch (error) {
-      console.error('Error clearing localStorage:', error);
-    }
   };
 
   const updateFormData = (newData) => {
