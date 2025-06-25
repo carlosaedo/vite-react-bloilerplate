@@ -39,7 +39,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsContext';
 
 function NotificationsList() {
-  const { token } = useAuth();
+  const [refreshKey, setRefreshKey] = useState(0);
   const {
     notifications,
     unreadCount,
@@ -56,7 +56,8 @@ function NotificationsList() {
   };
 
   const handleRefresh = () => {
-    console.log('lol');
+    console.log('Refreshing notifications...');
+    setRefreshKey((prev) => prev + 1); // this forces re-render
   };
 
   const handleMarkAllAsRead = async () => {
@@ -141,7 +142,7 @@ function NotificationsList() {
   }
 
   return (
-    <Container maxWidth='md' sx={{ mt: 2, mb: 4 }}>
+    <Container key={refreshKey} maxWidth='md' sx={{ mt: 2, mb: 4 }}>
       {/* Header */}
       <AppBar position='static' color='transparent' elevation={0} sx={{ mb: 3 }}>
         <Toolbar sx={{ px: 0 }}>
@@ -150,11 +151,11 @@ function NotificationsList() {
           </IconButton>
           <Box sx={{ flex: 1 }}>
             <Typography variant='h5' component='h1' sx={{ fontWeight: 'bold' }}>
-              Notificações
+              Notifications
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              {notifications.length} notificação{notifications.length !== 1 ? 's' : ''}
-              {unreadCount > 0 && ` • ${unreadCount} não lida${unreadCount !== 1 ? 's' : ''}`}
+              {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
+              {unreadCount > 0 && ` • ${unreadCount} not read${unreadCount !== 1 ? 's' : ''}`}
             </Typography>
           </Box>
           <IconButton onClick={handleRefresh} disabled={notificationsLoading}>
@@ -176,7 +177,7 @@ function NotificationsList() {
             onClick={handleMarkAllAsRead}
             sx={{ textTransform: 'none' }}
           >
-            Marcar todas como lidas
+            Mark all as read ({unreadCount})
           </Button>
         </Box>
       )}
@@ -186,14 +187,14 @@ function NotificationsList() {
         <Paper sx={{ p: 6, textAlign: 'center' }}>
           <NotificationsNoneIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
           <Typography variant='h6' color='text.secondary' gutterBottom>
-            Nenhuma notificação
+            No new notifications
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Suas notificações aparecerão aqui quando você receber novas mensagens
+            Your notifications will appear here when you receive them.
           </Typography>
         </Paper>
       ) : (
-        <Paper sx={{ overflow: 'hidden' }}>
+        <Paper key={refreshKey} sx={{ overflow: 'hidden' }}>
           <List sx={{ p: 0 }}>
             {notifications.map((notification, index) => (
               <React.Fragment key={notification.notificationId}>
@@ -305,7 +306,7 @@ function NotificationsList() {
                             fontWeight: 'medium',
                           }}
                         >
-                          Ver detalhes →
+                          See details →
                         </Link>
                       )}
                     </Box>
