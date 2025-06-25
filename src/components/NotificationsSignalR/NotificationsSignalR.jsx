@@ -24,90 +24,27 @@ import {
   Person as PersonIcon,
   Business as BusinessIcon,
 } from '@mui/icons-material';
-import torrestirApi from '../api/torrestirApi';
 
-import connection from '../SignalR/connection';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationsContext';
 
 function NotificationsSignalR() {
   const { token } = useAuth();
   const navigateTo = useNavigate();
-  const [notifications, setNotifications] = useState([]);
-  const [isConnected, setIsConnected] = useState(false);
+  const {
+    notifications,
+    unreadCount,
+    markNotificationAsRead,
+    markAllAsRead,
+    isConnected,
+    notificationsLoading,
+    notificationsError,
+  } = useNotifications();
+
   const [anchorEl, setAnchorEl] = useState(null);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const open = Boolean(anchorEl);
   const id = open ? 'notifications-popover' : undefined;
-
-  useEffect(() => {
-    async function fetchInitialNotifications() {
-      try {
-        const response = await torrestirApi.get('/api/notifications', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const initialNotifications = response.data || [];
-        setNotifications(initialNotifications);
-        setUnreadCount(initialNotifications.filter((n) => !n.isRead).length);
-        console.log('Initial notifications fetched:', initialNotifications);
-      } catch (error) {
-        console.error('Error fetching initial notifications:', error);
-      }
-    }
-
-    fetchInitialNotifications();
-
-    const startConnection = async () => {
-      // Simple fix: only start if disconnected
-      console.log('Current connection:', connection.state);
-      if (connection.state === 'Disconnected') {
-        try {
-          await connection.start();
-          console.log('SignalR connected');
-          setIsConnected(true);
-        } catch (err) {
-          console.error('SignalR connection failed:', err);
-          setIsConnected(false);
-          setTimeout(() => {
-            console.log('Retrying SignalR connection...');
-            startConnection(); // retry again
-          }, 10000);
-        }
-      }
-    };
-
-    startConnection();
-
-    connection.on('ReceiveNotification', (notification) => {
-      console.log('Received notification:', notification);
-      setNotifications((prev) => [notification, ...prev]);
-      if (!notification.isRead) {
-        setUnreadCount((prev) => prev + 1);
-      }
-    });
-
-    connection.onclose((err) => {
-      console.error('Connection closed:', err?.message);
-      setIsConnected(false);
-    });
-
-    connection.onreconnecting((err) => {
-      console.warn('Reconnecting...', err?.message);
-      setIsConnected(false);
-    });
-
-    connection.onreconnected(() => {
-      console.log('Reconnected!');
-      setIsConnected(true);
-    });
-
-    return () => {
-      connection.off('ReceiveNotification');
-      connection.off('onclose');
-      connection.off('onreconnecting');
-      connection.off('onreconnected');
-    };
-  }, []);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -122,32 +59,10 @@ function NotificationsSignalR() {
     handleClose();
   };
 
-  const handleMarkAsRead = (notificationId) => {
-    const updateNotificationReadOnServer = async () => {
-      try {
-        await torrestirApi.patch(`/api/notifications/${notificationId}/read`, null, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log(`Notification ${notificationId} marked as read`);
-      } catch (error) {
-        console.error(`Error marking notification ${notificationId} as read on server:`, error);
-      }
-    };
-
-    updateNotificationReadOnServer();
-
-    setNotifications((prev) =>
-      prev.map((notif) =>
-        notif.notificationId === notificationId ? { ...notif, isRead: true } : notif,
-      ),
-    );
-    setUnreadCount((prev) => Math.max(0, prev - 1));
-  };
-
-  const handleNotificationClick = (notification) => {
+  const handleNotificationClick = async (notification) => {
     // Mark as read
     if (!notification.isRead) {
-      handleMarkAsRead(notification.notificationId);
+      await markNotificationAsRead(notification.notificationId);
     }
 
     // Navigate to action URL if provided
@@ -192,11 +107,11 @@ function NotificationsSignalR() {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'Agora mesmo';
-    if (minutes < 60) return `${minutes}m atrás`;
-    if (hours < 24) return `${hours}h atrás`;
-    if (days === 1) return 'Ontem';
-    return `${days} dias atrás`;
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days === 1) return 'Yesterday';
+    return `${days} days ago`;
   };
 
   // Get recent notifications for popover (max 5)
@@ -257,7 +172,7 @@ function NotificationsSignalR() {
       >
         <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
           <Typography variant='h6' component='div'>
-            Notificações
+            Notifications
           </Typography>
           {!isConnected && <Chip label='Desconectado' color='error' size='small' sx={{ mt: 1 }} />}
         </Box>
@@ -266,10 +181,10 @@ function NotificationsSignalR() {
           <Box sx={{ p: 4, textAlign: 'center' }}>
             <NotificationsNoneIcon sx={{ fontSize: 56, color: 'text.secondary', mb: 2 }} />
             <Typography variant='body1' color='text.secondary' gutterBottom>
-              Nenhuma notificação
+              No new notifications
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              A suas notificações aparecerão aqui
+              Your notifications will appear here when you receive them.
             </Typography>
           </Box>
         ) : (
@@ -379,7 +294,7 @@ function NotificationsSignalR() {
                             textAlign: 'left',
                           }}
                         >
-                          Ver detalhes →
+                          See details →
                         </Link>
                       )}
                     </Box>
@@ -403,7 +318,7 @@ function NotificationsSignalR() {
                 onClick={handleSeeAll}
                 sx={{ textTransform: 'none' }}
               >
-                Ver todas as notificações ({notifications.length})
+                See all notifications ({notifications.length})
               </Button>
             </Box>
           </>

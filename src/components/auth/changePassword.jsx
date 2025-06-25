@@ -19,7 +19,6 @@ import FlorkHide from '../../assets/flork-114-png.png';
 import FlorkYay from '../../assets/yay-flork.png';
 
 import Message from '../messages/Message';
-import Error from '../messages/ErrorMessage';
 import ErrorMessage from '../messages/ErrorMessage';
 
 const ChangePassword = () => {

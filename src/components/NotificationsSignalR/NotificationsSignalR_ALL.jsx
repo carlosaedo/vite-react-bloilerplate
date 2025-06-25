@@ -31,110 +31,46 @@ import {
   MarkEmailRead as MarkAllReadIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import torrestirApi from '../api/torrestirApi';
+
+import Message from '../messages/Message';
+import ErrorMessage from '../messages/ErrorMessage';
+
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationsContext';
 
 function NotificationsList() {
   const { token } = useAuth();
+  const {
+    notifications,
+    unreadCount,
+    markNotificationAsRead,
+    markAllAsRead,
+    isConnected,
+    notificationsLoading,
+    notificationsError,
+  } = useNotifications();
   const navigateTo = useNavigate();
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  const fetchAllNotifications = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await torrestirApi.get('/api/notifications', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const allNotifications = response.data || [];
-      setNotifications(allNotifications);
-      setUnreadCount(allNotifications.filter((n) => !n.isRead).length);
-      console.log('All notifications fetched:', allNotifications);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      setError('Erro ao carregar notificações. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllNotifications();
-  }, [token]);
 
   const handleBack = () => {
     navigateTo(-1);
   };
 
   const handleRefresh = () => {
-    fetchAllNotifications();
+    console.log('lol');
   };
 
   const handleMarkAsRead = async (notificationId) => {
-    try {
-      // Optimistically update UI
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.notificationId === notificationId ? { ...notif, isRead: true } : notif,
-        ),
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-
-      // Make API call to mark as read
-      await torrestirApi.patch(`/api/notifications/${notificationId}/read`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log(`Notification ${notificationId} marked as read`);
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      // Revert optimistic update on error
-      fetchAllNotifications();
-    }
+    await markNotificationAsRead(notificationId);
   };
 
   const handleMarkAllAsRead = async () => {
-    try {
-      // Optimistically update UI
-      setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: true })));
-      setUnreadCount(0);
-
-      const unreadNotifications = notifications.filter((n) => !n.isRead);
-
-      const results = await Promise.allSettled(
-        unreadNotifications.map((notification) => {
-          const notificationId = notification.notificationId;
-          console.log(`Marking notification ${notificationId} as read`);
-          return torrestirApi.patch(`/api/notifications/${notificationId}/read`, null, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-        }),
-      );
-
-      // Log any errors
-      for (const [index, result] of results.entries()) {
-        if (result.status === 'rejected') {
-          console.error(
-            `Failed to mark notification ${unreadNotifications[index].notificationId}:`,
-            result.reason,
-          );
-        }
-      }
-
-      console.log(`All notifications marked as read`);
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      // Revert optimistic update on error
-      fetchAllNotifications();
-    }
+    await markAllAsRead();
   };
 
-  const handleNotificationClick = (notification) => {
+  const handleNotificationClick = async (notification) => {
     // Mark as read if not already read
     if (!notification.isRead) {
-      handleMarkAsRead(notification.notificationId);
+      await markNotificationAsRead(notification.notificationId);
     }
 
     // Navigate to action URL if provided
@@ -197,12 +133,12 @@ function NotificationsList() {
     });
   };
 
-  if (loading) {
+  if (notificationsLoading) {
     return (
       <Container maxWidth='md' sx={{ mt: 4, textAlign: 'center' }}>
         <CircularProgress />
         <Typography variant='body1' sx={{ mt: 2 }}>
-          Carregando notificações...
+          Loading notifications...
         </Typography>
       </Container>
     );
@@ -225,18 +161,14 @@ function NotificationsList() {
               {unreadCount > 0 && ` • ${unreadCount} não lida${unreadCount !== 1 ? 's' : ''}`}
             </Typography>
           </Box>
-          <IconButton onClick={handleRefresh} disabled={loading}>
+          <IconButton onClick={handleRefresh} disabled={notificationsLoading}>
             <RefreshIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
 
       {/* Error Alert */}
-      {error && (
-        <Alert severity='error' sx={{ mb: 3 }} onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+      <ErrorMessage errorMessage={notificationsError} />
 
       {/* Mark All as Read Button */}
       {unreadCount > 0 && (
