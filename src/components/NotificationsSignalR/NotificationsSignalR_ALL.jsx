@@ -144,21 +144,147 @@ function NotificationsList() {
   return (
     <Container key={refreshKey} maxWidth='md' sx={{ mt: 2, mb: 4 }}>
       {/* Header */}
-      <AppBar position='static' color='transparent' elevation={0} sx={{ mb: 3 }}>
-        <Toolbar sx={{ px: 0 }}>
-          <IconButton edge='start' onClick={handleBack} sx={{ mr: 2 }}>
+      <AppBar
+        position='static'
+        color='transparent'
+        elevation={0}
+        sx={{
+          mb: 3,
+          background:
+            'linear-gradient(135deg, rgba(0, 61, 44, 0.1) 0%, rgba(255, 201, 40, 0.1) 100%)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: 3,
+          border: '1px solid rgba(0, 61, 44, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <Toolbar sx={{ px: 3, py: 2 }}>
+          <IconButton
+            edge='start'
+            onClick={handleBack}
+            sx={{
+              mr: 2,
+              background: 'linear-gradient(135deg, #003D2C 0%, #ffc928 100%)',
+              color: 'white',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #ffc928 0%, #003D2C 100%)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 25px rgba(0, 61, 44, 0.4)',
+              },
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              width: 44,
+              height: 44,
+            }}
+          >
             <ArrowBackIcon />
           </IconButton>
+
           <Box sx={{ flex: 1 }}>
-            <Typography variant='h5' component='h1' sx={{ fontWeight: 'bold' }}>
+            <Typography
+              variant='h4'
+              component='h1'
+              sx={{
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #003D2C 0%, #ffc928 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 0.5,
+                letterSpacing: '-0.02em',
+              }}
+            >
               Notifications
             </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
-              {unreadCount > 0 && ` • ${unreadCount} not read${unreadCount !== 1 ? 's' : ''}`}
-            </Typography>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 20,
+                  background:
+                    'linear-gradient(135deg, rgba(0, 61, 44, 0.2) 0%, rgba(255, 201, 40, 0.2) 100%)',
+                  border: '1px solid rgba(0, 61, 44, 0.3)',
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
+                <Typography
+                  variant='caption'
+                  sx={{
+                    fontWeight: 600,
+                    color: 'primary.main',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
+                </Typography>
+              </Box>
+
+              {unreadCount > 0 && (
+                <Box
+                  sx={{
+                    px: 2,
+                    py: 0.5,
+                    borderRadius: 20,
+                    background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
+                    boxShadow: '0 4px 15px rgba(255, 107, 107, 0.3)',
+                    animation: 'pulse 2s infinite',
+                    '@keyframes pulse': {
+                      '0%': {
+                        boxShadow: '0 4px 15px rgba(255, 107, 107, 0.3)',
+                      },
+                      '50%': {
+                        boxShadow: '0 4px 20px rgba(255, 107, 107, 0.5)',
+                      },
+                      '100%': {
+                        boxShadow: '0 4px 15px rgba(255, 107, 107, 0.3)',
+                      },
+                    },
+                  }}
+                >
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      fontWeight: 700,
+                      color: 'white',
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    {unreadCount} unread
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
-          <IconButton onClick={handleRefresh} disabled={notificationsLoading}>
+
+          <IconButton
+            onClick={handleRefresh}
+            disabled={notificationsLoading}
+            sx={{
+              background: notificationsLoading
+                ? 'rgba(0, 61, 44, 0.1)'
+                : 'linear-gradient(135deg, rgba(0, 61, 44, 0.2) 0%, rgba(255, 201, 40, 0.2) 100%)',
+              border: '1px solid rgba(0, 61, 44, 0.3)',
+              color: 'primary.main',
+              '&:hover': {
+                background:
+                  'linear-gradient(135deg, rgba(0, 61, 44, 0.3) 0%, rgba(255, 201, 40, 0.3) 100%)',
+                transform: notificationsLoading ? 'none' : 'translateY(-2px) rotate(180deg)',
+                boxShadow: notificationsLoading ? 'none' : '0 8px 25px rgba(0, 61, 44, 0.3)',
+              },
+              '&:disabled': {
+                color: 'rgba(0, 61, 44, 0.5)',
+                animation: 'spin 1s linear infinite',
+              },
+              '@keyframes spin': {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(360deg)' },
+              },
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              width: 44,
+              height: 44,
+            }}
+          >
             <RefreshIcon />
           </IconButton>
         </Toolbar>
