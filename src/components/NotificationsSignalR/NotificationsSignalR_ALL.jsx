@@ -142,7 +142,7 @@ function NotificationsList() {
   }
 
   return (
-    <Container key={refreshKey} maxWidth='md' sx={{ mt: 2, mb: 4 }}>
+    <Container key={refreshKey} maxWidth={false} sx={{ width: '100%', mt: 2, mb: 4 }}>
       {/* Header */}
       <AppBar
         position='static'
@@ -154,7 +154,7 @@ function NotificationsList() {
             'linear-gradient(135deg, rgba(0, 61, 44, 0.1) 0%, rgba(255, 201, 40, 0.1) 100%)',
           backdropFilter: 'blur(10px)',
           borderRadius: 3,
-          border: '1px solid rgba(0, 61, 44, 0.1)',
+          border: '0px',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         }}
       >
@@ -204,7 +204,7 @@ function NotificationsList() {
                   borderRadius: 20,
                   background:
                     'linear-gradient(135deg, rgba(0, 61, 44, 0.2) 0%, rgba(255, 201, 40, 0.2) 100%)',
-                  border: '1px solid rgba(0, 61, 44, 0.3)',
+                  border: '0px',
                   backdropFilter: 'blur(8px)',
                 }}
               >
@@ -264,7 +264,7 @@ function NotificationsList() {
               background: notificationsLoading
                 ? 'rgba(0, 61, 44, 0.1)'
                 : 'linear-gradient(135deg, rgba(0, 61, 44, 0.2) 0%, rgba(255, 201, 40, 0.2) 100%)',
-              border: '1px solid rgba(0, 61, 44, 0.3)',
+
               color: 'primary.main',
               '&:hover': {
                 background:
