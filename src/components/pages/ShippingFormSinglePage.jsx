@@ -858,7 +858,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         RetailStoreFlag: formData.RetailStoreFlag,
         DriversHelperFlag: formData.DriversHelperFlag,
         PriorContactFlag: formData.PriorContactFlag,
-        PinCodeFlag: formData.PinCodeFlag,
         valueOfInsurance: formData.valueOfInsurance || 0,
         customsClearedBy: formData.customsClearedBy,
       };
