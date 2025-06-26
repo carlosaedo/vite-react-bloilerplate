@@ -789,10 +789,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   };
 
   const handleSubmit = async () => {
-    if (!validateFromBeforeSubmit()) {
-      setErrorMessage('Please fill in all required fields.');
-      return;
-    }
+    //if (!validateFromBeforeSubmit()) {
+    //  setErrorMessage('Please fill in all required fields.');
+    //  return;
+    //}
 
     const formDataToBackendPayload = (formData) => {
       return {
@@ -805,7 +805,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         shipperReference: formData.shipperRef,
         consigneeReference: formData.consigneeRef,
 
-        shipperId: formData.senderId,
+        ShipperId: formData.senderId,
         shipperName: formData.senderName,
         shipperEmail: formData.senderEmail,
         shipperPhone: formData.senderPhone,
@@ -816,7 +816,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         shipperCountry: formData.senderCountry,
         shipperVAT: formData.senderTaxId,
 
-        consigneeId: formData.recipientId,
+        ConsigneeId: formData.recipientId,
         consigneeName: formData.recipientName,
         consigneeEmail: formData.recipientEmail,
         consigneePhone: formData.recipientPhone,
@@ -837,7 +837,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
           packageType: pkg.packageType,
           cbm: pkg.CBM,
           ldm: pkg.LDM,
-          taxableWeight: pkg.TaxableWeight,
+          taxableWeight: String(pkg.TaxableWeight),
           stackable: pkg.stackable,
           dangerousGoods: pkg.dangerousGoods,
           marksAndNumbers: pkg.marksAndNumbers,
@@ -845,24 +845,34 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         })),
 
         tempControlled: formData.tempControlled,
-        tempControlledMinTemp: formData.tempControlledMinTemp,
-        tempControlledMaxTemp: formData.tempControlledMaxTemp,
+        tempControlledMinTemp: formData.tempControlledMinTemp || 0,
+        tempControlledMaxTemp: formData.tempControlledMaxTemp || 0,
         valueOfGoods: formData.valueOfGoods,
         insured: formData.insured,
         customs: formData.customs,
         shippingService: formData.shippingService,
         shipperInstructions: formData.shipperInstructions,
         consigneeInstructions: formData.consigneeInstructions,
+        PinCodeFlag: formData.PinCodeFlag,
+        PinCode: formData.PinCode,
+        RetailStoreFlag: formData.RetailStoreFlag,
+        DriversHelperFlag: formData.DriversHelperFlag,
+        PriorContactFlag: formData.PriorContactFlag,
+        PinCodeFlag: formData.PinCodeFlag,
+        valueOfInsurance: formData.valueOfInsurance || 0,
+        customsClearedBy: formData.customsClearedBy,
       };
     };
 
     try {
       const payload = formDataToBackendPayload(shippingFormData);
+      console.log('payload: ', payload);
       const response = await torrestirApi.post(`/api/bookings/external`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       console.log('Form submitted successfully:', response.data);
       if (response?.status === 200) {
         setMessage('Form submitted successfully!');

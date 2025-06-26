@@ -16,6 +16,7 @@ import { Add } from '@mui/icons-material';
 import api from '../api/api';
 import torrestirApi from '../api/torrestirApi';
 import { useAuth } from '../context/AuthContext';
+import { useClient } from '../context/ClientContext';
 
 const defaultNewEntity = {
   Name: '',
@@ -38,6 +39,7 @@ const EntitySelector = ({
   isRecipient = false,
 }) => {
   const { token } = useAuth();
+  const { selectedClient } = useClient();
   const [options, setOptions] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [newEntityData, setNewEntityData] = useState(defaultNewEntity);
@@ -57,7 +59,9 @@ const EntitySelector = ({
     setFetching(true);
 
     const cleanDataFromBackend = (data) => {
+      console.log('entity data from backend:', data);
       return {
+        id: data.id,
         Name: data.name || '',
         Add1: data.add1 || '',
         Add2: data.add2 || '',
@@ -72,21 +76,18 @@ const EntitySelector = ({
     };
 
     try {
-      const response = await torrestirApi.get(
-        `/api/clients/37aacab0-13c9-11f0-854e-005056b7886b/entities`,
-        {
-          params: {
-            page: page,
-            pageSize: pageSize,
-            ...(isRecipient && { delivery: isRecipient }),
-            ...(isSender && { shipping: isSender }),
-            search: search,
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await torrestirApi.get(`/api/clients/${selectedClient.clientId}/entities`, {
+        params: {
+          page: page,
+          pageSize: pageSize,
+          ...(isRecipient && { delivery: isRecipient }),
+          ...(isSender && { shipping: isSender }),
+          search: search,
         },
-      );
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const items = response.data.items.map((item) => cleanDataFromBackend(item));
 
@@ -113,7 +114,11 @@ const EntitySelector = ({
 
   useEffect(() => {
     fetchEntities('', 1);
-  }, []);
+  }, [selectedClient]);
+
+  useEffect(() => {
+    setSelectedValue(null);
+  }, [selectedClient]);
 
   const handleScroll = (event) => {
     const listboxNode = event.currentTarget;
