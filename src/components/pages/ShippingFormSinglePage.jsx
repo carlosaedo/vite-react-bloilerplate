@@ -88,7 +88,7 @@ const insuredByOptions = [
   { value: 'client', label: 'Client' },
 ];
 
-const typeOfGoodsOptions = [{ value: 'general_goods', label: 'General Goods' }];
+const typeOfGoodsOptions = [{ value: 'GEN', label: 'General Goods' }];
 
 const defaultPackageValues = {
   packageQuantity: '1',
@@ -97,19 +97,19 @@ const defaultPackageValues = {
   packageWidth: '',
   packageHeight: '',
   packageNote: '',
-  packageType: 'volume',
+  packageType: 'VLM',
   CBM: '',
   LDM: '',
   TaxableWeight: '',
   stackable: false,
   dangerousGoods: false,
   marksAndNumbers: '',
-  typeOfGoods: 'general_goods',
+  typeOfGoods: 'GEN',
 };
 
 const packageType = [
-  { value: 'volume', label: 'Volume' },
-  { value: 'palete', label: 'Palete' },
+  { value: 'VLM', label: 'Volume' },
+  { value: 'PLT', label: 'Palete' },
 ];
 
 const shippingPayment = [
@@ -789,6 +789,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   };
 
   const handleSubmit = async () => {
+    // TODO: Uncomment this validation when ready to enforce it
     //if (!validateFromBeforeSubmit()) {
     //  setErrorMessage('Please fill in all required fields.');
     //  return;
@@ -847,14 +848,14 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         tempControlled: formData.tempControlled,
         tempControlledMinTemp: formData.tempControlledMinTemp || 0,
         tempControlledMaxTemp: formData.tempControlledMaxTemp || 0,
-        valueOfGoods: formData.valueOfGoods,
+        valueOfGoods: String(formData.valueOfGoods) || '',
         insured: formData.insured,
         customs: formData.customs,
         shippingService: formData.shippingService,
         shipperInstructions: formData.shipperInstructions,
         consigneeInstructions: formData.consigneeInstructions,
         PinCodeFlag: formData.PinCodeFlag,
-        PinCode: formData.PinCode,
+        PinCode: formData.PinCode || '',
         RetailStoreFlag: formData.RetailStoreFlag,
         DriversHelperFlag: formData.DriversHelperFlag,
         PriorContactFlag: formData.PriorContactFlag,
