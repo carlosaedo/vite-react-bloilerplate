@@ -1,46 +1,4 @@
-/*
-React tirCaptcha Component
-
-how to use in react:
-
-import TirCaptcha from './components/TirCaptcha';
-
-<TirCaptcha
-  apiInstance={your_axios_instance}
-  antiPhishingKey="your_key"
-  onValidation={(isValid, captchaCode) => {
-    // Handle validation result
-  }}
-  onError={(errorMsg, error) => {
-    // Handle errors
-  }}
-  showInput={true}
-  label="Custom Label"
-  size="small" // small, medium, large
-/>
-
-add validation to backend (Optional but recommended)
-
-// In your /Account/register endpoint
-const { captchaToken, ...userData } = req.body;
-
-// Re-validate the captcha token with the captcha service
-const captchaValidation = await axios.post(
-  `${CAPTCHA_SERVICE_URL}/tirCaptcha/validate-key?antiPhishingKey=${ANTI_PHISHING_KEY}`,
-  { tirKey: captchaToken }
-);
-
-if (captchaValidation.status !== 200) {
-  return res.status(400).json({ error: 'Invalid captcha' });
-}
-
-// Proceed with registration...
-
-Carlos Aedo - Torres Lab 2025
-
-*/
-
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -61,9 +19,8 @@ const TirCaptcha = ({
   disabled = false,
   showInput = true,
   label = 'Security Verification',
-  size = 'medium', // small, medium, large
+  size = 'medium',
 }) => {
-  console.log(apiInstance);
   const [captchaImage, setCaptchaImage] = useState(null);
   const [captchaInput, setCaptchaInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -71,7 +28,7 @@ const TirCaptcha = ({
   const [error, setError] = useState(null);
   const [isValid, setIsValid] = useState(false);
 
-  const fetchCaptchaImage = useCallback(async () => {
+  const fetchCaptchaImage = async () => {
     setLoading(true);
     setError(null);
     setIsValid(false);
@@ -82,124 +39,105 @@ const TirCaptcha = ({
         `/tirCaptcha/get-key?antiPhishingKey=${antiPhishingKey}`,
         {
           responseType: 'blob',
-          headers: {
-            Accept: 'image/png',
-          },
+          headers: { Accept: 'image/png' },
         },
       );
 
       const imageBlob = new Blob([response.data], { type: 'image/png' });
       const imageObjectURL = URL.createObjectURL(imageBlob);
 
-      // Clean up previous image URL
-      if (captchaImage) {
-        URL.revokeObjectURL(captchaImage);
-      }
-
-      setCaptchaImage(imageObjectURL);
+      setCaptchaImage((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return imageObjectURL;
+      });
     } catch (err) {
       const errorMsg = 'Failed to load captcha';
       setError(errorMsg);
-      if (onError) onError(errorMsg, err);
+      onError?.(errorMsg, err);
       console.error('Error fetching captcha:', err);
     } finally {
       setLoading(false);
     }
-  }, [apiInstance, antiPhishingKey, captchaImage, onError]);
+  };
 
-  const validateCaptcha = useCallback(
-    async (tirKey = captchaInput) => {
-      if (!tirKey.trim()) {
-        const errorMsg = 'Please enter the captcha code';
-        setError(errorMsg);
-        if (onError) onError(errorMsg);
-        return false;
-      }
+  const validateCaptcha = async (tirKey = captchaInput) => {
+    if (!tirKey.trim()) {
+      const errorMsg = 'Please enter the captcha code';
+      setError(errorMsg);
+      onError?.(errorMsg);
+      return false;
+    }
 
-      setValidating(true);
-      setError(null);
+    setValidating(true);
+    setError(null);
 
-      try {
-        const response = await apiInstance.post(
-          `/tirCaptcha/validate-key?antiPhishingKey=${antiPhishingKey}`,
-          { tirKey: tirKey.trim() },
-        );
+    try {
+      const response = await apiInstance.post(
+        `/tirCaptcha/validate-key?antiPhishingKey=${antiPhishingKey}`,
+        { tirKey: tirKey.trim() },
+      );
 
-        if (response?.status === 200) {
-          setIsValid(true);
-          if (onValidation) onValidation(true, tirKey);
-          return true;
-        } else {
-          const errorMsg = 'Invalid captcha code';
-          setError(errorMsg);
-          setIsValid(false);
-          if (onValidation) onValidation(false, tirKey);
-          if (onError) onError(errorMsg);
-          return false;
-        }
-      } catch (err) {
-        let errorMsg = 'Captcha validation failed';
-
-        if (err.response?.status === 400) {
-          errorMsg = 'Invalid captcha code';
-        } else if (err.response?.status === 429) {
-          errorMsg = 'Too many attempts. Please try again later';
-        }
-
+      if (response?.status === 200) {
+        setIsValid(true);
+        onValidation?.(true, tirKey);
+        return true;
+      } else {
+        const errorMsg = 'Invalid captcha code';
         setError(errorMsg);
         setIsValid(false);
-        if (onValidation) onValidation(false, tirKey);
-        if (onError) onError(errorMsg, err);
-        console.error('Error validating captcha:', err);
+        onValidation?.(false, tirKey);
+        onError?.(errorMsg);
         return false;
-      } finally {
-        setValidating(false);
       }
-    },
-    [apiInstance, antiPhishingKey, captchaInput, onValidation, onError],
-  );
+    } catch (err) {
+      let errorMsg = 'Captcha validation failed';
+      if (err.response?.status === 400) errorMsg = 'Invalid captcha code';
+      else if (err.response?.status === 429) errorMsg = 'Too many attempts. Please try again later';
 
-  const handleRefresh = useCallback(() => {
+      setError(errorMsg);
+      setIsValid(false);
+      onValidation?.(false, tirKey);
+      onError?.(errorMsg, err);
+      console.error('Error validating captcha:', err);
+      return false;
+    } finally {
+      setValidating(false);
+    }
+  };
+
+  const handleRefresh = () => {
     setCaptchaInput('');
     setIsValid(false);
     fetchCaptchaImage();
-  }, [fetchCaptchaImage]);
+  };
 
-  const handleInputChange = useCallback((event) => {
+  const handleInputChange = (event) => {
     setCaptchaInput(event.target.value);
     setError(null);
     setIsValid(false);
-  }, []);
+  };
 
-  const handleValidateClick = useCallback(() => {
+  const handleValidateClick = () => {
     validateCaptcha();
-  }, [validateCaptcha]);
+  };
 
-  // Auto-validate on Enter key
-  const handleKeyPress = useCallback(
-    (event) => {
-      if (event.key === 'Enter' && !validating && captchaInput.trim()) {
-        validateCaptcha();
-      }
-    },
-    [validateCaptcha, validating, captchaInput],
-  );
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && !validating && captchaInput.trim()) {
+      validateCaptcha();
+    }
+  };
 
   useEffect(() => {
     fetchCaptchaImage();
-
-    // Cleanup on unmount
     return () => {
       if (captchaImage) {
         URL.revokeObjectURL(captchaImage);
       }
     };
-  }, []); // Only run on mount
+  }, []);
 
-  // Expose validation method to parent
   useEffect(() => {
     if (onValidation) {
-      // Attach validation method to parent
       const parentValidate = () => validateCaptcha();
       parentValidate.isValid = isValid;
       parentValidate.captchaValue = captchaInput;
@@ -210,14 +148,7 @@ const TirCaptcha = ({
     size === 'small' ? { maxWidth: 250 } : size === 'large' ? { maxWidth: 450 } : { maxWidth: 350 };
 
   return (
-    <Card
-      variant='outlined'
-      sx={{
-        mt: 1,
-        opacity: disabled ? 0.6 : 1,
-        ...cardSize,
-      }}
-    >
+    <Card variant='outlined' sx={{ mt: 1, opacity: disabled ? 0.6 : 1, ...cardSize }}>
       <CardContent sx={{ pb: 1 }}>
         <Typography variant='body2' color='text.secondary' gutterBottom>
           {label}
@@ -249,7 +180,7 @@ const TirCaptcha = ({
           </Typography>
         )}
 
-        {captchaImage && !isValid && !loading && (
+        {captchaImage && (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
             <img
               src={captchaImage}
@@ -264,7 +195,7 @@ const TirCaptcha = ({
           </Box>
         )}
 
-        {showInput && captchaImage && !isValid && !loading && (
+        {showInput && captchaImage && (
           <Box sx={{ mt: 2 }}>
             <TextField
               fullWidth
@@ -290,40 +221,37 @@ const TirCaptcha = ({
         )}
       </CardContent>
 
-      {!isValid && (
-        <CardActions sx={{ justifyContent: 'center', pt: 0 }}>
-          <Button
-            size='small'
-            startIcon={<RefreshIcon />}
-            onClick={handleRefresh}
-            disabled={disabled || loading || validating}
-            variant='outlined'
-          >
-            Refresh
-          </Button>
-        </CardActions>
-      )}
+      <CardActions sx={{ justifyContent: 'center', pt: 0 }}>
+        <Button
+          size='small'
+          startIcon={<RefreshIcon />}
+          onClick={handleRefresh}
+          disabled={disabled || loading || validating}
+          variant='outlined'
+        >
+          Refresh
+        </Button>
+      </CardActions>
     </Card>
   );
 };
 
-// Export with validation hook for easier integration
 export const useTirCaptcha = () => {
   const [captchaRef, setCaptchaRef] = useState(null);
   const [isValid, setIsValid] = useState(false);
 
-  const validateCaptcha = useCallback(async () => {
+  const validateCaptcha = async () => {
     if (captchaRef && typeof captchaRef.validate === 'function') {
       return await captchaRef.validate();
     }
     return false;
-  }, [captchaRef]);
+  };
 
-  const resetCaptcha = useCallback(() => {
+  const resetCaptcha = () => {
     if (captchaRef && typeof captchaRef.refresh === 'function') {
       captchaRef.refresh();
     }
-  }, [captchaRef]);
+  };
 
   return {
     captchaRef: setCaptchaRef,

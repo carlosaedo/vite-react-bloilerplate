@@ -113,8 +113,7 @@ const CreateAccount = () => {
   const handleCaptchaError = (errorMsg) => {
     setCaptchaValid(false);
     setCaptchaValue('');
-    // You can choose to show captcha errors in the main error area or handle them separately
-    // setErrorMessage(errorMsg);
+    setErrorMessage(errorMsg);
   };
 
   return (
