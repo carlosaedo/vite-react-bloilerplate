@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../api/api';
 import torrestirApi from '../api/torrestirApi';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -19,6 +20,7 @@ import FlorkYay from '../../assets/yay-flork.png';
 
 import Message from '../messages/Message';
 import ErrorMessage from '../messages/ErrorMessage';
+import TirCaptcha from '../TirCaptcha/TirCaptcha.jsx';
 
 const CreateAccount = () => {
   const navigateTo = useNavigate();
@@ -33,10 +35,24 @@ const CreateAccount = () => {
   const [message, setMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaValid, setCaptchaValid] = useState(false);
+  const [captchaValue, setCaptchaValue] = useState('');
 
-  async function handleRequestResetPassword() {
+  async function handleRequestCreateNewAccount() {
+    // First validate captcha before proceeding
+    if (!captchaValid) {
+      setErrorMessage('Please complete the security verification first.');
+      return;
+    }
+
     try {
-      const response = await torrestirApi.post('/Account/register', formData);
+      // Include captcha validation in the request to your backend
+      const requestData = {
+        ...formData,
+        captchaToken: captchaValue, // Include the validated captcha
+      };
+
+      const response = await torrestirApi.post('/Account/register', requestData);
       console.log(response);
       if (response?.status === 200) {
         setMessage('Conta criada. Verifique o seu email para ativar a conta.');
@@ -54,15 +70,22 @@ const CreateAccount = () => {
         error.response?.data?.error === 'Esse email já se encontra registado.'
       ) {
         setErrorMessage('Esse email já se encontra registado.');
+      } else if (
+        error.response?.status === 400 &&
+        error.response?.data?.error?.includes('captcha')
+      ) {
+        setErrorMessage('Security verification failed. Please try again.');
+        setCaptchaValid(false);
       } else {
         console.error(error);
+        setErrorMessage('Algo correu mal.');
       }
     }
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await handleRequestResetPassword();
+    await handleRequestCreateNewAccount();
   };
 
   const handleChange = (event) => {
@@ -76,6 +99,22 @@ const CreateAccount = () => {
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
+  const handleCaptchaValidation = (isValid, captchaCode) => {
+    setCaptchaValid(isValid);
+    setCaptchaValue(isValid ? captchaCode : '');
+
+    if (isValid) {
+      setErrorMessage(null); // Clear any previous captcha errors
+    }
+  };
+
+  const handleCaptchaError = (errorMsg) => {
+    setCaptchaValid(false);
+    setCaptchaValue('');
+    // You can choose to show captcha errors in the main error area or handle them separately
+    // setErrorMessage(errorMsg);
   };
 
   return (
@@ -155,7 +194,25 @@ const CreateAccount = () => {
             />
           </FormControl>
 
-          <Button type='submit' variant='contained' color='primary'>
+          <TirCaptcha
+            apiInstance={api}
+            antiPhishingKey='b647d2331b97509caa701db9ba7568ce7c82f30db8da8d241c486f8dadd002ff'
+            onValidation={handleCaptchaValidation}
+            onError={handleCaptchaError}
+            showInput={true}
+            label='Security Verification'
+            size='large'
+          />
+
+          <Button
+            type='submit'
+            variant='contained'
+            color='primary'
+            disabled={!captchaValid}
+            sx={{
+              opacity: captchaValid ? 1 : 0.7,
+            }}
+          >
             Create account
           </Button>
         </Box>
