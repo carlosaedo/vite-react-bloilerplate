@@ -186,6 +186,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   const [selectedPackageIndex, setSelectedPackageIndex] = useState(0);
 
+  const [clientDepartments, setClientDepartments] = useState([]);
+
   const [infoValues, setInfoValues] = useState(() => {
     const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
       calculateShippingFormTotals(shippingFormData.packages);
@@ -206,7 +208,28 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   useEffect(() => {
     setClientFromStorage(selectedClient);
-    console.log('selectedClient', selectedClient?.clientId);
+  }, [selectedClient]);
+
+  useEffect(() => {
+    async function fetchClientDepartments() {
+      try {
+        const result = await torrestirApi.get(
+          `/api/client-departments?clientId=${selectedClient?.clientId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        if (result?.status === 200) {
+          setClientDepartments(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching client departments:', error);
+      }
+    }
+
+    fetchClientDepartments();
   }, [selectedClient]);
 
   const handleJumpToPackage = (index) => {
@@ -729,15 +752,17 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     }
   };
 
-  const resetForm = async () => {
-    const confirmed = await confirm({
-      message: 'Are you sure you want to reset the form data? This action cannot be undone.',
-      title: 'Reset Form Data',
-      confirmText: 'Reset',
-      cancelText: 'Cancel',
-      severity: 'error',
-    });
-    if (!confirmed) return;
+  const resetForm = async ({ showConfirm = true }) => {
+    if (showConfirm) {
+      const confirmed = await confirm({
+        message: 'Are you sure you want to reset the form data? This action cannot be undone.',
+        title: 'Reset Form Data',
+        confirmText: 'Reset',
+        cancelText: 'Cancel',
+        severity: 'error',
+      });
+      if (!confirmed) return;
+    }
     setErrorMessage(null);
     setMessage(null);
     resetShippingFormData(shippingFormData.trackingRef);
@@ -876,7 +901,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       console.log('Form submitted successfully:', response.data);
       if (response?.status === 200) {
         setMessage('Form submitted successfully!');
-        resetForm();
+        resetForm({ showConfirm: false });
         console.log(response);
       }
     } catch (error) {
@@ -2504,6 +2529,95 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             )}
           </Box>
         </Box>
+
+        <Box
+          sx={{
+            mb: 3,
+            p: 2,
+            border: '1px solid rgba(255, 201, 40, 0.3)',
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, #eaf4f0 0%, #fff7e0 100%)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)',
+            color: '#003D2C',
+            position: 'relative',
+            overflow: 'hidden',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': {
+              boxShadow: '0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)',
+              transform: 'translateY(-2px)',
+            },
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '3px',
+              background: 'linear-gradient(90deg, #003D2C, #ffc928, #003D2C)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 3s ease-in-out infinite',
+            },
+            '@keyframes shimmer': {
+              '0%': { backgroundPosition: '200% 0' },
+              '100%': { backgroundPosition: '-200% 0' },
+            },
+            '& .MuiInputBase-root': {
+              color: '#003D2C',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              px: 1,
+            },
+            '& .MuiInputLabel-root': {
+              color: '#003D2C',
+              fontWeight: 500,
+            },
+            '& .MuiInputLabel-shrink': {
+              color: '#003D2C',
+              transform: 'translate(14px, -9px) scale(0.75) !important',
+            },
+            '& .MuiCheckbox-root': {
+              color: '#003D2C',
+            },
+            '& .MuiFormControlLabel-label': {
+              color: '#003D2C',
+            },
+            '& .MuiSvgIcon-root': {
+              color: '#003D2C',
+            },
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(255, 201, 40, 0.5)',
+              transition: 'border-color 0.2s ease',
+            },
+            '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#ffc928',
+              borderWidth: '2px',
+            },
+            '& .MuiTextField-root': {
+              '& .MuiInputBase-root': {
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              },
+            },
+          }}
+        >
+          {clientDepartments.length > 0 && (
+            <TextField
+              select
+              label='Client Departments'
+              name='clientDepartmentId'
+              value={shippingFormData.clientDepartmentId || ''}
+              onChange={handleChange}
+              fullWidth
+              size='small'
+              margin='dense'
+              required
+            >
+              {clientDepartments.map((option) => (
+                <MenuItem key={option.clientDepartmentId} value={option.clientDepartmentId}>
+                  {option?.nome?.toUpperCase()}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        </Box>
         <Grid container spacing={2}>
           <Grid
             size={{
@@ -3848,7 +3962,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <ErrorMessage errorMessage={errorMessage} />
             <Message message={message} />
             {!isExternal && (
-              <Button onClick={resetForm} variant='outlined' color='primary'>
+              <Button
+                onClick={() => resetForm({ showConfirm: true })}
+                variant='outlined'
+                color='primary'
+              >
                 Reset Form
               </Button>
             )}

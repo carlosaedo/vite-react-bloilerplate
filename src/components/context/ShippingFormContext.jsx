@@ -86,7 +86,7 @@ export const ShippingFormProvider = ({ children }) => {
     PinCodeFlag: false,
     PinCode: '',
     clientId: '',
-    clientName_REFERENCE: '',
+    clientDepartmentId: '',
   });
 
   const [formData, setFormData] = useState(() => {

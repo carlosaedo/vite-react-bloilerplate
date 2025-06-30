@@ -2,16 +2,20 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import torrestirApi from '../api/torrestirApi';
 import connection from '../SignalR/connection';
 import { useAuth } from './AuthContext';
+import { useToaster, Toaster } from '../Toaster/Toaster';
 
 const NotificationsContext = createContext();
 
 export function NotificationsProvider({ children }) {
   const { token } = useAuth();
   const [notifications, setNotifications] = useState([]);
+  const [lastNotification, setLastNotification] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { toasts, removeToast, showToast } = useToaster();
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -57,6 +61,8 @@ export function NotificationsProvider({ children }) {
 
     connection.on('ReceiveNotification', (notification) => {
       console.log('Received notification:', notification);
+      setLastNotification(notification);
+      showToast(notification?.title);
       setNotifications((prev) => [notification, ...prev]);
       if (!notification.isRead) {
         setUnreadCount((prev) => prev + 1);
@@ -136,9 +142,11 @@ export function NotificationsProvider({ children }) {
         markAllAsRead,
         notificationsLoading: loading,
         notificationsError: error,
+        lastNotification,
       }}
     >
       {children}
+      <Toaster toasts={toasts} onRemove={removeToast} />
     </NotificationsContext.Provider>
   );
 }

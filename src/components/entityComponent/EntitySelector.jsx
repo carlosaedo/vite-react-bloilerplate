@@ -38,8 +38,6 @@ const EntitySelector = ({
   isSender = false,
   isRecipient = false,
 }) => {
-  console.log('selectedEntityName: ', selectedEntityName);
-
   const { token } = useAuth();
   const { selectedClient } = useClient();
   const [options, setOptions] = useState([]);
@@ -61,7 +59,6 @@ const EntitySelector = ({
     setFetching(true);
 
     const cleanDataFromBackend = (data) => {
-      console.log('entity data from backend:', data);
       return {
         id: data.id,
         Name: data.name || '',
@@ -78,7 +75,7 @@ const EntitySelector = ({
     };
 
     try {
-      const response = await torrestirApi.get(`/api/clients/${selectedClient.clientId}/entities`, {
+      const response = await torrestirApi.get(`/api/clients/${selectedClient?.clientId}/entities`, {
         params: {
           page: page,
           pageSize: pageSize,
