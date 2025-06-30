@@ -33,6 +33,7 @@ import {
   CheckCircle,
   Cancel,
   Money,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import * as stringUtils from '../../utils/stringOperations.js';
@@ -214,36 +215,35 @@ const ShippingFormDetails = ({ form, openDialog = true, onCloseDialog }) => {
       onClose={onCloseDialog}
       maxWidth='xl'
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: 3, overflow: 'visible' } } }}
+      slotProps={{ paper: { sx: { overflow: 'visible' } } }}
     >
+      <Box
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          p: 1,
+          backgroundColor: 'background.paper', // match modal background
+          borderBottom: '1px solid #ccc',
+        }}
+      >
+        <IconButton onClick={onCloseDialog}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
       <DialogContent sx={{ p: 0 }}>
         {/* Your entire <Card> JSX goes here */}
         <Card
           variant='outlined'
           sx={{
-            borderRadius: 3,
             p: 0,
             bgcolor: 'background.paper',
             boxShadow: '0 4px 16px rgba(0,61,44,0.08)',
             border: `1px solid ${primaryColor}20`,
             overflow: 'hidden',
             position: 'relative',
-            margin: 0,
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '3px',
-              background: `linear-gradient(90deg, ${primaryColor}, ${secondaryColor}, ${primaryColor})`,
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 3s ease-in-out infinite',
-            },
-            '@keyframes shimmer': {
-              '0%': { backgroundPosition: '-200% 0' },
-              '100%': { backgroundPosition: '200% 0' },
-            },
           }}
         >
           <CardContent sx={{ p: 2.5 }}>
