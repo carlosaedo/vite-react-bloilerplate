@@ -38,6 +38,8 @@ const EntitySelector = ({
   isSender = false,
   isRecipient = false,
 }) => {
+  console.log('selectedEntityName: ', selectedEntityName);
+
   const { token } = useAuth();
   const { selectedClient } = useClient();
   const [options, setOptions] = useState([]);
@@ -104,20 +106,22 @@ const EntitySelector = ({
     }
   };
 
-  useEffect(() => {
+  function changeValueSelected() {
     if (selectedEntityName) {
       setSelectedValue({ Name: selectedEntityName });
     } else {
       setSelectedValue(null);
     }
-  }, [selectedEntityName]);
+  }
 
   useEffect(() => {
     fetchEntities('', 1);
+    changeValueSelected();
   }, [selectedClient]);
 
   useEffect(() => {
     setSelectedValue(null);
+    changeValueSelected();
   }, [selectedClient]);
 
   const handleScroll = (event) => {

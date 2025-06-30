@@ -180,7 +180,7 @@ const TirCaptcha = ({
           </Typography>
         )}
 
-        {captchaImage && (
+        {captchaImage && !loading && !isValid && (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 1 }}>
             <img
               src={captchaImage}
@@ -195,7 +195,7 @@ const TirCaptcha = ({
           </Box>
         )}
 
-        {showInput && captchaImage && (
+        {showInput && captchaImage && !loading && !isValid && (
           <Box sx={{ mt: 2 }}>
             <TextField
               fullWidth
@@ -220,18 +220,19 @@ const TirCaptcha = ({
           </Box>
         )}
       </CardContent>
-
-      <CardActions sx={{ justifyContent: 'center', pt: 0 }}>
-        <Button
-          size='small'
-          startIcon={<RefreshIcon />}
-          onClick={handleRefresh}
-          disabled={disabled || loading || validating}
-          variant='outlined'
-        >
-          Refresh
-        </Button>
-      </CardActions>
+      {!loading && !isValid && (
+        <CardActions sx={{ justifyContent: 'center', pt: 0 }}>
+          <Button
+            size='small'
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+            disabled={disabled || loading || validating}
+            variant='outlined'
+          >
+            Refresh
+          </Button>
+        </CardActions>
+      )}
     </Card>
   );
 };

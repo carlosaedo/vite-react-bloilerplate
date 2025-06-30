@@ -1475,7 +1475,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     </Grid>
                   </Grid>
 
-                  {shippingSenderRouting?.data && (
+                  {shippingSenderRouting?.data ? (
                     <Grid
                       container
                       spacing={1}
@@ -1532,6 +1532,31 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         </Grid>
                       ))}
                     </Grid>
+                  ) : (
+                    <Typography
+                      variant='body2'
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        color: '#003D2C',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        borderRadius: 2,
+                        px: 1.5,
+                        py: 0.75,
+                        display: 'inline-block',
+                        border: '1px solid rgba(255, 201, 40, 0.3)',
+                        transition: 'all 0.2s ease',
+                        cursor: 'default',
+                        animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${1.2 * 0.1}s both`,
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        },
+                      }}
+                    >
+                      Out of range
+                    </Typography>
                   )}
                 </Box>
               </React.Fragment>
@@ -1783,7 +1808,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     ))}
                   </Grid>
 
-                  {shippingSenderRouting?.data && (
+                  {shippingSenderRouting?.data ? (
                     <Grid
                       container
                       spacing={1}
@@ -1830,6 +1855,31 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         </Grid>
                       ))}
                     </Grid>
+                  ) : (
+                    <Typography
+                      variant='body2'
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        color: '#003D2C',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        borderRadius: 2,
+                        px: 1.5,
+                        py: 0.75,
+                        display: 'inline-block',
+                        border: '1px solid rgba(255, 201, 40, 0.3)',
+                        transition: 'all 0.2s ease',
+                        cursor: 'default',
+                        animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${1.2 * 0.1}s both`,
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        },
+                      }}
+                    >
+                      Out of range
+                    </Typography>
                   )}
                 </Box>
               </React.Fragment>
@@ -2035,7 +2085,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     </Grid>
                   </Grid>
 
-                  {shippingRecipientRouting?.data && (
+                  {shippingRecipientRouting?.data ? (
                     <Grid
                       container
                       spacing={1}
@@ -2098,6 +2148,31 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         </Grid>
                       ))}
                     </Grid>
+                  ) : (
+                    <Typography
+                      variant='body2'
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        color: '#003D2C',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        borderRadius: 2,
+                        px: 1.5,
+                        py: 0.75,
+                        display: 'inline-block',
+                        border: '1px solid rgba(255, 201, 40, 0.3)',
+                        transition: 'all 0.2s ease',
+                        cursor: 'default',
+                        animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${1.2 * 0.1}s both`,
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        },
+                      }}
+                    >
+                      Out of range
+                    </Typography>
                   )}
                 </Box>
               </React.Fragment>
@@ -2345,7 +2420,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     ))}
                   </Grid>
 
-                  {shippingRecipientRouting?.data && (
+                  {shippingRecipientRouting?.data ? (
                     <Grid
                       container
                       spacing={1}
@@ -2398,6 +2473,31 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         </Grid>
                       ))}
                     </Grid>
+                  ) : (
+                    <Typography
+                      variant='body2'
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        color: '#003D2C',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        borderRadius: 2,
+                        px: 1.5,
+                        py: 0.75,
+                        display: 'inline-block',
+                        border: '1px solid rgba(255, 201, 40, 0.3)',
+                        transition: 'all 0.2s ease',
+                        cursor: 'default',
+                        animation: `fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${1.2 * 0.1}s both`,
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        },
+                      }}
+                    >
+                      Out of range
+                    </Typography>
                   )}
                 </Box>
               </React.Fragment>
