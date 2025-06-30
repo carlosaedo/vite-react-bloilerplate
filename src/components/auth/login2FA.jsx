@@ -216,10 +216,8 @@ const Login2FA = () => {
               <TextField
                 key={index}
                 id={`digit-${index}`}
-                value={digit}
-                onChange={(e) => handleDigitChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={index === 0 ? handlePaste : undefined}
+                name={`digit-${index}-${Math.random()}`} // random name prevents caching
+                autoComplete='off'
                 slotProps={{
                   htmlInput: {
                     maxLength: 1,
@@ -231,7 +229,17 @@ const Login2FA = () => {
                       padding: '16px 8px',
                     },
                   },
+                  input: {
+                    autoComplete: 'new-password', // helps avoid Chrome autofill
+                    form: {
+                      autoComplete: 'off', // extra fallback
+                    },
+                  },
                 }}
+                value={digit}
+                onChange={(e) => handleDigitChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={index === 0 ? handlePaste : undefined}
                 sx={{
                   width: 56,
                   height: 56,
