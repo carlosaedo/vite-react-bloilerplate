@@ -147,6 +147,7 @@ const parceiros = [
     termos: 'Válido apenas para jantar, exclui bebidas alcoólicas. Máximo 4 pessoas.',
     desconto: '20% desconto',
     validade: 'Válido até 31/12/2023',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUqwhOgesbFE5DTOeEfih7JUKmgFrF6-71ZA&s',
   },
   {
     id: 2,
@@ -156,6 +157,7 @@ const parceiros = [
     termos: 'Válido para todos os tratamentos exceto pacotes. Uma utilização por colaborador.',
     desconto: '15% desconto',
     validade: 'Válido até 30/06/2024',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjKe-usqONXqwLqvY0EzVKvm2EcdZutcCEHQ&s',
   },
   {
     id: 3,
@@ -165,6 +167,7 @@ const parceiros = [
     termos: 'Válido apenas para artigos em stock. Não acumulável com outras promoções.',
     desconto: '10% desconto',
     validade: 'Sem data de expiração',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmgG1nsVts6qzpt5uaQ_Kq8qOSe5XPohJ4Ug&s',
   },
   {
     id: 4,
@@ -174,6 +177,7 @@ const parceiros = [
     termos: 'Válido para reservas feitas com pelo menos 30 dias de antecedência.',
     desconto: '12% desconto',
     validade: 'Válido até 31/12/2023',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR4TcaReLwcwjWd1zDX4mwZXFEAVgntisYsQ&s',
   },
   {
     id: 5,
@@ -183,6 +187,7 @@ const parceiros = [
     termos: 'Válido para almoço e jantar. Inclui uma entrada gratuita.',
     desconto: '15% desconto',
     validade: 'Válido até 30/09/2023',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR4TcaReLwcwjWd1zDX4mwZXFEAVgntisYsQ&s',
   },
   {
     id: 6,
@@ -192,6 +197,7 @@ const parceiros = [
     termos: 'Válido de terça a quinta-feira. Inclui consulta gratuita.',
     desconto: '25% desconto',
     validade: 'Válido até 31/03/2024',
+    img: 'https://res.cloudinary.com/odisseias/image/upload/w_800,c_limit,f_auto,q_auto/img/promos/aventura-a-dois-pack-presente-para-duas-pessoas-capa_F.jpg',
   },
 ];
 
@@ -252,8 +258,13 @@ const Home = () => {
                   <div className='grid md:grid-cols-2 gap-8'>
                     <div>
                       <div className='bg-gray-100 rounded-xl w-full h-64 mb-6 flex items-center justify-center'>
-                        <span className='text-gray-400'>Imagem do parceiro</span>
+                        <img
+                          src={parceiroSelecionado.img}
+                          alt={parceiroSelecionado.nome}
+                          className='h-full object-contain rounded-lg'
+                        />
                       </div>
+
                       <h3 className='font-medium mb-2 text-gray-900'>Descrição</h3>
                       <p className='text-gray-600 mb-6'>{parceiroSelecionado.descricao}</p>
                     </div>
@@ -381,9 +392,14 @@ const Home = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className='bg-gray-100 rounded-xl w-full h-40 mb-4 flex items-center justify-center'>
-                        <span className='text-gray-400'>Imagem do parceiro</span>
+                      <div className='bg-gray-100 rounded-xl w-full h-64 mb-6 flex items-center justify-center'>
+                        <img
+                          src={parceiro.img}
+                          alt={parceiro.nome}
+                          className='h-full object-contain rounded-lg'
+                        />
                       </div>
+
                       <p className='text-gray-600 text-sm line-clamp-2'>{parceiro.descricao}</p>
                     </CardContent>
                     <CardFooter className='flex justify-between items-center'>
