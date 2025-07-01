@@ -10,7 +10,7 @@ const Home = () => {
       postalCode: '4715 216 BRAGA',
     },
     ctt: {
-      recipientName: 'WILLIAN DE MATOS MARTINS',
+      recipientName: 'CAPITÃO FAUSTO',
       recipientAddress1: 'R Rafael Bordalo Pinheiro 32 12',
       recipientPostal: '2 9 5 0 5 8 0 Quinta do Anjo',
       senderName: 'TORRES, LDA',
