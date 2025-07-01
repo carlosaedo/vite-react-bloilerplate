@@ -6,7 +6,7 @@ import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter basename='/rh-print'>
+    <BrowserRouter basename='/rh-parcerias'>
       <App />
     </BrowserRouter>
   </React.StrictMode>,
