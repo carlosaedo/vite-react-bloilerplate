@@ -8,6 +8,10 @@ import { AuthProvider } from './components/context/AuthContext';
 import { ClientProvider } from './components/context/ClientContext';
 import { ConfirmationProvider } from './components/context/ConfirmationModalContext';
 import { NotificationsProvider } from './components/context/NotificationsContext';
+
+import { NotificationProvider } from './components/context/NotificationContext';
+import { NotificationPermissionCard } from './components/Notification/NotificationPermissionCard';
+
 import cleanLocalStorage from './utils/cleanLocalStorage.js';
 import theme from './theme'; // import the theme file
 import App from './App.jsx';
@@ -48,9 +52,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <BrowserRouter basename='/shipping-portal/'>
           <ClientProvider>
             <ConfirmationProvider>
-              <NotificationsProvider>
-                <App />
-              </NotificationsProvider>
+              <NotificationProvider>
+                <NotificationsProvider>
+                  <div>
+                    <NotificationPermissionCard />
+                  </div>
+                  <App />
+                </NotificationsProvider>
+              </NotificationProvider>
             </ConfirmationProvider>
           </ClientProvider>
         </BrowserRouter>

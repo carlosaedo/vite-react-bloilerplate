@@ -4,11 +4,15 @@ import connection from '../SignalR/connection';
 import { useAuth } from './AuthContext';
 import { useToaster, Toaster } from '../Toaster/Toaster';
 
+import { useNotificationSender } from '../hooks/useNotificationSender';
+
 const NotificationsContext = createContext();
 
 export function NotificationsProvider({ children }) {
   const { token } = useAuth();
   const [notifications, setNotifications] = useState([]);
+  const { sendMessage, sendReminder, sendSuccess, sendWarning, sendError, sendInfo, isEnabled } =
+    useNotificationSender();
   const [lastNotification, setLastNotification] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
@@ -63,6 +67,7 @@ export function NotificationsProvider({ children }) {
       console.log('Received notification:', notification);
       setLastNotification(notification);
       showToast(notification?.title);
+      sendMessage(notification?.title, notification?.message);
       setNotifications((prev) => [notification, ...prev]);
       if (!notification.isRead) {
         setUnreadCount((prev) => prev + 1);

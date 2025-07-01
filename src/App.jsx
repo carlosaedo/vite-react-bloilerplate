@@ -25,6 +25,8 @@ import TestType00 from './components/pages/TestType-00';
 import ConnectionBanner from './components/connectionBanner/ConnectionBanner';
 import NotificationsSignalR_ALL from './components/NotificationsSignalR/NotificationsSignalR_ALL';
 
+import ExampleUsage from './components/NotificationExample';
+
 import Waybills from './components/pages/Waybills';
 
 import EditShippingFormSinglePage from './components/pages/EditShippingFormSinglePage';
