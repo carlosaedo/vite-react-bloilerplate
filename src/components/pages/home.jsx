@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Printer, FileText, Mail } from 'lucide-react';
 
-const Home = () => {
+const EnvelopeTemplateEditor = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('ar');
   const [templateData, setTemplateData] = useState({
     ar: {
@@ -51,7 +51,7 @@ const Home = () => {
       case 'ar':
         return (
           <div
-            className='relative bg-white border-2 border-gray-300'
+            className='relative bg-white border-2 border-gray-300 print-template mx-auto'
             style={{
               width: '148mm',
               height: '210mm',
@@ -71,7 +71,7 @@ const Home = () => {
       case 'ctt':
         return (
           <div
-            className='relative bg-white border-2 border-gray-300'
+            className='relative bg-white border-2 border-gray-300 print-template mx-auto'
             style={{
               width: '220mm',
               height: '110mm',
@@ -99,7 +99,7 @@ const Home = () => {
       case 'tci':
         return (
           <div
-            className='relative bg-white border-2 border-gray-300'
+            className='relative bg-white border-2 border-gray-300 print-template mx-auto'
             style={{
               width: '220mm',
               height: '110mm',
@@ -314,33 +314,35 @@ const Home = () => {
       </div>
 
       {/* Print Styles */}
-      <style jsx>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          @media print {
+            body * {
+              visibility: hidden;
+            }
 
-          .print-area,
-          .print-area * {
-            visibility: visible;
-          }
+            .print-template, .print-template * {
+              visibility: visible;
+            }
 
-          .print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-          }
+            .print-template {
+              position: absolute;
+              left: 0;
+              top: 0;
+              transform: none !important;
+            }
 
-          @page {
-            margin: 0;
-            size: ${selectedTemplate === 'ar' ? 'A5' : 'A4 landscape'};
+            @page {
+              margin: 0;
+              size: ${selectedTemplate === 'ar' ? 'A5' : 'A4 landscape'};
+            }
           }
-        }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 };
 
-export default Home;
+export default EnvelopeTemplateEditor;
