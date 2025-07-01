@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Printer, FileText, Mail } from 'lucide-react';
 
-const EnvelopeTemplateEditor = () => {
+const Home = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('ar');
   const [templateData, setTemplateData] = useState({
     ar: {
@@ -257,7 +257,7 @@ const EnvelopeTemplateEditor = () => {
   return (
     <div className='max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen'>
       <div className='mb-6'>
-        <h1 className='text-3xl font-bold text-gray-900 mb-2'>Template Editor</h1>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>RH Torrestir - Print service</h1>
         <p className='text-gray-600'>Select a template and customize the text for printing</p>
       </div>
 
@@ -275,7 +275,7 @@ const EnvelopeTemplateEditor = () => {
                     onClick={() => setSelectedTemplate(key)}
                     className={`w-full p-3 rounded-lg border-2 transition-all duration-200 flex items-center gap-3 ${
                       selectedTemplate === key
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        ? 'border-green-500 bg-green-50 text-green-700'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
@@ -296,7 +296,7 @@ const EnvelopeTemplateEditor = () => {
             {renderEditForm()}
             <button
               onClick={handlePrint}
-              className='w-full mt-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2'
+              className='w-full mt-6 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2'
             >
               <Printer size={18} />
               Print Template
@@ -345,4 +345,4 @@ const EnvelopeTemplateEditor = () => {
   );
 };
 
-export default EnvelopeTemplateEditor;
+export default Home;
