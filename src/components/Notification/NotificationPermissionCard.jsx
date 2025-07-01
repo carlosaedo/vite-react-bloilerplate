@@ -87,7 +87,7 @@ export const NotificationPermissionCard = ({
                 Enable
               </Button>
             )}
-            {permission !== 'denied' && (
+            {showDismiss && (
               <Button
                 variant='contained'
                 size='small'
@@ -157,7 +157,7 @@ export const NotificationPermissionCard = ({
           </Button>
         )}
 
-        {permission !== 'denied' && (
+        {showDismiss && (
           <Button
             size='small'
             startIcon={<NotificationsOff fontSize='small' />}
