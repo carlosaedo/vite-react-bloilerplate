@@ -54,9 +54,23 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <ConfirmationProvider>
               <NotificationProvider>
                 <NotificationsProvider>
-                  <div>
-                    <NotificationPermissionCard />
+                  <div
+                    style={{
+                      position: 'sticky',
+                      top: 0,
+                      zIndex: 9999,
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      background: 'transparent',
+                      pointerEvents: 'none', // let NotificationPermissionCard handle interaction
+                    }}
+                  >
+                    <div style={{ width: '700px', pointerEvents: 'auto' }}>
+                      <NotificationPermissionCard />
+                    </div>
                   </div>
+
                   <App />
                 </NotificationsProvider>
               </NotificationProvider>

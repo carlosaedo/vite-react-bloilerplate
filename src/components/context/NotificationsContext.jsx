@@ -63,11 +63,15 @@ export function NotificationsProvider({ children }) {
 
     startConnection();
 
-    connection.on('ReceiveNotification', (notification) => {
+    connection.on('ReceiveNotification', async (notification) => {
       console.log('Received notification:', notification);
       setLastNotification(notification);
       showToast(notification?.title);
-      sendMessage(notification?.title, notification?.message);
+
+      if (isEnabled) {
+        sendMessage(notification?.title, notification?.message);
+      }
+
       setNotifications((prev) => [notification, ...prev]);
       if (!notification.isRead) {
         setUnreadCount((prev) => prev + 1);
@@ -95,7 +99,7 @@ export function NotificationsProvider({ children }) {
       connection.off('onreconnecting');
       connection.off('onreconnected');
     };
-  }, [token]);
+  }, [token, isEnabled]);
 
   const markNotificationAsRead = async (notificationId) => {
     try {

@@ -24,7 +24,9 @@ export const NotificationPermissionCard = ({
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
 
-  if (!isSupported || permission === 'granted' || dismissed) {
+  const dismissedPermission = localStorage.getItem('notificationPermissionDismissed');
+
+  if (!isSupported || permission === 'granted' || dismissed || dismissedPermission === 'true') {
     return null;
   }
 
@@ -36,6 +38,11 @@ export const NotificationPermissionCard = ({
     if (granted && onPermissionGranted) {
       onPermissionGranted();
     }
+  };
+
+  const handleDismissPersist = () => {
+    localStorage.setItem('notificationPermissionDismissed', 'true');
+    setDismissed(true);
   };
 
   const getAlertSeverity = () => {
@@ -74,10 +81,21 @@ export const NotificationPermissionCard = ({
           minWidth: 300,
         }}
         action={
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, width: '700' }}>
             {permission !== 'denied' && (
               <Button color='inherit' size='small' onClick={handleRequest} disabled={loading}>
                 Enable
+              </Button>
+            )}
+            {permission !== 'denied' && (
+              <Button
+                variant='contained'
+                size='small'
+                startIcon={<NotificationsOff fontSize='small' />}
+                onClick={handleDismissPersist}
+                disabled={loading}
+              >
+                {loading ? 'Dismissing...' : 'No notifications'}
               </Button>
             )}
             {showDismiss && (
@@ -126,7 +144,7 @@ export const NotificationPermissionCard = ({
         </Typography>
       </CardContent>
 
-      <CardActions sx={{ pt: 0, justifyContent: 'space-between' }}>
+      <CardActions sx={{ pt: 0 }}>
         {permission !== 'denied' && (
           <Button
             variant='contained'
@@ -136,6 +154,17 @@ export const NotificationPermissionCard = ({
             disabled={loading}
           >
             {loading ? 'Requesting...' : 'Enable'}
+          </Button>
+        )}
+
+        {permission !== 'denied' && (
+          <Button
+            size='small'
+            startIcon={<NotificationsOff fontSize='small' />}
+            onClick={handleDismissPersist}
+            disabled={loading}
+          >
+            {loading ? 'Dismissing...' : 'No notifications'}
           </Button>
         )}
         {showDismiss && (
