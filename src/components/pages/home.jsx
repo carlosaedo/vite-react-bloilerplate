@@ -32,7 +32,7 @@ const Home = () => {
       senderPostalCode2: '906',
       senderCity: 'Braga',
       name: 'Capitão Fausto',
-      senderAddress: 'Rua 25 de Abril, 1',
+      address: 'Rua 25 de Abril, 1',
       address2: 'Nogueiró',
       country: 'Portugal',
       postalCodeAndCity: '4715-216 Braga',
@@ -201,7 +201,7 @@ const Home = () => {
           >
             <div className='absolute font-mono' style={{ top: '13mm', left: '22mm' }}>
               <div className='text-xs font-bold whitespace-pre'>{data.name}</div>
-              <div className='text-xs whitespace-pre'>{data.senderAddress}</div>
+              <div className='text-xs whitespace-pre'>{data.address}</div>
               <div className='text-xs tracking-wider whitespace-pre'>{data.address2}</div>
               <div className='flex gap-[10px] text-xs tracking-wider whitespace-pre'>
                 <div>{data.postalCodeAndCity}</div>
@@ -430,10 +430,8 @@ const Home = () => {
                   <label className='block text-sm font-medium mb-1'>Endereço Linha 1</label>
                   <input
                     type='text'
-                    value={data.senderAddress}
-                    onChange={(e) =>
-                      handleInputChange('ctt_aviso_rec', 'senderAddress', e.target.value)
-                    }
+                    value={data.address}
+                    onChange={(e) => handleInputChange('ctt_aviso_rec', 'address', e.target.value)}
                     className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
