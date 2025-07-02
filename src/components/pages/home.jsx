@@ -5,13 +5,16 @@ const Home = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('ctt_a5');
   const [templateData, setTemplateData] = useState({
     ctt_a5: {
-      companyName: 'Torres, Lda.',
-      address1: 'RUA PARQUE COMERCIAL, N.º 91 -- Nogueira',
+      name: 'Torres, Lda.',
+      address: 'RUA PARQUE COMERCIAL, N.º 91 -- Nogueira',
       postalCode: '4715 216 BRAGA',
+      senderName: 'Torres, Lda.',
+      senderAddress: 'RUA PARQUE COMERCIAL, N.º 91 -- Nogueira',
+      senderPostalCode: '4715 216 BRAGA',
     },
     envelope_com10: {
       recipientName: 'CAPITÃO FAUSTO',
-      recipientAddress1: 'R Rafael Bordalo Pinheiro 32 12',
+      recipientsenderAddress: 'R Rafael Bordalo Pinheiro 32 12',
       recipientPostal: '2950-580 Quinta do Anjo',
       senderName: 'TORRES, LDA',
       senderAddress: 'PARQUE COMERCIAL, N.º 91, NOGUEIRA',
@@ -25,7 +28,7 @@ const Home = () => {
       senderPostalCode2: '906',
       senderCity: 'Braga',
       name: 'Capitão Fausto',
-      address1: 'Rua 25 de Abril, 1',
+      senderAddress: 'Rua 25 de Abril, 1',
       address2: 'Nogueiró',
       country: 'Portugal',
       postalCodeAndCity: '4715-216 Braga',
@@ -106,11 +109,17 @@ const Home = () => {
               maxHeight: '100%',
             }}
           >
-            {/* A5 Template */}
             <div className='absolute' style={{ top: '50mm', left: '20mm' }}>
-              <div className='font-bold text-lg mb-2 whitespace-pre'>{data.companyName}</div>
-              <div className='text-sm mb-1 whitespace-pre'>{data.address1}</div>
+              <div className='font-bold text-lg mb-2 whitespace-pre'>{data.name}</div>
+              <div className='text-sm mb-1 whitespace-pre'>{data.address}</div>
               <div className='text-sm whitespace-pre'>{data.postalCode}</div>
+            </div>
+
+            {/* A5 Template */}
+            <div className='absolute' style={{ top: '80mm', left: '20mm' }}>
+              <div className='font-bold text-lg mb-2 whitespace-pre'>{data.senderName}</div>
+              <div className='text-sm mb-1 whitespace-pre'>{data.senderAddress}</div>
+              <div className='text-sm whitespace-pre'>{data.senderPostalCode}</div>
             </div>
           </div>
         );
@@ -130,7 +139,7 @@ const Home = () => {
             {/* Recipient Address - Center Right */}
             <div className='absolute font-mono' style={{ top: '35mm', left: '120mm' }}>
               <div className='text-sm font-bold mb-1 whitespace-pre'>{data.recipientName}</div>
-              <div className='text-sm mb-1 whitespace-pre'>{data.recipientAddress1}</div>
+              <div className='text-sm mb-1 whitespace-pre'>{data.recipientsenderAddress}</div>
               <div className='text-sm tracking-wider whitespace-pre'>{data.recipientPostal}</div>
             </div>
 
@@ -156,7 +165,7 @@ const Home = () => {
           >
             <div className='absolute font-mono' style={{ top: '13mm', left: '22mm' }}>
               <div className='text-xs font-bold whitespace-pre'>{data.name}</div>
-              <div className='text-xs whitespace-pre'>{data.address1}</div>
+              <div className='text-xs whitespace-pre'>{data.senderAddress}</div>
               <div className='text-xs tracking-wider whitespace-pre'>{data.address2}</div>
               <div className='flex gap-[10px] text-xs tracking-wider whitespace-pre'>
                 <div>{data.postalCodeAndCity}</div>
@@ -194,12 +203,44 @@ const Home = () => {
       case 'ctt_a5':
         return (
           <div className='space-y-4'>
+            <div className='border-b border-dashed border-gray-400 pb-4'>
+              <h4 className='font-medium mb-2'>Destinatário</h4>
+              <div>
+                <label className='block text-sm font-medium mb-1'>Empresa</label>
+                <input
+                  type='text'
+                  value={data.name}
+                  onChange={(e) => handleInputChange('ctt_a5', 'name', e.target.value)}
+                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium mb-1'>Endereço</label>
+                <input
+                  type='text'
+                  value={data.address}
+                  onChange={(e) => handleInputChange('ctt_a5', 'address', e.target.value)}
+                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium mb-1'>Código postal</label>
+                <input
+                  type='text'
+                  value={data.postalCode}
+                  onChange={(e) => handleInputChange('ctt_a5', 'postalCode', e.target.value)}
+                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                />
+              </div>
+            </div>
+
+            <h4 className='font-medium mb-2'>Remetente</h4>
             <div>
               <label className='block text-sm font-medium mb-1'>Empresa</label>
               <input
                 type='text'
-                value={data.companyName}
-                onChange={(e) => handleInputChange('ctt_a5', 'companyName', e.target.value)}
+                value={data.senderName}
+                onChange={(e) => handleInputChange('ctt_a5', 'senderName', e.target.value)}
                 className='w-full p-2 border border-gray-300 rounded-md text-sm'
               />
             </div>
@@ -207,8 +248,8 @@ const Home = () => {
               <label className='block text-sm font-medium mb-1'>Endereço</label>
               <input
                 type='text'
-                value={data.address1}
-                onChange={(e) => handleInputChange('ctt_a5', 'address1', e.target.value)}
+                value={data.senderAddress}
+                onChange={(e) => handleInputChange('ctt_a5', 'senderAddress', e.target.value)}
                 className='w-full p-2 border border-gray-300 rounded-md text-sm'
               />
             </div>
@@ -216,8 +257,8 @@ const Home = () => {
               <label className='block text-sm font-medium mb-1'>Código postal</label>
               <input
                 type='text'
-                value={data.postalCode}
-                onChange={(e) => handleInputChange('ctt_a5', 'postalCode', e.target.value)}
+                value={data.senderPostalCode}
+                onChange={(e) => handleInputChange('ctt_a5', 'senderPostalCode', e.target.value)}
                 className='w-full p-2 border border-gray-300 rounded-md text-sm'
               />
             </div>
@@ -245,9 +286,9 @@ const Home = () => {
                   <label className='block text-sm font-medium mb-1'>Endereço</label>
                   <input
                     type='text'
-                    value={data.recipientAddress1}
+                    value={data.recipientsenderAddress}
                     onChange={(e) =>
-                      handleInputChange('envelope_com10', 'recipientAddress1', e.target.value)
+                      handleInputChange('envelope_com10', 'recipientsenderAddress', e.target.value)
                     }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
                   />
@@ -325,8 +366,10 @@ const Home = () => {
                   <label className='block text-sm font-medium mb-1'>Endereço Linha 1</label>
                   <input
                     type='text'
-                    value={data.address1}
-                    onChange={(e) => handleInputChange('ctt_aviso_rec', 'address1', e.target.value)}
+                    value={data.senderAddress}
+                    onChange={(e) =>
+                      handleInputChange('ctt_aviso_rec', 'senderAddress', e.target.value)
+                    }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
