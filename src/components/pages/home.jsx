@@ -7,10 +7,14 @@ const Home = () => {
     ctt_a5: {
       name: 'Torres, Lda.',
       address: 'RUA PARQUE COMERCIAL, N.º 91 -- Nogueira',
-      postalCode: '4715 216 BRAGA',
+      postalCode: '4701',
+      postalCode2: '906',
+      city: 'Braga',
       senderName: 'Torres, Lda.',
       senderAddress: 'RUA PARQUE COMERCIAL, N.º 91 -- Nogueira',
-      senderPostalCode: '4715 216 BRAGA',
+      senderPostalCode: '4701',
+      senderPostalCode2: '906',
+      senderCity: 'Braga',
     },
     envelope_com10: {
       recipientName: 'CAPITÃO FAUSTO',
@@ -109,17 +113,49 @@ const Home = () => {
               maxHeight: '100%',
             }}
           >
-            <div className='absolute' style={{ top: '50mm', left: '20mm' }}>
+            <div className='absolute' style={{ top: '46mm', left: '13mm' }}>
               <div className='font-bold text-lg mb-2 whitespace-pre'>{data.name}</div>
               <div className='text-sm mb-1 whitespace-pre'>{data.address}</div>
-              <div className='text-sm whitespace-pre'>{data.postalCode}</div>
+            </div>
+
+            <div className='absolute' style={{ top: '64mm', left: '32mm' }}>
+              <div className='flex gap-[10px] text-sm font-bold whitespace-pre'>
+                <div className='flex gap-[3px]'>
+                  {data.postalCode?.split('').map((char, index) => (
+                    <span key={index}>{char}</span>
+                  ))}
+                </div>
+
+                <div className='flex gap-[3px]'>
+                  {data.postalCode2?.split('').map((char, index) => (
+                    <span key={index}>{char}</span>
+                  ))}
+                </div>
+
+                <div>{data.city}</div>
+              </div>
             </div>
 
             {/* A5 Template */}
-            <div className='absolute' style={{ top: '80mm', left: '20mm' }}>
+            <div className='absolute' style={{ top: '76mm', left: '13mm' }}>
               <div className='font-bold text-lg mb-2 whitespace-pre'>{data.senderName}</div>
               <div className='text-sm mb-1 whitespace-pre'>{data.senderAddress}</div>
-              <div className='text-sm whitespace-pre'>{data.senderPostalCode}</div>
+            </div>
+            <div className='absolute' style={{ top: '94mm', left: '32mm' }}>
+              <div className='flex gap-[10px] text-sm font-bold whitespace-pre'>
+                <div className='flex gap-[3px]'>
+                  {data.senderPostalCode?.split('').map((char, index) => (
+                    <span key={index}>{char}</span>
+                  ))}
+                </div>
+
+                <div className='flex gap-[3px]'>
+                  {data.senderPostalCode2?.split('').map((char, index) => (
+                    <span key={index}>{char}</span>
+                  ))}
+                </div>
+                <div>{data.senderCity}</div>
+              </div>
             </div>
           </div>
         );
@@ -224,13 +260,27 @@ const Home = () => {
                 />
               </div>
               <div>
-                <label className='block text-sm font-medium mb-1'>Código postal</label>
-                <input
-                  type='text'
-                  value={data.postalCode}
-                  onChange={(e) => handleInputChange('ctt_a5', 'postalCode', e.target.value)}
-                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
-                />
+                <label className='block text-sm font-medium mb-1'>Código Postal e Cidade</label>
+                <div className='flex gap-[10px]'>
+                  <input
+                    type='text'
+                    value={data.senderPostalCode}
+                    onChange={(e) => handleInputChange('ctt_a5', 'postalCode', e.target.value)}
+                    className='min-w-0 w-[120px] p-2 border border-gray-300 rounded-md'
+                  />
+                  <input
+                    type='text'
+                    value={data.senderPostalCode2}
+                    onChange={(e) => handleInputChange('ctt_a5', 'postalCode2', e.target.value)}
+                    className='min-w-0 w-[80px] p-2 border border-gray-300 rounded-md'
+                  />
+                  <input
+                    type='text'
+                    value={data.senderCity}
+                    onChange={(e) => handleInputChange('ctt_a5', 'city', e.target.value)}
+                    className='min-w-0 w-[140px] p-2 border border-gray-300 rounded-md'
+                  />
+                </div>
               </div>
             </div>
 
@@ -254,13 +304,27 @@ const Home = () => {
               />
             </div>
             <div>
-              <label className='block text-sm font-medium mb-1'>Código postal</label>
-              <input
-                type='text'
-                value={data.senderPostalCode}
-                onChange={(e) => handleInputChange('ctt_a5', 'senderPostalCode', e.target.value)}
-                className='w-full p-2 border border-gray-300 rounded-md text-sm'
-              />
+              <label className='block text-sm font-medium mb-1'>Código Postal e Cidade</label>
+              <div className='flex gap-[10px]'>
+                <input
+                  type='text'
+                  value={data.senderPostalCode}
+                  onChange={(e) => handleInputChange('ctt_a5', 'senderPostalCode', e.target.value)}
+                  className='min-w-0 w-[120px] p-2 border border-gray-300 rounded-md'
+                />
+                <input
+                  type='text'
+                  value={data.senderPostalCode2}
+                  onChange={(e) => handleInputChange('ctt_a5', 'senderPostalCode2', e.target.value)}
+                  className='min-w-0 w-[80px] p-2 border border-gray-300 rounded-md'
+                />
+                <input
+                  type='text'
+                  value={data.senderCity}
+                  onChange={(e) => handleInputChange('ctt_a5', 'senderCity', e.target.value)}
+                  className='min-w-0 w-[140px] p-2 border border-gray-300 rounded-md'
+                />
+              </div>
             </div>
           </div>
         );
