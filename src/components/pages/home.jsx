@@ -64,9 +64,9 @@ const Home = () => {
       case 'ctt_a5':
         return 'A5';
       case 'envelope_std':
-        return '220mm 110mm'; // Custom envelope size
+        return '220mm 110mm';
       case 'ctt_aviso_rec':
-        return '242mm 110mm'; // Custom envelope size
+        return '242mm 110mm';
       default:
         return 'A4';
     }
@@ -77,9 +77,9 @@ const Home = () => {
       case 'ctt_a5':
         return '148mm';
       case 'envelope_std':
-        return '220mm'; // Custom envelope size
+        return '220mm';
       case 'ctt_aviso_rec':
-        return '242mm'; // Custom envelope size
+        return '242mm';
       default:
         return '148mm';
     }
@@ -88,13 +88,13 @@ const Home = () => {
   const getPrintSizesH = () => {
     switch (selectedTemplate) {
       case 'ctt_a5':
-        return '242mm';
+        return '210mm';
       case 'envelope_std':
-        return '110mm'; // Custom envelope size
+        return '110mm';
       case 'ctt_aviso_rec':
-        return '110mm'; // Custom envelope size
+        return '110mm';
       default:
-        return '242mm';
+        return '210mm';
     }
   };
 
@@ -136,7 +136,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* A5 Template */}
             <div className='absolute' style={{ top: '76mm', left: '13mm' }}>
               <div className='font-bold text-lg mb-2 whitespace-pre'>{data.senderName}</div>
               <div className='text-sm mb-1 whitespace-pre'>{data.senderAddress}</div>
@@ -171,15 +170,12 @@ const Home = () => {
               maxHeight: '100%',
             }}
           >
-            {/* CTT Envelope Template */}
-            {/* Recipient Address - Center Right */}
             <div className='absolute font-mono' style={{ top: '35mm', left: '120mm' }}>
               <div className='text-sm font-bold mb-1 whitespace-pre'>{data.recipientName}</div>
               <div className='text-sm mb-1 whitespace-pre'>{data.recipientsenderAddress}</div>
               <div className='text-sm tracking-wider whitespace-pre'>{data.recipientPostal}</div>
             </div>
 
-            {/* Sender Address - Top Left */}
             <div className='absolute font-mono' style={{ top: '15mm', left: '15mm' }}>
               <div className='text-xs font-bold whitespace-pre'>{data.senderName}</div>
               <div className='text-xs whitespace-pre'>{data.senderAddress}</div>
@@ -272,19 +268,19 @@ const Home = () => {
                 <div className='flex gap-[10px]'>
                   <input
                     type='text'
-                    value={data.senderPostalCode}
+                    value={data.postalCode}
                     onChange={(e) => handleInputChange('ctt_a5', 'postalCode', e.target.value)}
                     className='min-w-0 w-[120px] p-2 border border-gray-300 rounded-md'
                   />
                   <input
                     type='text'
-                    value={data.senderPostalCode2}
+                    value={data.postalCode2}
                     onChange={(e) => handleInputChange('ctt_a5', 'postalCode2', e.target.value)}
                     className='min-w-0 w-[80px] p-2 border border-gray-300 rounded-md'
                   />
                   <input
                     type='text'
-                    value={data.senderCity}
+                    value={data.city}
                     onChange={(e) => handleInputChange('ctt_a5', 'city', e.target.value)}
                     className='min-w-0 w-[140px] p-2 border border-gray-300 rounded-md'
                   />
@@ -351,7 +347,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('envelope_std', 'recipientName', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
                 <div>
@@ -362,7 +358,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('envelope_std', 'recipientsenderAddress', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
                 <div>
@@ -373,7 +369,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('envelope_std', 'recipientPostal', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
               </div>
@@ -389,7 +385,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('envelope_std', 'senderName', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
                 <div>
@@ -400,7 +396,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('envelope_std', 'senderAddress', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
                 <div>
@@ -411,7 +407,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('envelope_std', 'senderPostal', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
               </div>
@@ -486,7 +482,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('ctt_aviso_rec', 'senderName', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
                 <div>
@@ -497,7 +493,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('ctt_aviso_rec', 'senderAddress', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
                 <div>
@@ -508,7 +504,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleInputChange('ctt_aviso_rec', 'senderCountry', e.target.value)
                     }
-                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
                   />
                 </div>
                 <div>
@@ -560,7 +556,7 @@ const Home = () => {
       </div>
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Template Selection */}
-        <div className='lg:col-span-1 space-y-4'>
+        <div className='lg:col-span-1 space-y-4 no-print'>
           <div className='bg-white rounded-lg shadow-md p-4'>
             <h2 className='text-lg font-semibold mb-4'>Select Template</h2>
             <div className='space-y-2'>
@@ -609,32 +605,50 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {/* Print Styles */}
 
       <style
         dangerouslySetInnerHTML={{
           __html: `
       @media print {
-        body * {
-          visibility: hidden;
+        /* 1. Hide the controls column completely */
+        .no-print {
+          display: none !important;
         }
 
-        .print-template, .print-template * {
-          visibility: visible;
+        /* 2. Reset the main page layout to prevent blank pages */
+        body, html {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: none !important;
         }
 
+        /* This is crucial: Force the page's containers to have no
+          padding, margin, or minimum height during print.
+        */
+        .mx-auto, .grid, .lg\\:col-span-2, .lg\\:col-span-2 > div {
+          padding: 0 !important;
+          margin: 0 !important;
+          min-height: 0 !important;
+          box-shadow: none !important;
+        }
+
+        /* 3. Position the print template at the top-left of the page */
         .print-template {
           position: absolute;
           left: 0;
           top: 0;
-          transform: none !important;
-          width: ${getPrintSizesW()} !important;
-          height: ${getPrintSizesH()} !important;
+          margin: 0;
+          padding: 0;
+          border: none !important;
+          width: ${getPrintSizesW()};
+          height: ${getPrintSizesH()};
+          page-break-after: avoid;
         }
 
+        /* 4. Define the exact page size for the printer */
         @page {
-          margin: 0;
           size: ${getPageSize()};
+          margin: 0;
         }
       }
     `,
