@@ -2,32 +2,40 @@ import React, { useState } from 'react';
 import { Printer, FileText, Mail } from 'lucide-react';
 
 const Home = () => {
-  const [selectedTemplate, setSelectedTemplate] = useState('ar');
+  const [selectedTemplate, setSelectedTemplate] = useState('ctt_a5');
   const [templateData, setTemplateData] = useState({
-    ar: {
+    ctt_a5: {
       companyName: 'Torres, Lda.',
       address1: 'RUA PARQUE COMERCIAL, N.º 91 -- Nogueira',
       postalCode: '4715 216 BRAGA',
     },
-    ctt: {
+    envelope_com10: {
       recipientName: 'CAPITÃO FAUSTO',
       recipientAddress1: 'R Rafael Bordalo Pinheiro 32 12',
-      recipientPostal: '2 9 5 0 5 8 0 Quinta do Anjo',
+      recipientPostal: '2950-580 Quinta do Anjo',
       senderName: 'TORRES, LDA',
       senderAddress: 'PARQUE COMERCIAL, N.º 91, NOGUEIRA',
-      senderPostal: '4 7 1 5 2 1 6 BRAGA',
+      senderPostal: '4715-216 BRAGA',
     },
-    tci: {
-      address1: 'R. do Parque Comercial, 91 - Nogueira',
-      address2: 'Apartado 2468',
-      postalCode: '4701-906 Braga',
+    ctt_aviso_rec: {
+      senderName: 'TORRES, LDA',
+      senderAddress: 'PARQUE COMERCIAL, N.º 91, NOGUEIRA',
+      senderCountry: 'Portugal',
+      senderPostalCode: '4701',
+      senderPostalCode2: '906',
+      senderCity: 'Braga',
+      name: 'Capitão Fausto',
+      address1: 'Rua 25 de Abril, 1',
+      address2: 'Nogueiró',
+      country: 'Portugal',
+      postalCodeAndCity: '4715-216 Braga',
     },
   });
 
   const templates = {
-    ar: { name: 'A5 Template (AR)', icon: FileText, format: 'A5' },
-    ctt: { name: 'CTT Envelope', icon: Mail, format: 'Envelope' },
-    tci: { name: 'TCI Sky Envelope', icon: Mail, format: 'Envelope' },
+    ctt_a5: { name: 'CTT A5', icon: FileText, format: 'A5' },
+    envelope_com10: { name: 'Envelope COM 10', icon: Mail, format: 'Envelope' },
+    ctt_aviso_rec: { name: 'CTT Aviso Entrega', icon: Mail, format: 'Envelope' },
   };
 
   const handleInputChange = (template, field, value) => {
@@ -44,74 +52,132 @@ const Home = () => {
     window.print();
   };
 
+  const getPageSize = () => {
+    switch (selectedTemplate) {
+      case 'ctt_a5':
+        return 'A5';
+      case 'envelope_com10':
+        return '220mm 110mm'; // Custom envelope size
+      case 'ctt_aviso_rec':
+        return '242mm 110mm'; // Custom envelope size
+      default:
+        return 'A4';
+    }
+  };
+
+  const getPrintSizesW = () => {
+    switch (selectedTemplate) {
+      case 'ctt_a5':
+        return '148mm';
+      case 'envelope_com10':
+        return '220mm'; // Custom envelope size
+      case 'ctt_aviso_rec':
+        return '242mm'; // Custom envelope size
+      default:
+        return '148mm';
+    }
+  };
+
+  const getPrintSizesH = () => {
+    switch (selectedTemplate) {
+      case 'ctt_a5':
+        return '220mm';
+      case 'envelope_com10':
+        return '110mm'; // Custom envelope size
+      case 'ctt_aviso_rec':
+        return '110mm'; // Custom envelope size
+      default:
+        return '220mm';
+    }
+  };
+
   const renderTemplate = () => {
     const data = templateData[selectedTemplate];
 
     switch (selectedTemplate) {
-      case 'ar':
+      case 'ctt_a5':
         return (
           <div
             className='relative bg-white border-2 border-gray-300 print-template mx-auto'
             style={{
               width: '148mm',
               height: '210mm',
-              transform: 'scale(0.6)',
-              transformOrigin: 'top left',
+              maxWidth: '100%',
+              maxHeight: '100%',
             }}
           >
             {/* A5 Template */}
             <div className='absolute' style={{ top: '50mm', left: '20mm' }}>
-              <div className='font-bold text-lg mb-2'>{data.companyName}</div>
-              <div className='text-sm mb-1'>{data.address1}</div>
-              <div className='text-sm'>{data.postalCode}</div>
+              <div className='font-bold text-lg mb-2 whitespace-pre'>{data.companyName}</div>
+              <div className='text-sm mb-1 whitespace-pre'>{data.address1}</div>
+              <div className='text-sm whitespace-pre'>{data.postalCode}</div>
             </div>
           </div>
         );
 
-      case 'ctt':
+      case 'envelope_com10':
         return (
           <div
             className='relative bg-white border-2 border-gray-300 print-template mx-auto'
             style={{
               width: '220mm',
               height: '110mm',
-              transform: 'scale(0.5)',
-              transformOrigin: 'top left',
+              maxWidth: '100%',
+              maxHeight: '100%',
             }}
           >
             {/* CTT Envelope Template */}
             {/* Recipient Address - Center Right */}
             <div className='absolute font-mono' style={{ top: '35mm', left: '120mm' }}>
-              <div className='text-sm font-bold mb-1'>{data.recipientName}</div>
-              <div className='text-sm mb-1'>{data.recipientAddress1}</div>
-              <div className='text-sm tracking-wider'>{data.recipientPostal}</div>
+              <div className='text-sm font-bold mb-1 whitespace-pre'>{data.recipientName}</div>
+              <div className='text-sm mb-1 whitespace-pre'>{data.recipientAddress1}</div>
+              <div className='text-sm tracking-wider whitespace-pre'>{data.recipientPostal}</div>
             </div>
 
             {/* Sender Address - Top Left */}
             <div className='absolute font-mono' style={{ top: '15mm', left: '15mm' }}>
-              <div className='text-xs font-bold'>{data.senderName}</div>
-              <div className='text-xs'>{data.senderAddress}</div>
-              <div className='text-xs tracking-wider'>{data.senderPostal}</div>
+              <div className='text-xs font-bold whitespace-pre'>{data.senderName}</div>
+              <div className='text-xs whitespace-pre'>{data.senderAddress}</div>
+              <div className='text-xs tracking-wider whitespace-pre'>{data.senderPostal}</div>
             </div>
           </div>
         );
 
-      case 'tci':
+      case 'ctt_aviso_rec':
         return (
           <div
             className='relative bg-white border-2 border-gray-300 print-template mx-auto'
             style={{
-              width: '220mm',
+              width: '242mm',
               height: '110mm',
-              transform: 'scale(0.5)',
-              transformOrigin: 'top left',
+              maxWidth: '100%',
+              maxHeight: '100%',
             }}
           >
-            {/* TCI Sky Envelope Template */}
-            <div className='absolute' style={{ top: '40mm', left: '130mm' }}>
-              <div className='text-sm mb-1'>{data.address1}</div>
-              <div className='text-sm mb-1'>{data.address2}</div>
-              <div className='text-sm font-bold'>{data.postalCode}</div>
+            <div className='absolute font-mono' style={{ top: '13mm', left: '22mm' }}>
+              <div className='text-xs font-bold whitespace-pre'>{data.name}</div>
+              <div className='text-xs whitespace-pre'>{data.address1}</div>
+              <div className='text-xs tracking-wider whitespace-pre'>{data.address2}</div>
+              <div className='flex gap-[10px] text-xs tracking-wider whitespace-pre'>
+                <div>{data.postalCodeAndCity}</div>
+                <div>{data.country}</div>
+              </div>
+            </div>
+
+            <div className='absolute' style={{ top: '55mm', left: '130mm' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3mm' }}>
+                <div className='font-bold text-sm whitespace-pre'>{data.senderName}</div>
+                <div className='text-sm whitespace-pre'>{data.senderAddress}</div>
+                <div className='text-sm whitespace-pre'>{data.senderCountry}</div>
+              </div>
+            </div>
+
+            <div className='absolute' style={{ top: '82mm', left: '130mm' }}>
+              <div className='flex gap-[10px] text-sm font-bold whitespace-pre'>
+                <div>{data.senderPostalCode}</div>
+                <div>{data.senderPostalCode2}</div>
+                <div>{data.senderCity}</div>
+              </div>
             </div>
           </div>
         );
@@ -125,126 +191,243 @@ const Home = () => {
     const data = templateData[selectedTemplate];
 
     switch (selectedTemplate) {
-      case 'ar':
+      case 'ctt_a5':
         return (
           <div className='space-y-4'>
             <div>
-              <label className='block text-sm font-medium mb-1'>Company Name</label>
+              <label className='block text-sm font-medium mb-1'>Empresa</label>
               <input
                 type='text'
                 value={data.companyName}
-                onChange={(e) => handleInputChange('ar', 'companyName', e.target.value)}
-                className='w-full p-2 border border-gray-300 rounded-md'
+                onChange={(e) => handleInputChange('ctt_a5', 'companyName', e.target.value)}
+                className='w-full p-2 border border-gray-300 rounded-md text-sm'
               />
             </div>
             <div>
-              <label className='block text-sm font-medium mb-1'>Address</label>
+              <label className='block text-sm font-medium mb-1'>Endereço</label>
               <input
                 type='text'
                 value={data.address1}
-                onChange={(e) => handleInputChange('ar', 'address1', e.target.value)}
-                className='w-full p-2 border border-gray-300 rounded-md'
+                onChange={(e) => handleInputChange('ctt_a5', 'address1', e.target.value)}
+                className='w-full p-2 border border-gray-300 rounded-md text-sm'
               />
             </div>
             <div>
-              <label className='block text-sm font-medium mb-1'>Postal Code</label>
+              <label className='block text-sm font-medium mb-1'>Código postal</label>
               <input
                 type='text'
                 value={data.postalCode}
-                onChange={(e) => handleInputChange('ar', 'postalCode', e.target.value)}
-                className='w-full p-2 border border-gray-300 rounded-md'
+                onChange={(e) => handleInputChange('ctt_a5', 'postalCode', e.target.value)}
+                className='w-full p-2 border border-gray-300 rounded-md text-sm'
               />
             </div>
           </div>
         );
 
-      case 'ctt':
+      case 'envelope_com10':
         return (
           <div className='space-y-4'>
-            <div className='border-b pb-4'>
-              <h4 className='font-medium mb-2'>Recipient</h4>
+            <div className='border-b border-dashed border-gray-400 pb-4'>
+              <h4 className='font-medium mb-2'>Destinatário</h4>
               <div className='space-y-2'>
-                <input
-                  type='text'
-                  placeholder='Recipient Name'
-                  value={data.recipientName}
-                  onChange={(e) => handleInputChange('ctt', 'recipientName', e.target.value)}
-                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
-                />
-                <input
-                  type='text'
-                  placeholder='Address'
-                  value={data.recipientAddress1}
-                  onChange={(e) => handleInputChange('ctt', 'recipientAddress1', e.target.value)}
-                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
-                />
-                <input
-                  type='text'
-                  placeholder='Postal Code'
-                  value={data.recipientPostal}
-                  onChange={(e) => handleInputChange('ctt', 'recipientPostal', e.target.value)}
-                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
-                />
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Nome</label>
+                  <input
+                    type='text'
+                    value={data.recipientName}
+                    onChange={(e) =>
+                      handleInputChange('envelope_com10', 'recipientName', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Endereço</label>
+                  <input
+                    type='text'
+                    value={data.recipientAddress1}
+                    onChange={(e) =>
+                      handleInputChange('envelope_com10', 'recipientAddress1', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Código Postal</label>
+                  <input
+                    type='text'
+                    value={data.recipientPostal}
+                    onChange={(e) =>
+                      handleInputChange('envelope_com10', 'recipientPostal', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
               </div>
             </div>
             <div>
-              <h4 className='font-medium mb-2'>Sender</h4>
+              <h4 className='font-medium mb-2'>Remetente</h4>
               <div className='space-y-2'>
-                <input
-                  type='text'
-                  placeholder='Sender Name'
-                  value={data.senderName}
-                  onChange={(e) => handleInputChange('ctt', 'senderName', e.target.value)}
-                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
-                />
-                <input
-                  type='text'
-                  placeholder='Address'
-                  value={data.senderAddress}
-                  onChange={(e) => handleInputChange('ctt', 'senderAddress', e.target.value)}
-                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
-                />
-                <input
-                  type='text'
-                  placeholder='Postal Code'
-                  value={data.senderPostal}
-                  onChange={(e) => handleInputChange('ctt', 'senderPostal', e.target.value)}
-                  className='w-full p-2 border border-gray-300 rounded-md text-sm'
-                />
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Nome</label>
+                  <input
+                    type='text'
+                    value={data.senderName}
+                    onChange={(e) =>
+                      handleInputChange('envelope_com10', 'senderName', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Endereço</label>
+                  <input
+                    type='text'
+                    value={data.senderAddress}
+                    onChange={(e) =>
+                      handleInputChange('envelope_com10', 'senderAddress', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Código Postal</label>
+                  <input
+                    type='text'
+                    value={data.senderPostal}
+                    onChange={(e) =>
+                      handleInputChange('envelope_com10', 'senderPostal', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
               </div>
             </div>
           </div>
         );
 
-      case 'tci':
+      case 'ctt_aviso_rec':
         return (
           <div className='space-y-4'>
-            <div>
-              <label className='block text-sm font-medium mb-1'>Address Line 1</label>
-              <input
-                type='text'
-                value={data.address1}
-                onChange={(e) => handleInputChange('tci', 'address1', e.target.value)}
-                className='w-full p-2 border border-gray-300 rounded-md'
-              />
+            <div className='border-b border-dashed border-gray-400 pb-4'>
+              <h4 className='font-medium mb-2'>Destinatário</h4>
+              <div className='space-y-2'>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Nome</label>
+                  <input
+                    type='text'
+                    value={data.name}
+                    onChange={(e) => handleInputChange('ctt_aviso_rec', 'name', e.target.value)}
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Endereço Linha 1</label>
+                  <input
+                    type='text'
+                    value={data.address1}
+                    onChange={(e) => handleInputChange('ctt_aviso_rec', 'address1', e.target.value)}
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Endereço Linha 2</label>
+                  <input
+                    type='text'
+                    value={data.address2}
+                    onChange={(e) => handleInputChange('ctt_aviso_rec', 'address2', e.target.value)}
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>País</label>
+                  <input
+                    type='text'
+                    value={data.country}
+                    onChange={(e) => handleInputChange('ctt_aviso_rec', 'country', e.target.value)}
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Código Postal e Cidade</label>
+                  <input
+                    type='text'
+                    value={data.postalCodeAndCity}
+                    onChange={(e) =>
+                      handleInputChange('ctt_aviso_rec', 'postalCodeAndCity', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm'
+                  />
+                </div>
+              </div>
             </div>
+
             <div>
-              <label className='block text-sm font-medium mb-1'>Address Line 2</label>
-              <input
-                type='text'
-                value={data.address2}
-                onChange={(e) => handleInputChange('tci', 'address2', e.target.value)}
-                className='w-full p-2 border border-gray-300 rounded-md'
-              />
-            </div>
-            <div>
-              <label className='block text-sm font-medium mb-1'>Postal Code</label>
-              <input
-                type='text'
-                value={data.postalCode}
-                onChange={(e) => handleInputChange('tci', 'postalCode', e.target.value)}
-                className='w-full p-2 border border-gray-300 rounded-md'
-              />
+              <h4 className='font-medium mb-2'>Remetente</h4>
+              <div className='space-y-2'>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Nome</label>
+                  <input
+                    type='text'
+                    value={data.senderName}
+                    onChange={(e) =>
+                      handleInputChange('ctt_aviso_rec', 'senderName', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Endereço</label>
+                  <input
+                    type='text'
+                    value={data.senderAddress}
+                    onChange={(e) =>
+                      handleInputChange('ctt_aviso_rec', 'senderAddress', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>País</label>
+                  <input
+                    type='text'
+                    value={data.senderCountry}
+                    onChange={(e) =>
+                      handleInputChange('ctt_aviso_rec', 'senderCountry', e.target.value)
+                    }
+                    className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium mb-1'>Código Postal e Cidade</label>
+                  <div className='flex gap-[10px]'>
+                    <input
+                      type='text'
+                      value={data.senderPostalCode}
+                      onChange={(e) =>
+                        handleInputChange('ctt_aviso_rec', 'senderPostalCode', e.target.value)
+                      }
+                      className='min-w-0 w-[120px] p-2 border border-gray-300 rounded-md'
+                    />
+                    <input
+                      type='text'
+                      value={data.senderPostalCode2}
+                      onChange={(e) =>
+                        handleInputChange('ctt_aviso_rec', 'senderPostalCode2', e.target.value)
+                      }
+                      className='min-w-0 w-[80px] p-2 border border-gray-300 rounded-md'
+                    />
+                    <input
+                      type='text'
+                      value={data.senderCity}
+                      onChange={(e) =>
+                        handleInputChange('ctt_aviso_rec', 'senderCity', e.target.value)
+                      }
+                      className='min-w-0 w-[140px] p-2 border border-gray-300 rounded-md'
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -255,12 +438,13 @@ const Home = () => {
   };
 
   return (
-    <div className='max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen'>
+    <div className='mx-auto p-6 bg-gray-50 min-h-screen'>
       <div className='mb-6'>
-        <h1 className='text-3xl font-bold text-gray-900 mb-2'>RH Torrestir - Print service</h1>
-        <p className='text-gray-600'>Select a template and customize the text for printing</p>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>
+          RH Torrestir - Serviço de Impressão
+        </h1>
+        <p className='text-gray-600'>Seleciona um template e edita as informações.</p>
       </div>
-
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Template Selection */}
         <div className='lg:col-span-1 space-y-4'>
@@ -292,14 +476,14 @@ const Home = () => {
 
           {/* Edit Form */}
           <div className='bg-white rounded-lg shadow-md p-4'>
-            <h2 className='text-lg font-semibold mb-4'>Edit Text</h2>
+            <h2 className='text-lg font-semibold mb-4'>Editar Template</h2>
             {renderEditForm()}
             <button
               onClick={handlePrint}
               className='w-full mt-6 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2'
             >
               <Printer size={18} />
-              Print Template
+              Imprimir
             </button>
           </div>
         </div>
@@ -307,38 +491,40 @@ const Home = () => {
         {/* Template Preview */}
         <div className='lg:col-span-2'>
           <div className='bg-white rounded-lg shadow-md p-6'>
-            <h2 className='text-lg font-semibold mb-4'>Preview</h2>
+            <h2 className='text-lg font-semibold mb-4'>Pré-Visualizar</h2>
             <div className='flex justify-center overflow-auto'>{renderTemplate()}</div>
           </div>
         </div>
       </div>
-
       {/* Print Styles */}
+
       <style
         dangerouslySetInnerHTML={{
           __html: `
-          @media print {
-            body * {
-              visibility: hidden;
-            }
+      @media print {
+        body * {
+          visibility: hidden;
+        }
 
-            .print-template, .print-template * {
-              visibility: visible;
-            }
+        .print-template, .print-template * {
+          visibility: visible;
+        }
 
-            .print-template {
-              position: absolute;
-              left: 0;
-              top: 0;
-              transform: none !important;
-            }
+        .print-template {
+          position: absolute;
+          left: 0;
+          top: 0;
+          transform: none !important;
+          width: ${getPrintSizesW()} !important;
+          height: ${getPrintSizesH()} !important;
+        }
 
-            @page {
-              margin: 0;
-              size: ${selectedTemplate === 'ar' ? 'A5' : 'A4 landscape'};
-            }
-          }
-        `,
+        @page {
+          margin: 0;
+          size: ${getPageSize()};
+        }
+      }
+    `,
         }}
       />
     </div>
