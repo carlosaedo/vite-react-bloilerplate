@@ -16,7 +16,7 @@ const Home = () => {
       senderPostalCode2: '906',
       senderCity: 'Braga',
     },
-    envelope_com10: {
+    envelope_std: {
       recipientName: 'CAPITÃO FAUSTO',
       recipientsenderAddress: 'R Rafael Bordalo Pinheiro 32 12',
       recipientPostal: '2950-580 Quinta do Anjo',
@@ -41,8 +41,8 @@ const Home = () => {
 
   const templates = {
     ctt_a5: { name: 'CTT A5', icon: FileText, format: 'A5' },
-    envelope_com10: { name: 'Envelope COM 10', icon: Mail, format: 'Envelope' },
-    ctt_aviso_rec: { name: 'CTT Aviso Entrega', icon: Mail, format: 'Envelope' },
+    envelope_std: { name: 'Envelope Standard', icon: Mail, format: 'Envelope DL' },
+    ctt_aviso_rec: { name: 'CTT Aviso Entrega', icon: Mail, format: 'Envelope Com10' },
   };
 
   const handleInputChange = (template, field, value) => {
@@ -63,7 +63,7 @@ const Home = () => {
     switch (selectedTemplate) {
       case 'ctt_a5':
         return 'A5';
-      case 'envelope_com10':
+      case 'envelope_std':
         return '220mm 110mm'; // Custom envelope size
       case 'ctt_aviso_rec':
         return '242mm 110mm'; // Custom envelope size
@@ -76,7 +76,7 @@ const Home = () => {
     switch (selectedTemplate) {
       case 'ctt_a5':
         return '148mm';
-      case 'envelope_com10':
+      case 'envelope_std':
         return '220mm'; // Custom envelope size
       case 'ctt_aviso_rec':
         return '242mm'; // Custom envelope size
@@ -88,13 +88,13 @@ const Home = () => {
   const getPrintSizesH = () => {
     switch (selectedTemplate) {
       case 'ctt_a5':
-        return '220mm';
-      case 'envelope_com10':
+        return '242mm';
+      case 'envelope_std':
         return '110mm'; // Custom envelope size
       case 'ctt_aviso_rec':
         return '110mm'; // Custom envelope size
       default:
-        return '220mm';
+        return '242mm';
     }
   };
 
@@ -118,15 +118,15 @@ const Home = () => {
               <div className='text-sm mb-1 whitespace-pre'>{data.address}</div>
             </div>
 
-            <div className='absolute' style={{ top: '64mm', left: '32mm' }}>
-              <div className='flex gap-[10px] text-sm font-bold whitespace-pre'>
-                <div className='flex gap-[3px]'>
+            <div className='absolute' style={{ top: '64mm', left: '22mm' }}>
+              <div className='flex gap-[17px] text-sm font-bold whitespace-pre'>
+                <div className='flex gap-[8px]'>
                   {data.postalCode?.split('').map((char, index) => (
                     <span key={index}>{char}</span>
                   ))}
                 </div>
 
-                <div className='flex gap-[3px]'>
+                <div className='flex gap-[8px]'>
                   {data.postalCode2?.split('').map((char, index) => (
                     <span key={index}>{char}</span>
                   ))}
@@ -141,15 +141,15 @@ const Home = () => {
               <div className='font-bold text-lg mb-2 whitespace-pre'>{data.senderName}</div>
               <div className='text-sm mb-1 whitespace-pre'>{data.senderAddress}</div>
             </div>
-            <div className='absolute' style={{ top: '94mm', left: '32mm' }}>
-              <div className='flex gap-[10px] text-sm font-bold whitespace-pre'>
-                <div className='flex gap-[3px]'>
+            <div className='absolute' style={{ top: '94mm', left: '22mm' }}>
+              <div className='flex gap-[17px] text-sm font-bold whitespace-pre'>
+                <div className='flex gap-[8px]'>
                   {data.senderPostalCode?.split('').map((char, index) => (
                     <span key={index}>{char}</span>
                   ))}
                 </div>
 
-                <div className='flex gap-[3px]'>
+                <div className='flex gap-[8px]'>
                   {data.senderPostalCode2?.split('').map((char, index) => (
                     <span key={index}>{char}</span>
                   ))}
@@ -160,7 +160,7 @@ const Home = () => {
           </div>
         );
 
-      case 'envelope_com10':
+      case 'envelope_std':
         return (
           <div
             className='relative bg-white border-2 border-gray-300 print-template mx-auto'
@@ -199,7 +199,7 @@ const Home = () => {
               maxHeight: '100%',
             }}
           >
-            <div className='absolute font-mono' style={{ top: '13mm', left: '22mm' }}>
+            <div className='absolute font-mono' style={{ top: '10mm', left: '22mm' }}>
               <div className='text-xs font-bold whitespace-pre'>{data.name}</div>
               <div className='text-xs whitespace-pre'>{data.address}</div>
               <div className='text-xs tracking-wider whitespace-pre'>{data.address2}</div>
@@ -209,7 +209,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div className='absolute' style={{ top: '55mm', left: '130mm' }}>
+            <div className='absolute' style={{ top: '53mm', left: '130mm' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3mm' }}>
                 <div className='font-bold text-sm whitespace-pre'>{data.senderName}</div>
                 <div className='text-sm whitespace-pre'>{data.senderAddress}</div>
@@ -217,10 +217,18 @@ const Home = () => {
               </div>
             </div>
 
-            <div className='absolute' style={{ top: '82mm', left: '130mm' }}>
-              <div className='flex gap-[10px] text-sm font-bold whitespace-pre'>
-                <div>{data.senderPostalCode}</div>
-                <div>{data.senderPostalCode2}</div>
+            <div className='absolute' style={{ top: '77mm', left: '130mm' }}>
+              <div className='flex gap-[18px] text-sm font-bold whitespace-pre'>
+                <div className='flex gap-[8px]'>
+                  {data.senderPostalCode?.split('').map((char, index) => (
+                    <span key={index}>{char}</span>
+                  ))}
+                </div>
+                <div className='flex gap-[8px]'>
+                  {data.senderPostalCode2?.split('').map((char, index) => (
+                    <span key={index}>{char}</span>
+                  ))}
+                </div>
                 <div>{data.senderCity}</div>
               </div>
             </div>
@@ -329,7 +337,7 @@ const Home = () => {
           </div>
         );
 
-      case 'envelope_com10':
+      case 'envelope_std':
         return (
           <div className='space-y-4'>
             <div className='border-b border-dashed border-gray-400 pb-4'>
@@ -341,7 +349,7 @@ const Home = () => {
                     type='text'
                     value={data.recipientName}
                     onChange={(e) =>
-                      handleInputChange('envelope_com10', 'recipientName', e.target.value)
+                      handleInputChange('envelope_std', 'recipientName', e.target.value)
                     }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
                   />
@@ -352,7 +360,7 @@ const Home = () => {
                     type='text'
                     value={data.recipientsenderAddress}
                     onChange={(e) =>
-                      handleInputChange('envelope_com10', 'recipientsenderAddress', e.target.value)
+                      handleInputChange('envelope_std', 'recipientsenderAddress', e.target.value)
                     }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
                   />
@@ -363,7 +371,7 @@ const Home = () => {
                     type='text'
                     value={data.recipientPostal}
                     onChange={(e) =>
-                      handleInputChange('envelope_com10', 'recipientPostal', e.target.value)
+                      handleInputChange('envelope_std', 'recipientPostal', e.target.value)
                     }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
                   />
@@ -379,7 +387,7 @@ const Home = () => {
                     type='text'
                     value={data.senderName}
                     onChange={(e) =>
-                      handleInputChange('envelope_com10', 'senderName', e.target.value)
+                      handleInputChange('envelope_std', 'senderName', e.target.value)
                     }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
                   />
@@ -390,7 +398,7 @@ const Home = () => {
                     type='text'
                     value={data.senderAddress}
                     onChange={(e) =>
-                      handleInputChange('envelope_com10', 'senderAddress', e.target.value)
+                      handleInputChange('envelope_std', 'senderAddress', e.target.value)
                     }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
                   />
@@ -401,7 +409,7 @@ const Home = () => {
                     type='text'
                     value={data.senderPostal}
                     onChange={(e) =>
-                      handleInputChange('envelope_com10', 'senderPostal', e.target.value)
+                      handleInputChange('envelope_std', 'senderPostal', e.target.value)
                     }
                     className='w-full p-2 border border-gray-300 rounded-md text-sm text-sm'
                   />
