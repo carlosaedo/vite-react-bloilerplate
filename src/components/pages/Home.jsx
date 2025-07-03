@@ -161,7 +161,7 @@ const statColors = {
 };
 
 const Home = () => {
-  const { getToken } = useAuth();
+  const { getToken, avatar } = useAuth();
   const navigateTo = useNavigate();
   const token = getToken();
   const isTokenPresent = !!token;
@@ -197,7 +197,21 @@ const Home = () => {
             <Grid container spacing={3} alignItems='center'>
               <Grid size={{ xs: 12, sm: 8 }}>
                 <Stack direction='row' spacing={2} alignItems='center'>
-                  <UserAvatar>{displayName?.charAt(0).toUpperCase() || 'U'}</UserAvatar>
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt='Avatar'
+                      style={{
+                        width: '60px',
+                        height: '60px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <UserAvatar>{displayName?.charAt(0).toUpperCase() || 'U'}</UserAvatar>
+                  )}
+
                   <Box>
                     <Typography variant='h5' fontWeight='bold' sx={{ mb: 0.5 }}>
                       Welcome, {displayName?.split('@')[0] || 'User'}

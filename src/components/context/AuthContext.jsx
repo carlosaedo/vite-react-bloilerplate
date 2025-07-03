@@ -3,15 +3,40 @@ import authLogout from '../../utils/authLogout';
 import authCheckLoginStatus from '../../utils/authCheckLoginStatus';
 import { jwtDecode } from 'jwt-decode';
 import cleanLocalStorage from '../../utils/cleanLocalStorage';
+import torrestirApi from '../api/torrestirApi';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [userEmail] = useState(() => localStorage.getItem('userEmail'));
+  const [avatar, setAvatar] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
+
+  async function fetchAvatar(id) {
+    let objectUrl;
+    try {
+      const response = await torrestirApi.get(`/api/cdn/avatar/${id}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob',
+      });
+
+      if (response.status === 200) {
+        objectUrl = URL.createObjectURL(response.data);
+        setAvatar(objectUrl);
+      }
+    } catch (error) {
+      console.error('Error fetching avatar:', error);
+    }
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }
 
   const clearAuthData = () => {
     setToken(null);
@@ -30,6 +55,8 @@ export function AuthProvider({ children }) {
       const decoded = jwtDecode(newToken);
       setUser(decoded);
       setUserRole(decoded.typ || 'user');
+      setUserId(decoded.sub);
+      fetchAvatar(decoded.sub);
       setIsLoggedIn(true);
     } catch (error) {
       console.error('Token decoding failed during login', error);
@@ -87,6 +114,8 @@ export function AuthProvider({ children }) {
         const decoded = jwtDecode(token);
         setUser(decoded);
         setUserRole(decoded.typ || 'user');
+        setUserId(decoded.sub);
+        fetchAvatar(decoded.sub);
         setIsLoggedIn(true);
       } catch (error) {
         console.error('Invalid token', error);
@@ -110,6 +139,10 @@ export function AuthProvider({ children }) {
         userRole,
         loadingAuth,
         getToken,
+        userId,
+        userEmail,
+        avatar,
+        setAvatar,
       }}
     >
       {children}

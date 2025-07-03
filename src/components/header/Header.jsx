@@ -143,7 +143,7 @@ const LanguageSelect = styled(FormControl)(({ theme }) => ({
 }));
 
 const Header = () => {
-  const { user, userRole, checkLoginStatusAuth, loadingAuth, token } = useAuth();
+  const { user, userRole, checkLoginStatusAuth, loadingAuth, token, avatar } = useAuth();
   const { selectedClient, setSelectedClient } = useClient();
   const navigateTo = useNavigate();
   const isTokenPresent = !!token;
@@ -353,7 +353,20 @@ const Header = () => {
                 <UserChip
                   avatar={
                     <Avatar>
-                      <FaRegUser size={14} />
+                      {avatar ? (
+                        <img
+                          src={avatar}
+                          alt='Avatar'
+                          style={{
+                            width: '25px',
+                            height: '25px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                          }}
+                        />
+                      ) : (
+                        <FaRegUser size={14} />
+                      )}
                     </Avatar>
                   }
                   label={`${displayName.split('@')[0]} | ${userRole || 'user'}`}

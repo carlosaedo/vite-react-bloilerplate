@@ -53,7 +53,7 @@ const LogoutButton = styled(Button)(({ theme }) => ({
 
 const Logout = ({ userInfoData }) => {
   const navigateTo = useNavigate();
-  const { logout } = useAuth();
+  const { logout, avatar } = useAuth();
   const confirm = useConfirm();
 
   function convertUnixToReadable(unixTimestamp) {
@@ -87,18 +87,31 @@ const Logout = ({ userInfoData }) => {
     <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
       <LogoutCard elevation={0}>
         <Stack spacing={3} alignItems='center'>
-          <Avatar
-            sx={{
-              width: 64,
-              height: 64,
-              backgroundColor: '#003D2C',
-              color: '#fff',
-              fontSize: '1.5rem',
-              boxShadow: `0 4px 10px ${alpha('#000', 0.2)}`,
-            }}
-          >
-            <FaRegUser />
-          </Avatar>
+          {avatar ? (
+            <img
+              src={avatar}
+              alt='Avatar'
+              style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+              }}
+            />
+          ) : (
+            <Avatar
+              sx={{
+                width: 64,
+                height: 64,
+                backgroundColor: '#003D2C',
+                color: '#fff',
+                fontSize: '1.5rem',
+                boxShadow: `0 4px 10px ${alpha('#000', 0.2)}`,
+              }}
+            >
+              <FaRegUser />
+            </Avatar>
+          )}
 
           <Label variant='h6'>
             <FaRegUser /> Logged in as:

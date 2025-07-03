@@ -42,6 +42,20 @@ export function NotificationsProvider({ children }) {
 
     fetchNotifications();
 
+    const fetchUnreadNotifications = async () => {
+      try {
+        const response = await torrestirApi.get('/api/notifications/unread', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = response.data || [];
+        setUnreadCount(data.length);
+      } catch (err) {
+        console.error('Failed to fetch unread notifications:', err);
+      }
+    };
+
+    fetchUnreadNotifications();
+
     const startConnection = async () => {
       // Simple fix: only start if disconnected
       console.log('Current connection:', connection.state);

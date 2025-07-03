@@ -47,7 +47,7 @@ const Sidebar = ({ onToggle }) => {
     return savedState === 'true';
   });
 
-  const { isLoggedIn, loadingAuth, userRole } = useAuth();
+  const { isLoggedIn, loadingAuth, userRole, avatar } = useAuth();
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', collapsed.toString());
@@ -350,7 +350,20 @@ const Sidebar = ({ onToggle }) => {
                       className={isLoggedIn ? 'logged-in' : ''}
                       sx={{ minWidth: collapsed ? '24px' : '35px' }}
                     >
-                      <FaUserCircle style={{ height: '19px', width: '19px' }} />
+                      {avatar ? (
+                        <img
+                          src={avatar}
+                          alt='Avatar'
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                          }}
+                        />
+                      ) : (
+                        <FaUserCircle style={{ height: '19px', width: '19px' }} />
+                      )}
                     </ListItemIcon>
                     <ListItemText
                       sx={{
