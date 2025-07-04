@@ -88,8 +88,8 @@ export function NotificationsProvider({ children }) {
       if (isEnabled) {
         sendMessage(notification?.title, notification?.message);
       }
-
       setNotifications((prev) => [notification, ...prev]);
+      setUnreadNotifications((prev) => [notification, ...prev]);
       if (!notification.isRead) {
         setUnreadCount((prev) => prev + 1);
       }
