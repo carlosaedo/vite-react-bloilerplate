@@ -33,6 +33,7 @@ function NotificationsSignalR() {
   const navigateTo = useNavigate();
   const {
     notifications,
+    unreadNotifications,
     unreadCount,
     markNotificationAsRead,
     markAllAsRead,
@@ -115,7 +116,7 @@ function NotificationsSignalR() {
   };
 
   // Get recent notifications for popover (max 5)
-  const recentNotifications = notifications.slice(0, 5);
+  const recentNotifications = unreadNotifications.slice(0, 5);
 
   return (
     <>
@@ -172,7 +173,7 @@ function NotificationsSignalR() {
       >
         <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
           <Typography variant='h6' component='div'>
-            Notifications
+            Notifications ({unreadCount || 0} unread)
           </Typography>
           {!isConnected && <Chip label='Desconectado' color='error' size='small' sx={{ mt: 1 }} />}
         </Box>
@@ -308,7 +309,7 @@ function NotificationsSignalR() {
           </List>
         )}
 
-        {notifications.length > 0 && (
+        {unreadNotifications.length > 0 && (
           <>
             <Divider />
             <Box sx={{ p: 2 }}>

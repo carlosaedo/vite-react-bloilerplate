@@ -100,7 +100,7 @@ const App = () => {
                   <Route path='/shipping-forms' element={<ShippingForms />} />
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-                  <Route path='/waybills' element={<Waybills />} />
+                  <Route path='/manifest' element={<Waybills />} />
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                   <Route path='/notifications' element={<NotificationsSignalR_ALL />} />

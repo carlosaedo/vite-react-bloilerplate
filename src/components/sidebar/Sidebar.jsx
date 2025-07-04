@@ -34,7 +34,7 @@ import { GrUserNew } from 'react-icons/gr';
 
 import { MdSupervisorAccount } from 'react-icons/md';
 import { RiPagesLine } from 'react-icons/ri';
-import { IoDocumentTextOutline } from 'react-icons/io5';
+import { IoReceiptOutline } from "react-icons/io5";
 
 import './Sidebar.css';
 import { useAuth } from '../context/AuthContext';
@@ -165,9 +165,9 @@ const Sidebar = ({ onToggle }) => {
           roles: ['user', 'admin', 'client'],
         },
         {
-          label: 'Waybills',
-          icon: <IoDocumentTextOutline style={{ height: '19px', width: '19px' }} />,
-          path: '/waybills',
+          label: 'Cargo Manifest',
+          icon: <IoReceiptOutline style={{ height: '19px', width: '19px' }} />,
+          path: '/manifest',
           roles: ['user', 'admin', 'client'],
         },
       ],

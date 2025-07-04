@@ -11,6 +11,7 @@ const NotificationsContext = createContext();
 export function NotificationsProvider({ children }) {
   const { token } = useAuth();
   const [notifications, setNotifications] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
   const { sendMessage, sendReminder, sendSuccess, sendWarning, sendError, sendInfo, isEnabled } =
     useNotificationSender();
   const [lastNotification, setLastNotification] = useState(null);
@@ -31,7 +32,7 @@ export function NotificationsProvider({ children }) {
         });
         const data = response.data || [];
         setNotifications(data);
-        setUnreadCount(data.filter((n) => !n.isRead).length);
+        //setUnreadCount(data.filter((n) => !n.isRead).length);
       } catch (err) {
         console.error('Failed to fetch notifications:', err);
         setError('Failed to fetch notifications.');
@@ -44,11 +45,13 @@ export function NotificationsProvider({ children }) {
 
     const fetchUnreadNotifications = async () => {
       try {
-        const response = await torrestirApi.get('/api/notifications/unread', {
+        const response = await torrestirApi.get('/api/notifications/unread?top=5', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = response.data || [];
-        setUnreadCount(data.length);
+        const data = response.data.notifications || [];
+        const unreadCount = response.data.totalUnread || 0;
+        setUnreadNotifications(data);
+        setUnreadCount(unreadCount);
       } catch (err) {
         console.error('Failed to fetch unread notifications:', err);
       }
@@ -160,6 +163,7 @@ export function NotificationsProvider({ children }) {
       value={{
         notifications,
         unreadCount,
+        unreadNotifications,
         isConnected,
         markNotificationAsRead,
         markAllAsRead,

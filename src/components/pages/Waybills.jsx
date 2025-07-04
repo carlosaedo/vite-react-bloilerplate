@@ -1,22 +1,14 @@
-import React, { useState } from 'react';
-import {
-  Calendar,
-  Filter as FilterIcon,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  X,
-  Truck,
-  Package,
-  Box as PackageIcon,
-  ArrowRight,
-} from 'lucide-react';
+// src/components/pages/Waybills.jsx
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
+import apiTorrestir from '../api/torrestirApi.js'
+import { useClient } from '../context/ClientContext'
+import {  Calendar, Plus, X, RefreshCw, Truck, Package as PackageIcon, Scale, Tag, MapPin, ArrowRight, Hash } from 'lucide-react'
 import {
   Box,
   Card,
   CardHeader,
   CardContent,
-  CardActions,
   Button,
   TextField,
   FormControl,
@@ -35,7 +27,8 @@ import {
   TableRow,
   Paper,
   Pagination,
-} from '@mui/material';
+  CircularProgress,
+} from '@mui/material'
 
 // Map of statuses
 const statusMap = {
@@ -45,311 +38,408 @@ const statusMap = {
   3: { label: 'Transmitido', color: 'secondary' },
   4: { label: 'Arquivado', color: 'warning' },
   9: { label: 'Cancelado', color: 'error' },
-};
-
-// Sample data
-const initialManifestos = [
-  {
-    id: 1,
-    dataExpedicao: new Date('2023-06-15'),
-    matriculaCamiao: 'AA-12-34',
-    matriculaTrator: 'BB-56-78',
-    armazemExpedicao: 'Armazém Norte',
-    armazemDescarga: 'Armazém Sul',
-    quantidadeEncomendas: 2,
-    quantidadeVolumes: 120,
-    status: 1,
-    encomendas: [
-      {
-        trackingNumber: 'ABC-12345',
-        pontoExpedicao: 'Loja Centro',
-        codigoPostalExpedicao: '1000-001',
-        cidadeExpedicao: 'Lisboa',
-        pontoEntrega: 'Cliente Silva',
-        codigoPostalEntrega: '2000-002',
-        cidadeEntrega: 'Santarém',
-        totalPacotes: 3,
-        totalPeso: 15.5,
-        totalCbm: 1.2,
-        totalLdm: 0.8,
-      },
-      {
-        trackingNumber: 'DEF-67890',
-        pontoExpedicao: 'Armazém Norte',
-        codigoPostalExpedicao: '1000-100',
-        cidadeExpedicao: 'Lisboa',
-        pontoEntrega: 'Cliente Santos',
-        codigoPostalEntrega: '3000-003',
-        cidadeEntrega: 'Coimbra',
-        totalPacotes: 5,
-        totalPeso: 22.0,
-        totalCbm: 1.8,
-        totalLdm: 1.2,
-      },
-    ],
-  },
-];
-
-const availableEncomendas = [
-  {
-    trackingNumber: 'GHI-54321',
-    pontoExpedicao: 'Loja Sul',
-    codigoPostalExpedicao: '1500-001',
-    cidadeExpedicao: 'Lisboa',
-    pontoEntrega: 'Cliente Pereira',
-    codigoPostalEntrega: '4000-004',
-    cidadeEntrega: 'Porto',
-    totalPacotes: 2,
-    totalPeso: 8.5,
-    totalCbm: 0.7,
-    totalLdm: 0.5,
-  },
-];
+}
 
 // Encomenda Card Component
-function EncomendaCard({ encomenda, onClick }) {
+function EncomendaCard({ encomenda, onClick, onDoubleClick }) {
   return (
-    <Card variant='outlined' onClick={onClick} sx={{ cursor: 'pointer', mb: 1 }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Box>
-            <Typography fontWeight='medium'>{encomenda.trackingNumber}</Typography>
-            <Typography variant='body2' color='text.secondary'>
-              De: {encomenda.pontoExpedicao} ({encomenda.codigoPostalExpedicao}{' '}
-              {encomenda.cidadeExpedicao})
-              <br />
-              Para: {encomenda.pontoEntrega} ({encomenda.codigoPostalEntrega}{' '}
-              {encomenda.cidadeEntrega})
+      <Card variant="outlined" onClick={onClick} onDoubleClick={onDoubleClick} sx={{ cursor: 'pointer', mb: 1 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box>
+              <Typography fontWeight="medium">{encomenda.trackingNumber}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {encomenda.pontoExpedicao && (
+                    <>De: {encomenda.pontoExpedicao} ({encomenda.codigoPostalExpedicao} {encomenda.cidadeExpedicao})
+                      <br /></>
+                )}
+                {encomenda.pontoEntrega && (
+                    <>Para: {encomenda.pontoEntrega} ({encomenda.codigoPostalEntrega} {encomenda.cidadeEntrega})</>
+                )}
+              </Typography>
+            </Box>
+            <Typography variant="body2" textAlign="right">
+              Pacotes: {encomenda.totalPacotes}
+              <br /> Peso: {encomenda.totalPeso}kg
+              <br /> CBM: {encomenda.totalCbm}
+              <br /> LDM: {encomenda.totalLdm}
             </Typography>
           </Box>
-          <Typography variant='body2' textAlign='right'>
-            Pacotes: {encomenda.totalPacotes}
-            <br /> Peso: {encomenda.totalPeso}kg
-            <br /> CBM: {encomenda.totalCbm}
-            <br /> LDM: {encomenda.totalLdm}
-          </Typography>
-        </Box>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+  )
 }
 
 // List View Component
-function ManifestoListView({ manifestos, onCreateNew, onDoubleClick }) {
-  const [filterDate, setFilterDate] = useState('');
-  const [filterCamiao, setFilterCamiao] = useState('');
-  const [filterTrator, setFilterTrator] = useState('');
-  const [filterArmazem, setFilterArmazem] = useState('');
-  const [selectedStatuses, setSelectedStatuses] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+function ManifestoListView({
+                             manifestos,
+                             selectedClient,
+                             loading,
+                             error,
+                             onRefresh,
+                             onCreateNew,
+                             onDoubleClick,
+                           }) {
+  const [filterDate, setFilterDate] = useState('')
+  const [filterCamiao, setFilterCamiao] = useState('')
+  const [filterTrator, setFilterTrator] = useState('')
+  const [filterArmazem, setFilterArmazem] = useState('')
+  const [selectedStatuses, setSelectedStatuses] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
-  const filteredManifestos = manifestos.filter((manifesto) => {
+  const filtered = manifestos.filter((m) => {
     const statusMatch =
-      selectedStatuses.length === 0 || selectedStatuses.includes(manifesto.status);
+        selectedStatuses.length === 0 || selectedStatuses.includes(m.status)
     return (
-      (filterDate === '' ||
-        manifesto.dataExpedicao.toLocaleDateString('pt-PT').includes(filterDate)) &&
-      (filterCamiao === '' ||
-        manifesto.matriculaCamiao.toLowerCase().includes(filterCamiao.toLowerCase())) &&
-      (filterTrator === '' ||
-        manifesto.matriculaTrator.toLowerCase().includes(filterTrator.toLowerCase())) &&
-      (filterArmazem === '' ||
-        manifesto.armazemExpedicao.toLowerCase().includes(filterArmazem.toLowerCase()) ||
-        manifesto.armazemDescarga.toLowerCase().includes(filterArmazem.toLowerCase())) &&
-      statusMatch
-    );
-  });
+        (filterDate === '' ||
+            m.dataExpedicao.toLocaleDateString('pt-PT').includes(filterDate)) &&
+        (filterCamiao === '' ||
+            m.matriculaCamiao.toLowerCase().includes(filterCamiao.toLowerCase())) &&
+        (filterTrator === '' ||
+            m.matriculaTrator.toLowerCase().includes(filterTrator.toLowerCase())) &&
+        (filterArmazem === '' ||
+            m.armazemExpedicao.toLowerCase().includes(filterArmazem.toLowerCase()) ||
+            m.armazemDescarga.toLowerCase().includes(filterArmazem.toLowerCase())) &&
+        statusMatch
+    )
+  })
 
-  const totalPages = Math.ceil(filteredManifestos.length / itemsPerPage);
-  const paginatedManifestos = filteredManifestos.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const totalPages = Math.ceil(filtered.length / itemsPerPage)
+  const pageItems = filtered.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+  )
 
   const formatDate = (date) =>
-    date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      date.toLocaleDateString('pt-PT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
 
-  const handleStatusSelect = (event) => {
-    setSelectedStatuses(
-      typeof event.target.value === 'string'
-        ? event.target.value.split(',').map(Number)
-        : event.target.value,
-    );
-    setCurrentPage(1);
-  };
-
+  const handleStatusSelect = (e) => {
+    const v =
+        typeof e.target.value === 'string'
+            ? e.target.value.split(',').map(Number)
+            : e.target.value
+    setSelectedStatuses(v)
+    setCurrentPage(1)
+  }
   const resetFilters = () => {
-    setFilterDate('');
-    setFilterCamiao('');
-    setFilterTrator('');
-    setFilterArmazem('');
-    setSelectedStatuses([]);
-    setCurrentPage(1);
-  };
+    setFilterDate('')
+    setFilterCamiao('')
+    setFilterTrator('')
+    setFilterArmazem('')
+    setSelectedStatuses([])
+    setCurrentPage(1)
+  }
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant='h5'>Manifestos de Carga</Typography>
-        <Box>
-          <Button onClick={resetFilters} sx={{ mr: 1 }}>
-            Limpar
-          </Button>
-          <Button variant='contained' startIcon={<Plus />} onClick={onCreateNew}>
-            Novo Manifesto
-          </Button>
-        </Box>
-      </Box>
-
-      <Box component={Paper} sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ p: 2 }}>
         <Box
-          sx={{
-            display: 'grid',
-            gap: 2,
-            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' },
-          }}
+            sx={{
+              mb: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}
         >
-          <TextField
-            label='Data'
-            placeholder='DD/MM/YYYY'
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
-          />
-          <TextField
-            label='Matrícula Camião'
-            placeholder='Camião'
-            value={filterCamiao}
-            onChange={(e) => setFilterCamiao(e.target.value)}
-          />
-          <TextField
-            label='Matrícula Trator'
-            placeholder='Trator'
-            value={filterTrator}
-            onChange={(e) => setFilterTrator(e.target.value)}
-          />
-          <FormControl>
-            <InputLabel>Status</InputLabel>
-            <Select
-              multiple
-              value={selectedStatuses}
-              onChange={handleStatusSelect}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={statusMap[value].label} />
-                  ))}
-                </Box>
-              )}
-            >
-              {Object.entries(statusMap).map(([key, val]) => (
-                <MenuItem key={key} value={Number(key)}>
-                  <Checkbox checked={selectedStatuses.includes(Number(key))} />
-                  {val.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            label='Armazém (expedição/descarga)'
-            placeholder='Armazém'
-            value={filterArmazem}
-            onChange={(e) => setFilterArmazem(e.target.value)}
-          />
-        </Box>
-      </Box>
-
-      <TableContainer component={Paper} sx={{ mb: 2 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Matrículas</TableCell>
-              <TableCell>Armazéns</TableCell>
-              <TableCell>Quantidades</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedManifestos.length > 0 ? (
-              paginatedManifestos.map((manifesto) => (
-                <TableRow
-                  key={manifesto.id}
-                  hover
-                  onDoubleClick={() => onDoubleClick(manifesto)}
-                  sx={{ cursor: 'pointer' }}
-                >
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Calendar fontSize='small' sx={{ mr: 1 }} />
-                      {formatDate(manifesto.dataExpedicao)}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    Camião: {manifesto.matriculaCamiao}
-                    <br />
-                    Trator: {manifesto.matriculaTrator}
-                  </TableCell>
-                  <TableCell>
-                    Exp: {manifesto.armazemExpedicao}
-                    <br />
-                    Desc: {manifesto.armazemDescarga}
-                  </TableCell>
-                  <TableCell>
-                    Enc: {manifesto.quantidadeEncomendas}
-                    <br />
-                    Vol: {manifesto.quantidadeVolumes}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={statusMap[manifesto.status].label}
-                      color={statusMap[manifesto.status].color}
-                      size='small'
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} align='center'>
-                  Nenhum manifesto encontrado
-                </TableCell>
-              </TableRow>
+          <Typography variant="h5">
+            Manifestos de Carga
+            {selectedClient && (
+                <>
+                  <br />
+                  {selectedClient.name}
+                </>
             )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          </Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant='body2'>
-          Mostrando {(currentPage - 1) * itemsPerPage + 1} a{' '}
-          {Math.min(currentPage * itemsPerPage, filteredManifestos.length)} de{' '}
-          {filteredManifestos.length}
-        </Typography>
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={(_, page) => setCurrentPage(page)}
-          color='primary'
-        />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+                onClick={onRefresh}
+                startIcon={<RefreshCw />}
+                disabled={loading}
+            >
+              Procurar Manifesto
+            </Button>
+            {loading && <CircularProgress size={24} />}
+            <Button onClick={resetFilters}>Limpar</Button>
+            <Button variant="contained" startIcon={<Plus />} onClick={onCreateNew}>
+              Novo Manifesto
+            </Button>
+          </Box>
+        </Box>
+
+        {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+        )}
+
+        {/* Filters Section */}
+        <Box component={Paper} sx={{ p: 2, mb: 2 }}>
+          <Box
+              sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: '1fr 1fr',
+                  md: 'repeat(4,1fr)',
+                },
+              }}
+          >
+            <TextField
+                label="Data"
+                placeholder="DD/MM/YYYY"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+            />
+            <TextField
+                label="Camião"
+                placeholder="Matrícula"
+                value={filterCamiao}
+                onChange={(e) => setFilterCamiao(e.target.value)}
+            />
+            <TextField
+                label="Trator"
+                placeholder="Matrícula"
+                value={filterTrator}
+                onChange={(e) => setFilterTrator(e.target.value)}
+            />
+            <FormControl>
+              <InputLabel>Status</InputLabel>
+              <Select
+                  multiple
+                  value={selectedStatuses}
+                  onChange={handleStatusSelect}
+                  renderValue={(sel) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {sel.map((v) => (
+                            <Chip key={v} label={statusMap[v].label} />
+                        ))}
+                      </Box>
+                  )}
+              >
+                {Object.entries(statusMap).map(([k, v]) => (
+                    <MenuItem key={k} value={Number(k)}>
+                      <Checkbox checked={selectedStatuses.includes(Number(k))} />
+                      {v.label}
+                    </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+                fullWidth
+                label="Armazém (Exp./Desc.)"
+                placeholder="Armazém"
+                value={filterArmazem}
+                onChange={(e) => setFilterArmazem(e.target.value)}
+            />
+          </Box>
+        </Box>
+
+        {/* Table Section */}
+        <TableContainer component={Paper} sx={{ mb: 2 }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>Data</TableCell>
+                <TableCell>Matrículas</TableCell>
+                <TableCell>Armazéns</TableCell>
+                <TableCell>Quantidades</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {pageItems.length > 0 ? (
+                  pageItems.map((m, idx) => (
+                      <TableRow
+                          key={`${m.id}-${idx}`}
+                          hover
+                          onDoubleClick={() => onDoubleClick(m)}
+                          sx={{ cursor: 'pointer' }}
+                      >
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Calendar size={16} sx={{ mr: 1 }} />
+                            {formatDate(m.dataExpedicao)}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          Camião: {m.matriculaCamiao}
+                          <br />
+                          Trator: {m.matriculaTrator}
+                        </TableCell>
+                        <TableCell>
+                          Exp: {m.armazemExpedicao}
+                          <br />
+                          Desc: {m.armazemDescarga}
+                        </TableCell>
+                        <TableCell>
+                          Enc: {m.quantidadeEncomendas}
+                          <br />
+                          Vol: {m.quantidadeVolumes}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                              label={statusMap[m.status].label}
+                              size="small"
+                              color={statusMap[m.status].color}
+                          />
+                        </TableCell>
+                      </TableRow>
+                  ))
+              ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      Nenhum manifesto encontrado
+                    </TableCell>
+                  </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+        >
+          <Typography variant="body2">
+            Mostrando{' '}
+            {(currentPage - 1) * itemsPerPage + 1} a{' '}
+            {Math.min(currentPage * itemsPerPage, filtered.length)} de{' '}
+            {filtered.length}
+          </Typography>
+          <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={(_, p) => setCurrentPage(p)}
+              color="primary"
+          />
+        </Box>
       </Box>
-    </Box>
-  );
+  )
 }
 
 // Main Page Component
 export default function WaybillsPage() {
-  const [view, setView] = useState('list');
-  const [selectedManifesto, setSelectedManifesto] = useState(null);
-  const [manifestos, setManifestos] = useState(initialManifestos);
-  const [unassignedEncomendas, setUnassignedEncomendas] = useState(availableEncomendas);
+  const { token } = useAuth()
+  const { selectedClient } = useClient()
+  const [view, setView] = useState('list')
+  const [manifestos, setManifestos] = useState([])
+  const [selectedManifesto, setSelectedManifesto] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
+  // detalhe
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState(null)
+  const [detailData, setDetailData] = useState(null)
+
+  const [unassignedEncomendas, setUnassignedEncomendas] = useState([])
+  const [unassignedLoading, setUnassignedLoading] = useState(false)
+  const [unassignedError, setUnassignedError] = useState(null)
+
+  // 1) Lista de manifestos
+  async function fetchManifestos() {
+    if (!selectedClient?.clientId) {
+      setManifestos([])
+      return
+    }
+    setLoading(true); setError(null)
+    try {
+      const { data } = await apiTorrestir.get(
+          `/api/manifest?clientId=${selectedClient.clientId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+      )
+      const parsed = data.map(item => ({
+        id: item.manifestId,
+        loadingPointId: item.loadingPointId,
+        dataExpedicao: new Date(item.expeditionDate),
+        matriculaCamiao: item.truckPlate,
+        matriculaTrator: item.trailerPlate,
+        armazemExpedicao: item.loadingPointName,
+        armazemDescarga: item.unloadingPointName,
+        quantidadeEncomendas: (item.lines || []).filter(l => l).length,
+        quantidadeVolumes: (item.lines || []).filter(l => l).length,
+        status: item.status,
+        encomendas: [], // só pra compatibilidade
+      }))
+      setManifestos(parsed)
+    } catch {
+      setError('Não foi possível carregar manifestos')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 2) Detalhes do manifesto
+  async function fetchDetail(manifestId) {
+    setDetailLoading(true); setDetailError(null)
+    try {
+      const { data } = await apiTorrestir.get(
+          `/api/manifest/${manifestId}/details?clientId=${selectedClient.clientId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+      )
+      setDetailData(data)
+    } catch {
+      setDetailError('Não foi possível carregar detalhes')
+    } finally {
+      setDetailLoading(false)
+    }
+  }
+
+  // 3) Bookings disponíveis (não atribuídos)
+  async function fetchUnassignedBookings(shippingPointId) {
+    setUnassignedLoading(true); setUnassignedError(null)
+    try {
+      const { data } = await apiTorrestir.get(
+          `/api/manifest/unassigned-bookings?clientId=${selectedClient.clientId}&shippingPoint=${shippingPointId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+      )
+      const items = data.map(b => ({
+        trackingNumber: b.trackingNo,
+        pontoExpedicao: b.shipperName,
+        codigoPostalExpedicao: b.shipperZip,
+        cidadeExpedicao: b.shipperCity,
+        pontoEntrega: b.consigneeName,
+        codigoPostalEntrega: b.consigneeZip,
+        cidadeEntrega: b.consigneeCity,
+        totalPacotes: b.lines?.reduce((s,l) => s + (l.qty||0), 0) || 0,
+        totalPeso:   b.lines?.reduce((s,l) => s + (l.gw ||0), 0) || 0,
+        totalCbm:    b.lines?.reduce((s,l) => s + (l.cbm||0), 0) || 0,
+        totalLdm:    b.lines?.reduce((s,l) => s + (l.ldm||0), 0) || 0,
+      }))
+      setUnassignedEncomendas(items)
+    } catch {
+      setUnassignedError('Não foi possível carregar bookings disponíveis')
+    } finally {
+      setUnassignedLoading(false)
+    }
+  }
+
+
+  // on mount ou muda de client
+  // efeitos
+  useEffect(() => { fetchManifestos() }, [selectedClient])
+  useEffect(() => {
+    if (view === 'manage' && selectedManifesto) {
+      fetchDetail(selectedManifesto.id)
+      fetchUnassignedBookings(selectedManifesto.loadingPointId)
+    }
+  }, [view, selectedManifesto])
+
+  // ações
   const handleCreateNew = () => {
-    const newManifesto = {
-      id: Math.max(...manifestos.map((m) => m.id), 0) + 1,
+    setSelectedManifesto({
+      id: Math.max(0, ...manifestos.map(m => m.id)) + 1,
+      loadingPointId: null,
       dataExpedicao: new Date(),
       matriculaCamiao: '',
       matriculaTrator: '',
@@ -359,206 +449,263 @@ export default function WaybillsPage() {
       quantidadeVolumes: 0,
       status: 0,
       encomendas: [],
-    };
-    setSelectedManifesto(newManifesto);
-    setView('manage');
-  };
+    })
+    setDetailData(null)
+    setView('manage')
+  }
+  const handleDoubleClick = m => { setSelectedManifesto(m); setView('manage') }
 
-  const handleDoubleClick = (manifesto) => {
-    setSelectedManifesto(manifesto);
-    setView('manage');
-  };
 
-  const toggleEncomenda = (encomenda) => {
-    if (!selectedManifesto) return;
-    const isAssigned = selectedManifesto.encomendas.some(
-      (e) => e.trackingNumber === encomenda.trackingNumber,
-    );
-    if (isAssigned) {
-      setSelectedManifesto((prev) => ({
-        ...prev,
-        encomendas: prev.encomendas.filter((e) => e.trackingNumber !== encomenda.trackingNumber),
-        quantidadeEncomendas: prev.encomendas.length - 1,
-      }));
-      setUnassignedEncomendas((prev) => [...prev, encomenda]);
-    } else {
-      setSelectedManifesto((prev) => ({
-        ...prev,
-        encomendas: [...prev.encomendas, encomenda],
-        quantidadeEncomendas: prev.encomendas.length + 1,
-      }));
-      setUnassignedEncomendas((prev) =>
-        prev.filter((e) => e.trackingNumber !== encomenda.trackingNumber),
-      );
+  const toggleEncomenda = async (e) => {
+    if (!selectedManifesto) return
+
+    const isAssigned = detailData?.bookings?.some(
+        (b) => b.trackingNo === e.trackingNumber
+    )
+
+    try {
+      if (isAssigned) {
+        // REMOVER do manifesto
+        await apiTorrestir.delete(
+            `/api/manifest/${selectedManifesto.id}/lines/${e.trackingNumber}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+      } else {
+        // ADICIONAR ao manifesto
+        await apiTorrestir.post(
+            `/api/manifest/${selectedManifesto.id}/lines/${e.trackingNumber}`,
+            null,
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+      }
+
+      // Atualizar dados após qualquer alteração
+      await fetchDetail(selectedManifesto.id)
+      await fetchUnassignedBookings(selectedManifesto.loadingPointId)
+
+    } catch (error) {
+      console.error('Erro ao alterar encomenda no manifesto:', error)
+      alert('Erro ao associar/remover encomenda no manifesto.')
     }
-  };
-
-  const saveManifesto = () => {
-    if (!selectedManifesto) return;
-    if (selectedManifesto.id > Math.max(...manifestos.map((m) => m.id), 0)) {
-      setManifestos((prev) => [...prev, selectedManifesto]);
-    } else {
-      setManifestos((prev) =>
-        prev.map((m) => (m.id === selectedManifesto.id ? selectedManifesto : m)),
-      );
-    }
-    setView('list');
-  };
-
-  const cancelEdit = () => setView('list');
-
-  if (view === 'list') {
-    return (
-      <ManifestoListView
-        manifestos={manifestos}
-        onCreateNew={handleCreateNew}
-        onDoubleClick={handleDoubleClick}
-      />
-    );
   }
 
-  return (
-    <Box sx={{ p: 2 }}>
-      <Card>
-        <CardHeader
-          title='Gestão de Manifesto'
-          action={
-            <Box>
-              <Button startIcon={<X />} onClick={cancelEdit} sx={{ mr: 1 }}>
-                Cancelar
-              </Button>
-              <Button variant='contained' startIcon={<Plus />} onClick={saveManifesto}>
-                Guardar
-              </Button>
-            </Box>
-          }
+
+
+  const saveManifesto = () => {
+    setManifestos(prev =>
+        prev.some(m => m.id === selectedManifesto.id)
+            ? prev.map(m => m.id === selectedManifesto.id ? selectedManifesto : m)
+            : [...prev, selectedManifesto]
+    )
+    setView('list')
+  }
+  const cancelEdit = () => setView('list')
+
+  // ==== render ====
+  if (view === 'list') {
+    return (
+        <ManifestoListView
+            manifestos={manifestos}
+            selectedClient={selectedClient}
+            loading={loading}
+            error={error}
+            onRefresh={fetchManifestos}
+            onCreateNew={handleCreateNew}
+            onDoubleClick={handleDoubleClick}
         />
-        <CardContent>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-              gap: 2,
-              mb: 2,
-            }}
-          >
-            <TextField
-              label='Data de Expedição'
-              type='date'
-              value={selectedManifesto?.dataExpedicao.toISOString().slice(0, 10)}
-              onChange={(e) =>
-                setSelectedManifesto((prev) => ({
-                  ...prev,
-                  dataExpedicao: new Date(e.target.value),
-                }))
-              }
-              InputLabelProps={{ shrink: true }}
-            />
-            <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
-              <Select
-                label='Status'
-                value={selectedManifesto?.status ?? 0}
-                onChange={(e) =>
-                  setSelectedManifesto((prev) => ({
-                    ...prev,
-                    status: Number(e.target.value),
-                  }))
-                }
+    )
+  }
+
+  // ==== gestão de manifesto ====
+  return (
+      <Box sx={{ p: 2 }}>
+        <Card sx={{ mb: 2 }}>
+          <CardContent>
+            {/* Summary estilo Apple */}
+            {detailLoading ? (
+                <CircularProgress size={24} />
+            ) : detailError ? (
+                <Typography color="error">{detailError}</Typography>
+            ) : detailData ? (
+
+
+                <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: '#F5F5F7',   // tom suave de fundo estilo macOS
+                      mb: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                    }}
+                >
+                  {/* Linha 1 */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Hash size={16} />
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {detailData.manifest.manifestId}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Calendar size={16} />
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {new Date(detailData.manifest.manifestDate).toLocaleDateString('pt-PT', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </Typography>
+                    </Box>
+
+                    {/* Camião / Trator */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Truck size={16} />
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {selectedManifesto.matriculaCamiao} / {selectedManifesto.matriculaTrator}
+                      </Typography>
+                    </Box>
+
+                    {/* Origem → Destino (com MapPin + ArrowRight) */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <MapPin size={16} />
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {selectedManifesto.armazemExpedicao}
+                      </Typography>
+                      <ArrowRight size={16} />
+                      <MapPin size={16} />
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {selectedManifesto.armazemDescarga}
+                      </Typography>
+                    </Box>
+
+                  </Box>
+
+                  {/* Linha 2 – Apple-style com ícones */}
+                  <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        flexWrap: 'wrap',
+                      }}
+                  >
+                    {/* Total Bookings */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <PackageIcon size={16} />
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {detailData.manifest.totalBookings} Bookings
+                      </Typography>
+                    </Box>
+
+                    {/* Peso total */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Scale size={16} />
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {detailData.bookings
+                            .reduce(
+                                (sum, b) =>
+                                    sum +
+                                    (b.lines?.reduce((s, l) => s + (l.gw || 0), 0) || 0),
+                                0
+                            )
+                            .toFixed(2)}{' '}
+                        kg
+                      </Typography>
+                    </Box>
+
+                    {/* Status */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Tag size={16} />
+                      <Chip
+                          label={statusMap[Number(detailData.manifest.status)].label}
+                          size="small"
+                          color={statusMap[Number(detailData.manifest.status)].color}
+                      />
+                    </Box>
+                  </Box>
+
+                </Box>
+
+            ) : null}
+
+            {/* actions */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button startIcon={<X />} onClick={cancelEdit} sx={{ mr: 1 }}>
+                Cancel
+              </Button>
+              <Button
+                  variant="contained"
+                  startIcon={<Plus />}
+                  onClick={saveManifesto}
               >
-                {Object.entries(statusMap).map(([key, val]) => (
-                  <MenuItem key={key} value={Number(key)}>
-                    {val.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label='Matrícula Camião'
-              value={selectedManifesto?.matriculaCamiao}
-              onChange={(e) =>
-                setSelectedManifesto((prev) => ({ ...prev, matriculaCamiao: e.target.value }))
-              }
-            />
-            <TextField
-              label='Matrícula Trator'
-              value={selectedManifesto?.matriculaTrator}
-              onChange={(e) =>
-                setSelectedManifesto((prev) => ({ ...prev, matriculaTrator: e.target.value }))
-              }
-            />
-            <TextField
-              label='Armazém de Expedição'
-              value={selectedManifesto?.armazemExpedicao}
-              onChange={(e) =>
-                setSelectedManifesto((prev) => ({ ...prev, armazemExpedicao: e.target.value }))
-              }
-            />
-            <TextField
-              label='Armazém de Descarga'
-              value={selectedManifesto?.armazemDescarga}
-              onChange={(e) =>
-                setSelected.Manifesto((prev) => ({ ...prev, armazemDescarga: e.target.value }))
-              }
-            />
-          </Box>
-          <Divider sx={{ my: 2 }} />
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Box sx={{ flex: 1 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 1,
-                }}
-              >
-                <Typography variant='h6'>Encomendas no Manifesto</Typography>
-                <Chip label={`${selectedManifesto.encomendas.length} encomendas`} />
-              </Box>
-              {selectedManifesto.encomendas.length > 0 ? (
-                selectedManifesto.encomendas.map((e) => (
-                  <EncomendaCard
-                    key={e.trackingNumber}
-                    encomenda={e}
-                    onClick={() => toggleEncomenda(e)}
-                  />
-                ))
-              ) : (
-                <Typography color='text.secondary' align='center'>
-                  Nenhuma encomenda associada
-                </Typography>
-              )}
+                Save
+              </Button>
             </Box>
-            <Box sx={{ flex: 1 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 1,
-                }}
-              >
-                <Typography variant='h6'>Encomendas Disponíveis</Typography>
-                <Chip label={`${unassignedEncomendas.length} encomendas`} />
-              </Box>
-              {unassignedEncomendas.length > 0 ? (
+          </CardContent>
+        </Card>
+
+        {/* duas colunas */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+          {/* Encomendas no manifesto */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Shipment on Manifest
+            </Typography>
+            {detailData?.bookings?.length ? (
+                detailData.bookings.map((b) => (
+                    <EncomendaCard
+                        key={b.trackingNo}
+                        encomenda={{
+                          trackingNumber: b.trackingNo,
+                          totalPacotes: b.lines?.reduce((acc, l) => acc + l.qty, 0) || 0,
+                          totalPeso: b.lines?.reduce((acc, l) => acc + l.gw, 0) || 0,
+                          totalCbm: b.lines?.reduce((acc, l) => acc + l.cbm, 0) || 0,
+                          totalLdm: b.lines?.reduce((acc, l) => acc + l.ldm, 0) || 0,
+                          pontoExpedicao: b.shipperName,
+                          codigoPostalExpedicao: b.shipperZip,
+                          cidadeExpedicao: b.shipperCity,
+                          pontoEntrega: b.consigneeName,
+                          codigoPostalEntrega: b.consigneeZip,
+                          cidadeEntrega: b.consigneeCity,
+                        }}
+                        onDoubleClick={() =>
+                            toggleEncomenda({ trackingNumber: b.trackingNo, ...b })
+                        }
+                    />
+                ))
+            ) : (
+                <Typography color="text.secondary">
+                  No Shipment assigned
+                </Typography>
+            )}
+          </Box>
+
+          {/* Encomendas disponíveis */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Shipments to Assign
+            </Typography>
+            {unassignedLoading ? (
+                <CircularProgress size={24} />
+            ) : unassignedError ? (
+                <Typography color="error">{unassignedError}</Typography>
+            ) : unassignedEncomendas.length ? (
                 unassignedEncomendas.map((e) => (
-                  <EncomendaCard
-                    key={e.trackingNumber}
-                    encomenda={e}
-                    onClick={() => toggleEncomenda(e)}
-                  />
+                    <EncomendaCard
+                        key={e.trackingNumber}
+                        encomenda={e}
+                        onDoubleClick={() => toggleEncomenda(e)}
+                    />
                 ))
-              ) : (
-                <Typography color='text.secondary' align='center'>
-                  Todas encomendas associadas
+            ) : (
+                <Typography color="text.secondary">
+                  All Shipments Assigned
                 </Typography>
-              )}
-            </Box>
+            )}
           </Box>
-        </CardContent>
-      </Card>
-    </Box>
-  );
+        </Box>
+      </Box>
+  )
 }

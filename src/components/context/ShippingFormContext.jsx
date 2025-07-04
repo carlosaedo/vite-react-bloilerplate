@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import torrestirApi from '../api/torrestirApi';
 
@@ -7,111 +7,103 @@ const ShippingFormContext = createContext(null);
 
 // Provider Component
 export const ShippingFormProvider = ({ children }) => {
-  const [loadingShippingForm, setLoadingShippingForm] = useState(true);
-  const [trackingNumberShippingForm, setTrackingNumberShippingForm] = useState([]);
   const { token } = useAuth();
 
-  const now = new Date();
-  const time = now.toTimeString().slice(0, 5); // "HH:MM"
-  const today = now.toISOString().slice(0, 10); // "yyyy-MM-dd"
-  const year = now.getFullYear();
+  // Loading state while fetching form / tracking numbers
+  const [loadingShippingForm, setLoadingShippingForm] = useState(true);
 
-  const getInitialFormData = (trackingRef = null) => ({
-    senderTaxId: '',
-    recipientTaxId: '',
-    shippingPayment: 'pronto',
-    shippingPaymentTo: 'expeditor',
-    deliveryTime: time,
-    date: today,
-    year: year,
-    hour: time,
-    extNumber: '',
-    deliveryDate: '',
-    extNumber2: '',
-    senderId: '',
-    senderName: '',
-    senderEmail: '',
-    senderPhone: '',
-    senderStreet: '',
-    senderStreet2: '',
-    senderCity: '',
-    senderState: '',
-    senderZip: '',
-    senderCountry: '',
-    recipientId: '',
-    recipientName: '',
-    recipientEmail: '',
-    recipientPhone: '',
-    recipientStreet: '',
-    recipientStreet2: '',
-    recipientCity: '',
-    recipientState: '',
-    recipientZip: '',
-    recipientCountry: '',
-    packages: [
-      {
-        packageQuantity: '1',
-        packageWeight: '',
-        packageLength: '',
-        packageWidth: '',
-        packageHeight: '',
-        packageNote: '',
-        packageType: 'VLM',
-        CBM: '',
-        LDM: '',
-        TaxableWeight: '',
-        stackable: false,
-        dangerousGoods: false,
-        marksAndNumbers: '',
-        typeOfGoods: 'GEN',
-      },
-    ],
-    valueOfGoods: '',
-    insured: false,
-    insuredBy: 'torrestir',
-    customs: false,
-    customsClearedBy: 'torresAduana',
-    shippingService: 'standard',
-    trackingRef: trackingRef,
-    shipperRef: '',
-    consigneeRef: '',
-    shipperInstructions: '',
-    consigneeInstructions: '',
-    tempControlled: false,
-    tempControlledMinTemp: '',
-    tempControlledMaxTemp: '',
-    RetailStoreFlag: false,
-    DriversHelperFlag: false,
-    PriorContactFlag: false,
-    PinCodeFlag: false,
-    PinCode: '',
-    clientId: '',
-    clientDepartmentId: '',
-  });
+  // List of tracking numbers created so far
+  const [trackingNumberShippingForm, setTrackingNumberShippingForm] = useState([]);
 
-  const [formData, setFormData] = useState(() => {
-    try {
-      const storedTrackingNumbers =
-        JSON.parse(localStorage.getItem('trackingNumberShippingForm')) || [];
-      const latestTrackingNumber = storedTrackingNumbers[storedTrackingNumbers.length - 1];
-      const key = `shippingFormData_${latestTrackingNumber}`;
-      const storedData = localStorage.getItem(key);
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        parsedData.trackingRef = latestTrackingNumber;
-        return parsedData;
-      }
-      return getInitialFormData(latestTrackingNumber);
-    } catch (error) {
-      console.error('Error loading form data from localStorage:', error);
-      return getInitialFormData();
-    }
-  });
+  // The current form data state
+  const [formData, setFormData] = useState(null);
 
+  // Helper: get initial empty form data, optionally with trackingRef
+  const getInitialFormData = (trackingRef = null) => {
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 5); // "HH:MM"
+    const today = now.toISOString().slice(0, 10); // "yyyy-MM-dd"
+    const year = now.getFullYear();
+
+    return {
+      senderTaxId: '',
+      recipientTaxId: '',
+      shippingPayment: 'pronto',
+      shippingPaymentTo: 'expeditor',
+      deliveryTime: time,
+      date: today,
+      year: year,
+      hour: time,
+      extNumber: '',
+      deliveryDate: '',
+      extNumber2: '',
+      senderId: '',
+      senderName: '',
+      senderEmail: '',
+      senderPhone: '',
+      senderStreet: '',
+      senderStreet2: '',
+      senderCity: '',
+      senderState: '',
+      senderZip: '',
+      senderCountry: '',
+      recipientId: '',
+      recipientName: '',
+      recipientEmail: '',
+      recipientPhone: '',
+      recipientStreet: '',
+      recipientStreet2: '',
+      recipientCity: '',
+      recipientState: '',
+      recipientZip: '',
+      recipientCountry: '',
+      packages: [
+        {
+          packageQuantity: '1',
+          packageWeight: '',
+          packageLength: '',
+          packageWidth: '',
+          packageHeight: '',
+          packageNote: '',
+          packageType: 'VLM',
+          CBM: '',
+          LDM: '',
+          TaxableWeight: '',
+          stackable: false,
+          dangerousGoods: false,
+          marksAndNumbers: '',
+          typeOfGoods: 'GEN',
+        },
+      ],
+      valueOfGoods: '',
+      insured: false,
+      insuredBy: 'torrestir',
+      customs: false,
+      customsClearedBy: 'torresAduana',
+      shippingService: 'standard',
+      trackingRef: trackingRef,
+      shipperRef: '',
+      consigneeRef: '',
+      shipperInstructions: '',
+      consigneeInstructions: '',
+      tempControlled: false,
+      tempControlledMinTemp: '',
+      tempControlledMaxTemp: '',
+      RetailStoreFlag: false,
+      DriversHelperFlag: false,
+      PriorContactFlag: false,
+      PinCodeFlag: false,
+      PinCode: '',
+      clientId: '',
+      clientDepartmentId: '',
+    };
+  };
+
+  // Fetch a new tracking number from the API
   const fetchTrackingNumber = async () => {
     if (!token) {
       setLoadingShippingForm(false);
-      return false;
+      return null;
     }
 
     try {
@@ -119,7 +111,7 @@ export const ShippingFormProvider = ({ children }) => {
       const response = await torrestirApi.post(
         '/api/Trackings',
         {
-          clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // TODO: make dynamic if needed
         },
         {
           headers: {
@@ -128,18 +120,22 @@ export const ShippingFormProvider = ({ children }) => {
         },
       );
 
-      if (response?.data) {
+      if (response?.data?.trackingNumber) {
         const trackingNumber = response.data.trackingNumber;
-        setFormData(getInitialFormData(trackingNumber));
 
+        // Add to tracking numbers list and save to localStorage
         setTrackingNumberShippingForm((prev) => {
           const updated = [...prev, trackingNumber];
           localStorage.setItem('trackingNumberShippingForm', JSON.stringify(updated));
           return updated;
         });
 
+        // Create a fresh form with the new tracking number
+        const newForm = getInitialFormData(trackingNumber);
+        setFormData(newForm);
+
         setLoadingShippingForm(false);
-        return trackingNumber; // Return the actual tracking number string
+        return trackingNumber;
       } else {
         setLoadingShippingForm(false);
         return null;
@@ -151,24 +147,39 @@ export const ShippingFormProvider = ({ children }) => {
     }
   };
 
+  // On mount, load saved data or fetch a new tracking number
   useEffect(() => {
     let retryInterval = null;
 
     async function initializeData() {
-      const stored = JSON.parse(localStorage.getItem('trackingNumberShippingForm')) || [];
-      if (stored.length > 0) {
-        const latestTracking = stored[stored.length - 1];
-        setTrackingNumberShippingForm(stored);
-        setFormData((prevData) => ({
-          ...prevData,
-          trackingRef: latestTracking,
-        }));
+      // Try loading tracking numbers from localStorage
+      const storedTrackingNumbers =
+        JSON.parse(localStorage.getItem('trackingNumberShippingForm')) || [];
+
+      if (storedTrackingNumbers.length > 0) {
+        // Load last tracking number data from localStorage
+        const latestTracking = storedTrackingNumbers[storedTrackingNumbers.length - 1];
+        setTrackingNumberShippingForm(storedTrackingNumbers);
+
+        const key = `shippingFormData_${latestTracking}`;
+        const storedData = localStorage.getItem(key);
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          parsedData.trackingRef = latestTracking;
+          setFormData(parsedData);
+        } else {
+          // No saved form for this tracking number, create initial form
+          setFormData(getInitialFormData(latestTracking));
+        }
         setLoadingShippingForm(false);
         return;
       }
 
-      const success = await fetchTrackingNumber();
-      if (!success && token) {
+      // No stored tracking numbers, fetch a new one
+      const trackingNumber = await fetchTrackingNumber();
+
+      // If fetch fails, retry every 10 seconds until success or token missing
+      if (!trackingNumber && token) {
         retryInterval = setInterval(async () => {
           const retrySuccess = await fetchTrackingNumber();
           if (retrySuccess) {
@@ -181,29 +192,29 @@ export const ShippingFormProvider = ({ children }) => {
     initializeData();
 
     return () => {
-      if (retryInterval) {
-        clearInterval(retryInterval);
-      }
+      if (retryInterval) clearInterval(retryInterval);
     };
   }, [token]);
 
+  // Save formData to localStorage whenever it changes
   useEffect(() => {
+    if (!formData?.trackingRef) return;
+
     try {
-      if (formData?.trackingRef) {
-        const key = `shippingFormData_${formData.trackingRef}`;
-        localStorage.setItem(key, JSON.stringify(formData));
-      }
+      const key = `shippingFormData_${formData.trackingRef}`;
+      localStorage.setItem(key, JSON.stringify(formData));
     } catch (error) {
       console.error('Error saving form data to localStorage:', error);
     }
   }, [formData]);
 
+  // Reset form data for a given tracking number
   const resetForm = (activeTrackingNumber) => {
-    console.log(activeTrackingNumber);
     const resetData = getInitialFormData(activeTrackingNumber);
     setFormData(resetData);
   };
 
+  // Update form data partially
   const updateFormData = (newData) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -211,6 +222,7 @@ export const ShippingFormProvider = ({ children }) => {
     }));
   };
 
+  // Switch active tracking number, loading data from storage or create new form
   const setActiveTrackingNumber = (trackingNumber) => {
     if (!trackingNumber) return;
 
@@ -226,6 +238,7 @@ export const ShippingFormProvider = ({ children }) => {
     }
   };
 
+  // Remove a tracking number and its saved data
   const removeTrackingNumber = (trackingNumber) => {
     setTrackingNumberShippingForm((prev) => {
       const updated = prev.filter((t) => t !== trackingNumber);
@@ -253,6 +266,7 @@ export const ShippingFormProvider = ({ children }) => {
   );
 };
 
+// Hook for easy usage in components
 export const useShippingFormContext = () => {
   const context = useContext(ShippingFormContext);
   if (!context) {

@@ -159,6 +159,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const context = useShippingFormContext();
   const [localShippingFormData, setLocalShippingFormData] = useState(externalFormData);
   const shippingFormData = isExternal ? localShippingFormData : context.shippingFormData;
+
   const setShippingFormData = isExternal ? setLocalShippingFormData : context.setShippingFormData;
   const resetShippingFormData = isExternal ? () => {} : context.resetShippingFormData;
   const retryFetchTrackingNumber = isExternal ? () => {} : context.retryFetchTrackingNumber;
@@ -190,7 +191,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
   const [infoValues, setInfoValues] = useState(() => {
     const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
-      calculateShippingFormTotals(shippingFormData.packages);
+      calculateShippingFormTotals(shippingFormData?.packages || []);
     return { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType };
   });
 
@@ -199,12 +200,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [shippingRecipientRouting, setShippingRecipientRouting] = useState(null);
 
   const [isPinFieldDisabled, setIsPinFieldDisabled] = useState(true);
+  const [clientFromStorage, setClientFromStorage] = useState(selectedClient);
 
   const handlePinFieldEdit = () => {
     setIsPinFieldDisabled((prev) => !prev);
   };
-
-  const [clientFromStorage, setClientFromStorage] = useState(selectedClient);
 
   useEffect(() => {
     setClientFromStorage(selectedClient);
@@ -373,10 +373,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     getShippingRecipientRouting();
   }, [
     shippingFormData?.senderZip,
-    shippingFormData.recipientZip,
-    shippingFormData.deliveryDate,
+    shippingFormData?.recipientZip,
+    shippingFormData?.deliveryDate,
     shippingFormData?.senderCountry,
-    shippingFormData.recipientCountry,
+    shippingFormData?.recipientCountry,
     token,
   ]);
 
@@ -920,7 +920,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       deliveryTime: time,
       date: today,
       year: year,
-      hour: shippingFormData.hour || time,
+      hour: shippingFormData?.hour || time,
     };
 
     setShippingFormData(updatedData);
@@ -929,7 +929,8 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const handleChangeFormTypeToParent = () => {
     handleChangeFormType(false);
   };
-  if (loadingShippingForm) return <TruckLoader sx={{ marginTop: 4 }} />;
+  if (loadingShippingForm || !shippingFormData || !shippingFormData?.packages?.length)
+    return <TruckLoader sx={{ marginTop: 4 }} />;
   //
 
   if (errorClient) return <Alert severity='error'>{errorClient}</Alert>;
