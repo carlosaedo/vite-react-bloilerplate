@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import torrestirApi from '../api/torrestirApi';
 
@@ -17,6 +17,7 @@ export const ShippingFormProvider = ({ children }) => {
 
   // The current form data state
   const [formData, setFormData] = useState(null);
+  const didInitRef = useRef(false); // 👈 prevent duplicate effect run
 
   // Helper: get initial empty form data, optionally with trackingRef
   const getInitialFormData = (trackingRef = null) => {
@@ -106,6 +107,11 @@ export const ShippingFormProvider = ({ children }) => {
       return null;
     }
 
+    const existing = JSON.parse(localStorage.getItem('trackingNumberShippingForm'));
+    if (Array.isArray(existing) && existing.length > 0) {
+      return null;
+    }
+
     try {
       setLoadingShippingForm(true);
       const response = await torrestirApi.post(
@@ -149,6 +155,9 @@ export const ShippingFormProvider = ({ children }) => {
 
   // On mount, load saved data or fetch a new tracking number
   useEffect(() => {
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+
     let retryInterval = null;
 
     async function initializeData() {
@@ -266,7 +275,6 @@ export const ShippingFormProvider = ({ children }) => {
   );
 };
 
-// Hook for easy usage in components
 export const useShippingFormContext = () => {
   const context = useContext(ShippingFormContext);
   if (!context) {
