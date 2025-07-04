@@ -153,6 +153,53 @@ export const ShippingFormProvider = ({ children }) => {
     }
   };
 
+  const fetchNewTrackingNumber = async () => {
+    if (!token) {
+      setLoadingShippingForm(false);
+      return null;
+    }
+
+    try {
+      setLoadingShippingForm(true);
+      const response = await torrestirApi.post(
+        '/api/Trackings',
+        {
+          clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // TODO: make dynamic if needed
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response?.data?.trackingNumber) {
+        const trackingNumber = response.data.trackingNumber;
+
+        // Add to tracking numbers list and save to localStorage
+        setTrackingNumberShippingForm((prev) => {
+          const updated = [...prev, trackingNumber];
+          localStorage.setItem('trackingNumberShippingForm', JSON.stringify(updated));
+          return updated;
+        });
+
+        // Create a fresh form with the new tracking number
+        const newForm = getInitialFormData(trackingNumber);
+        setFormData(newForm);
+
+        setLoadingShippingForm(false);
+        return trackingNumber;
+      } else {
+        setLoadingShippingForm(false);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching tracking number:', error);
+      setLoadingShippingForm(false);
+      return null;
+    }
+  };
+
   // On mount, load saved data or fetch a new tracking number
   useEffect(() => {
     if (didInitRef.current) return;
@@ -266,6 +313,7 @@ export const ShippingFormProvider = ({ children }) => {
         loadingShippingForm,
         trackingNumberShippingForm,
         retryFetchTrackingNumber: fetchTrackingNumber,
+        fetchNewTrackingNumber,
         removeTrackingNumber,
         setActiveTrackingNumber,
       }}

@@ -163,6 +163,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const setShippingFormData = isExternal ? setLocalShippingFormData : context.setShippingFormData;
   const resetShippingFormData = isExternal ? () => {} : context.resetShippingFormData;
   const retryFetchTrackingNumber = isExternal ? () => {} : context.retryFetchTrackingNumber;
+  const fetchNewTrackingNumber = isExternal ? () => {} : context.fetchNewTrackingNumber;
   const trackingNumbers = isExternal
     ? [externalFormData.trackingNumber]
     : context.trackingNumberShippingForm;
@@ -190,9 +191,9 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
   const [clientDepartments, setClientDepartments] = useState([]);
 
   const [infoValues, setInfoValues] = useState(() => {
-    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+    const { totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
       calculateShippingFormTotals(shippingFormData?.packages || []);
-    return { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType };
+    return { totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType };
   });
 
   const [shippingSenderRouting, setShippingSenderRouting] = useState(null);
@@ -250,11 +251,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       packages: [...shippingFormData.packages, newPackage],
     };
 
-    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+    const { totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
       calculateShippingFormTotals([...shippingFormData.packages, newPackage]);
 
     setInfoValues({
-      totalQuantity,
       totalWeight,
       totalCBM,
       totalLDM,
@@ -526,11 +526,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       packages: updatedPackages,
     };
 
-    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+    const { totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
       calculateShippingFormTotals(updatedPackages);
 
     setInfoValues({
-      totalQuantity,
       totalWeight,
       totalCBM,
       totalLDM,
@@ -674,11 +673,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       packages: [...shippingFormData.packages, newPackage],
     };
 
-    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+    const { totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
       calculateShippingFormTotals([...shippingFormData.packages, newPackage]);
 
     setInfoValues({
-      totalQuantity,
       totalWeight,
       totalCBM,
       totalLDM,
@@ -707,11 +705,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
       packages: [emptyPackage],
     };
 
-    const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+    const { totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
       calculateShippingFormTotals(updatedFormData.packages);
 
     setInfoValues({
-      totalQuantity,
       totalWeight,
       totalCBM,
       totalLDM,
@@ -733,11 +730,10 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
         packages: updatedPackages,
       };
 
-      const { totalQuantity, totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
+      const { totalWeight, totalCBM, totalLDM, totalTaxableWeight, quantityByType } =
         calculateShippingFormTotals(updatedPackages);
 
       setInfoValues({
-        totalQuantity,
         totalWeight,
         totalCBM,
         totalLDM,
@@ -767,7 +763,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
     setMessage(null);
     resetShippingFormData(shippingFormData.trackingRef);
     setInfoValues({
-      totalQuantity: 0,
       totalWeight: 0,
       totalCBM: 0,
       totalLDM: 0,
@@ -1088,7 +1083,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
 
           <Box
             onClick={async () => {
-              const newTracking = await retryFetchTrackingNumber(); // returns string
+              const newTracking = await fetchNewTrackingNumber(); // returns string
               if (newTracking) {
                 resetShippingFormData(newTracking); // requires update in context
                 setActiveTrackingNumber(newTracking); // Switch to the new tracking number
@@ -2831,9 +2826,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     <TableCell>
                       <strong>#</strong>
                     </TableCell>
-                    <TableCell>
-                      <strong>Quantity</strong>
-                    </TableCell>
+
                     <TableCell>
                       <strong>Type</strong>
                     </TableCell>
@@ -2870,9 +2863,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                         <Tooltip
                           title={
                             <Box sx={{ p: 1 }}>
-                              <Typography variant='body2'>
-                                <strong>Quantity:</strong> {pkg?.packageQuantity || '-'}
-                              </Typography>
                               <Typography variant='body2'>
                                 <strong>Weight:</strong> {pkg?.packageWeight || '-'} kg
                               </Typography>
@@ -2967,7 +2957,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                                 </Box>
                               </Typography>
                             </TableCell>
-                            <TableCell>{pkg?.packageQuantity || '-'}</TableCell>
 
                             <TableCell>
                               {pkg?.packageType?.charAt(0).toUpperCase() +
@@ -3063,10 +3052,6 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             <Tooltip
               title={
                 <Box sx={{ p: 1 }}>
-                  <Typography variant='body2'>
-                    <strong>Quantity:</strong>{' '}
-                    {shippingFormData?.packages[selectedPackageIndex]?.packageQuantity || '-'}
-                  </Typography>
                   <Typography variant='body2'>
                     <strong>Weight:</strong>{' '}
                     {shippingFormData?.packages[selectedPackageIndex]?.packageWeight || '-'} kg
@@ -3362,22 +3347,7 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
                     margin='dense'
                   />
                 </Grid>
-                <Grid size={{ sm: 6, xs: 6, md: 2, lg: 1 }}>
-                  <TextField
-                    label='Quantity'
-                    name={`packageQuantity_${selectedPackageIndex}`}
-                    type='number'
-                    value={shippingFormData.packages[selectedPackageIndex]?.packageQuantity || ''}
-                    onChange={(e) =>
-                      handlePackageChange(selectedPackageIndex, 'packageQuantity', e.target.value)
-                    }
-                    fullWidth
-                    size='small'
-                    margin='dense'
-                    required
-                    slotProps={{ htmlInput: { min: 0 } }}
-                  />
-                </Grid>
+
                 <Grid size={{ sm: 6, xs: 6, md: 2, lg: 2 }}>
                   <TextField
                     select
@@ -3851,11 +3821,11 @@ function ShippingForm({ handleChangeFormType, sidebarWidth }) {
             </Typography>
 
             <Typography>
-              Total Volumes: <strong>{infoValues?.quantityByType?.volume || 0}</strong>
+              Total Volumes: <strong>{infoValues?.quantityByType?.VLM || 0}</strong>
             </Typography>
 
             <Typography>
-              Total Palets: <strong>{infoValues?.quantityByType?.palete || 0}</strong>
+              Total Palets: <strong>{infoValues?.quantityByType?.PLT || 0}</strong>
             </Typography>
 
             <Button
